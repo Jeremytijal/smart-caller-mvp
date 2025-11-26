@@ -1,0 +1,21 @@
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 300px;
+    /* Sidebar width + gap */
+    padding: 2rem;
+    min-height: 100vh;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding-bottom: 5rem;
+        /* Space for mobile nav if added */
+    }
+}
