@@ -80,6 +80,8 @@
 .auth-logo {
     height: 48px;
     width: auto;
+    max-width: 100%;
+    object-fit: contain;
 }
 
 .auth-header h1 {
@@ -104,6 +106,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .input-icon {
