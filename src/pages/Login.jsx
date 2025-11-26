@@ -21,7 +21,14 @@ const Login = () => {
             navigate('/');
         } catch (error) {
             console.error('Login failed', error);
-            setError('Échec de la connexion. Vérifiez vos identifiants.');
+            // Translate common Supabase errors
+            if (error.message.includes('Email not confirmed')) {
+                setError('Veuillez confirmer votre email avant de vous connecter.');
+            } else if (error.message.includes('Invalid login credentials')) {
+                setError('Email ou mot de passe incorrect.');
+            } else {
+                setError(error.message);
+            }
         } finally {
             setIsLoading(false);
         }

@@ -27,23 +27,29 @@ const Onboarding = () => {
     const finishOnboarding = async () => {
         try {
             if (!user) {
-                console.error("No user found");
+                alert("Erreur : Utilisateur non connecté. Veuillez vous reconnecter.");
                 return;
             }
 
+            console.log("Saving config for user:", user.id, agentConfig);
+
             const { error } = await supabase
                 .from('profiles')
-                .upsert({
-                    id: user.id,
+                .update({
                     agent_config: agentConfig,
                     updated_at: new Date(),
-                });
+                })
+                .eq('id', user.id);
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
             navigate('/');
         } catch (error) {
             console.error('Error saving onboarding data:', error);
-            alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+            alert(`Erreur lors de la sauvegarde : ${error.message}`);
         }
     };
 
