@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, MessageSquare, Sliders, Rocket, User, Zap, Briefcase } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
 
 const Onboarding = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [step, setStep] = useState(1);
     const [agentConfig, setAgentConfig] = useState({
         name: '',
@@ -21,10 +24,27 @@ const Onboarding = () => {
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
 
-    const finishOnboarding = () => {
-        // Mock save configuration
-        localStorage.setItem('agent_config', JSON.stringify(agentConfig));
-        navigate('/');
+    const finishOnboarding = async () => {
+        try {
+            if (!user) {
+                console.error("No user found");
+                return;
+            }
+
+            const { error } = await supabase
+                .from('profiles')
+                .upsert({
+                    id: user.id,
+                    agent_config: agentConfig,
+                    updated_at: new Date(),
+                });
+
+            if (error) throw error;
+            navigate('/');
+        } catch (error) {
+            console.error('Error saving onboarding data:', error);
+            alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+        }
     };
 
     const getToneLabel = (value) => {

@@ -9,6 +9,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -20,6 +21,7 @@ const Login = () => {
             navigate('/');
         } catch (error) {
             console.error('Login failed', error);
+            setError('Échec de la connexion. Vérifiez vos identifiants.');
         } finally {
             setIsLoading(false);
         }
@@ -45,6 +47,12 @@ const Login = () => {
                     <h1>Bon retour</h1>
                     <p className="text-muted">Connectez-vous à votre agent Smart Caller</p>
                 </div>
+
+                {error && (
+                    <div className="auth-error">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">

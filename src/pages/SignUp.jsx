@@ -10,6 +10,7 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
     const { signup } = useAuth();
     const navigate = useNavigate();
 
@@ -21,6 +22,7 @@ const SignUp = () => {
             navigate('/onboarding');
         } catch (error) {
             console.error('Signup failed', error);
+            setError('Erreur lors de l\'inscription. Veuillez réessayer.');
         } finally {
             setIsLoading(false);
         }
@@ -46,6 +48,12 @@ const SignUp = () => {
                     <h1>Créer un compte</h1>
                     <p className="text-muted">Commencez à qualifier vos leads automatiquement</p>
                 </div>
+
+                {error && (
+                    <div className="auth-error">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">

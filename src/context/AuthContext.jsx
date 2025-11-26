@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 
 const AuthContext = createContext();
 
@@ -9,41 +10,48 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate checking for stored user
-        const storedUser = localStorage.getItem('smart_caller_user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        setLoading(false);
+        // Check active sessions and subscribe to auth changes
+        const getSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            setUser(session?.user ?? null);
+            setLoading(false);
+        };
+
+        getSession();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const login = async (email, password) => {
-        // Mock login
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockUser = { id: '1', email, name: 'Demo User' };
-                setUser(mockUser);
-                localStorage.setItem('smart_caller_user', JSON.stringify(mockUser));
-                resolve(mockUser);
-            }, 800);
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
+        if (error) throw error;
+        return data.user;
     };
 
     const signup = async (name, email, password) => {
-        // Mock signup
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockUser = { id: '1', email, name };
-                setUser(mockUser);
-                localStorage.setItem('smart_caller_user', JSON.stringify(mockUser));
-                resolve(mockUser);
-            }, 800);
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: name,
+                },
+            },
         });
+        if (error) throw error;
+        return data.user;
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('smart_caller_user');
+    const logout = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
     };
 
     const value = {
