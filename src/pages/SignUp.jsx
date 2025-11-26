@@ -43,13 +43,13 @@ const SignUp = () => {
                     <div className="logo-container">
                         <img src="/smart-caller-logo.png" alt="Smart Caller" className="auth-logo" />
                     </div>
-                    <h1>Create Account</h1>
-                    <p className="text-muted">Start qualifying leads automatically</p>
+                    <h1>Créer un compte</h1>
+                    <p className="text-muted">Commencez à qualifier vos leads automatiquement</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
-                        <label>Full Name</label>
+                        <label>Nom complet</label>
                         <div className="input-wrapper">
                             <User size={20} className="input-icon" />
                             <input
@@ -64,12 +64,12 @@ const SignUp = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Email Address</label>
+                        <label>Adresse Email</label>
                         <div className="input-wrapper">
                             <Mail size={20} className="input-icon" />
                             <input
                                 type="email"
-                                placeholder="name@company.com"
+                                placeholder="nom@entreprise.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -79,12 +79,12 @@ const SignUp = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Password</label>
+                        <label>Mot de passe</label>
                         <div className="input-wrapper">
                             <Lock size={20} className="input-icon" />
                             <input
                                 type="password"
-                                placeholder="Create a strong password"
+                                placeholder="Créez un mot de passe sécurisé"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -97,13 +97,13 @@ const SignUp = () => {
                         {isLoading ? (
                             <Loader2 size={20} className="animate-spin" />
                         ) : (
-                            <>Get Started <ArrowRight size={20} /></>
+                            <>Commencer <ArrowRight size={20} /></>
                         )}
                     </button>
                 </form>
 
                 <div className="auth-footer">
-                    <p>Already have an account? <Link to="/login" className="link-highlight">Sign in</Link></p>
+                    <p>Vous avez déjà un compte ? <Link to="/login" className="link-highlight">Se connecter</Link></p>
                 </div>
             </motion.div>
         </div>

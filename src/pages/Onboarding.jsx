@@ -40,10 +40,10 @@ const Onboarding = () => {
                             <div className="step-icon">
                                 <Rocket size={48} />
                             </div>
-                            <h2>Welcome to AI SMS Agent</h2>
-                            <p>Let's get your automated qualification agent set up in just a few minutes.</p>
+                            <h2>Welcome to Smart Caller</h2>
+                            <p>Configurons votre agent de qualification automatisé en quelques minutes.</p>
                             <button className="btn-primary mt-6" onClick={nextStep}>
-                                Get Started <ArrowRight size={18} />
+                                Commencer <ArrowRight size={18} />
                             </button>
                         </motion.div>
                     )}
@@ -61,19 +61,19 @@ const Onboarding = () => {
                             <div className="step-icon">
                                 <MessageSquare size={48} />
                             </div>
-                            <h2>Connect SMS Provider</h2>
-                            <p>Enter your Twilio credentials to enable SMS capabilities.</p>
+                            <h2>Connecter le fournisseur SMS</h2>
+                            <p>Entrez vos identifiants Twilio pour activer les capacités SMS.</p>
 
                             <div className="form-group">
                                 <input type="text" placeholder="Account SID" className="input-field" />
                                 <input type="password" placeholder="Auth Token" className="input-field" />
-                                <input type="text" placeholder="Phone Number" className="input-field" />
+                                <input type="text" placeholder="Numéro de téléphone" className="input-field" />
                             </div>
 
                             <button className="btn-primary mt-6" onClick={nextStep}>
-                                Connect & Continue <ArrowRight size={18} />
+                                Connecter & Continuer <ArrowRight size={18} />
                             </button>
-                            <button className="btn-text" onClick={nextStep}>Skip for now</button>
+                            <button className="btn-text" onClick={nextStep}>Passer pour l'instant</button>
                         </motion.div>
                     )}
 
@@ -90,35 +90,35 @@ const Onboarding = () => {
                             <div className="step-icon">
                                 <Sliders size={48} />
                             </div>
-                            <h2>Define Qualification Criteria</h2>
-                            <p>What makes a lead qualified for your business?</p>
+                            <h2>Définir les critères de qualification</h2>
+                            <p>Qu'est-ce qui rend un lead qualifié pour votre entreprise ?</p>
 
                             <div className="criteria-selection">
                                 <label className="checkbox-card">
                                     <input type="checkbox" defaultChecked />
                                     <div className="checkbox-content">
-                                        <span className="title">Budget Check</span>
-                                        <span className="desc">Ask about their budget range</span>
+                                        <span className="title">Vérification du budget</span>
+                                        <span className="desc">Demander leur fourchette budgétaire</span>
                                     </div>
                                 </label>
                                 <label className="checkbox-card">
                                     <input type="checkbox" defaultChecked />
                                     <div className="checkbox-content">
-                                        <span className="title">Timeline</span>
-                                        <span className="desc">Ask when they want to start</span>
+                                        <span className="title">Calendrier</span>
+                                        <span className="desc">Demander quand ils souhaitent commencer</span>
                                     </div>
                                 </label>
                                 <label className="checkbox-card">
                                     <input type="checkbox" />
                                     <div className="checkbox-content">
-                                        <span className="title">Decision Maker</span>
-                                        <span className="desc">Verify they can sign the contract</span>
+                                        <span className="title">Décideur</span>
+                                        <span className="desc">Vérifier s'ils peuvent signer le contrat</span>
                                     </div>
                                 </label>
                             </div>
 
                             <button className="btn-primary mt-6" onClick={nextStep}>
-                                Save Criteria <ArrowRight size={18} />
+                                Enregistrer les critères <ArrowRight size={18} />
                             </button>
                         </motion.div>
                     )}
@@ -136,23 +136,23 @@ const Onboarding = () => {
                             <div className="step-icon success">
                                 <Check size={48} />
                             </div>
-                            <h2>You're All Set!</h2>
-                            <p>Your AI agent is ready to start qualifying leads.</p>
+                            <h2>Tout est prêt !</h2>
+                            <p>Votre agent IA est prêt à commencer à qualifier des leads.</p>
 
                             <div className="summary-box">
                                 <div className="summary-item">
-                                    <Check size={16} className="text-success" /> SMS Connected
+                                    <Check size={16} className="text-success" /> SMS Connecté
                                 </div>
                                 <div className="summary-item">
-                                    <Check size={16} className="text-success" /> Criteria Defined
+                                    <Check size={16} className="text-success" /> Critères Définis
                                 </div>
                                 <div className="summary-item">
-                                    <Check size={16} className="text-success" /> Dashboard Ready
+                                    <Check size={16} className="text-success" /> Tableau de bord prêt
                                 </div>
                             </div>
 
                             <button className="btn-primary mt-6" onClick={finishOnboarding}>
-                                Go to Dashboard <ArrowRight size={18} />
+                                Aller au tableau de bord <ArrowRight size={18} />
                             </button>
                         </motion.div>
                     )}

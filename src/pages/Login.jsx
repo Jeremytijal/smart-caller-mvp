@@ -42,18 +42,18 @@ const Login = () => {
                     <div className="logo-container">
                         <img src="/smart-caller-logo.png" alt="Smart Caller" className="auth-logo" />
                     </div>
-                    <h1>Welcome Back</h1>
-                    <p className="text-muted">Sign in to your Smart Caller agent</p>
+                    <h1>Bon retour</h1>
+                    <p className="text-muted">Connectez-vous à votre agent Smart Caller</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
-                        <label>Email Address</label>
+                        <label>Adresse Email</label>
                         <div className="input-wrapper">
                             <Mail size={20} className="input-icon" />
                             <input
                                 type="email"
-                                placeholder="name@company.com"
+                                placeholder="nom@entreprise.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -63,7 +63,7 @@ const Login = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Password</label>
+                        <label>Mot de passe</label>
                         <div className="input-wrapper">
                             <Lock size={20} className="input-icon" />
                             <input
@@ -78,20 +78,20 @@ const Login = () => {
                     </div>
 
                     <div className="form-footer">
-                        <Link to="/forgot-password" class="forgot-link">Forgot password?</Link>
+                        <Link to="/forgot-password" class="forgot-link">Mot de passe oublié ?</Link>
                     </div>
 
                     <button type="submit" className="btn-primary btn-block" disabled={isLoading}>
                         {isLoading ? (
                             <Loader2 size={20} className="animate-spin" />
                         ) : (
-                            <>Sign In <ArrowRight size={20} /></>
+                            <>Se connecter <ArrowRight size={20} /></>
                         )}
                     </button>
                 </form>
 
                 <div className="auth-footer">
-                    <p>Don't have an account? <Link to="/signup" className="link-highlight">Sign up</Link></p>
+                    <p>Pas encore de compte ? <Link to="/signup" className="link-highlight">S'inscrire</Link></p>
                 </div>
             </motion.div>
         </div>

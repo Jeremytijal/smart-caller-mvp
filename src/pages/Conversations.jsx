@@ -11,7 +11,7 @@ const Conversations = () => {
         {
             id: 1,
             name: 'Alice Smith',
-            lastMessage: 'That sounds great, when can we schedule?',
+            lastMessage: 'Ça a l\'air super, quand pouvons-nous planifier ?',
             time: '2m',
             unread: 2,
             status: 'qualified',
@@ -21,7 +21,7 @@ const Conversations = () => {
         {
             id: 2,
             name: 'Bob Jones',
-            lastMessage: 'I think it is out of my budget right now.',
+            lastMessage: 'Je pense que c\'est hors de mon budget pour le moment.',
             time: '1h',
             unread: 0,
             status: 'disqualified',
@@ -31,7 +31,7 @@ const Conversations = () => {
         {
             id: 3,
             name: 'Charlie Brown',
-            lastMessage: 'Can you send me more info?',
+            lastMessage: 'Pouvez-vous m\'envoyer plus d\'infos ?',
             time: '3h',
             unread: 0,
             status: 'pending',
@@ -41,7 +41,7 @@ const Conversations = () => {
         {
             id: 4,
             name: 'David Wilson',
-            lastMessage: 'Thanks for the help!',
+            lastMessage: 'Merci pour votre aide !',
             time: '1d',
             unread: 0,
             status: 'qualified',
@@ -130,7 +130,7 @@ const Conversations = () => {
                             <div className="message-wrapper ai draft">
                                 <div className="message-bubble ghost">
                                     <div className="typing-indicator">
-                                        <span>AI is typing...</span>
+                                        <span>L'IA est en train d'écrire...</span>
                                     </div>
                                     <p>{draftMessage}</p>
                                     <div className="draft-actions">

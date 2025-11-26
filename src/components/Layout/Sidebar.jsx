@@ -16,7 +16,7 @@ const Sidebar = () => {
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
     { icon: Sliders, label: 'Qualité des Leads', path: '/quality' },
-    { icon: Bot, label: 'Agent Setup', path: '/agent-setup' }, // Added Agent Setup link
+    { icon: Bot, label: 'Configuration Agent', path: '/agent-setup' }, // Added Agent Setup link
     { icon: Zap, label: 'Intégrations', path: '/integrations' },
   ];
 
