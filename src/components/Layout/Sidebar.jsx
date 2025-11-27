@@ -7,7 +7,8 @@ import {
   Sliders,
   Zap,
   LogOut,
-  Bot // Added Bot icon
+  Bot,
+  User // Added User icon
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -15,8 +16,9 @@ const Sidebar = () => {
   const navItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
+    { icon: User, label: 'Contacts', path: '/contacts' }, // Added Contacts link
     { icon: Sliders, label: 'Qualité des Leads', path: '/quality' },
-    { icon: Bot, label: 'Configuration Agent', path: '/agent-setup' }, // Added Agent Setup link
+    { icon: Bot, label: 'Configuration Agent', path: '/agent-setup' },
     { icon: Zap, label: 'Intégrations', path: '/integrations' },
   ];
 
