@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { MessageSquare, Webhook, Calendar, CheckCircle, AlertCircle, XCircle, ExternalLink, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { MessageSquare, Webhook, Calendar, CheckCircle, AlertCircle, XCircle, ExternalLink, X, Save } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import './Integrations.css';
 
 const Integrations = () => {
+    const { user } = useAuth();
+    const [webhookUrl, setWebhookUrl] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
     const [integrations, setIntegrations] = useState([
         {
             id: 1,
@@ -10,16 +17,16 @@ const Integrations = () => {
             icon: MessageSquare,
             status: 'connected',
             desc: 'Connectez votre numéro Twilio pour envoyer et recevoir des SMS.',
-            config: { sid: 'AC123...', token: '••••••••' }
+            config: { sid: 'AC...', token: '••••••••' }
         },
         {
             id: 2,
             name: 'CRM Webhook',
             icon: Webhook,
-            status: 'error',
+            status: 'disconnected',
             desc: 'Envoyez les leads qualifiés vers votre CRM via Webhook.',
-            config: { url: 'https://api.crm.com/leads' },
-            errorLog: '401 Unauthorized - Check API Key'
+            config: { url: '' },
+            isWebhook: true
         },
         {
             id: 3,
@@ -32,6 +39,59 @@ const Integrations = () => {
     ]);
 
     const [selectedError, setSelectedError] = useState(null);
+
+    useEffect(() => {
+        if (user) {
+            fetchWebhookConfig();
+        }
+    }, [user]);
+
+    const fetchWebhookConfig = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('webhook_url')
+                .eq('id', user.id)
+                .single();
+
+            if (error) throw error;
+
+            if (data?.webhook_url) {
+                setWebhookUrl(data.webhook_url);
+                updateIntegrationStatus(2, 'connected', { url: data.webhook_url });
+            }
+        } catch (error) {
+            console.error('Error fetching webhook config:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const saveWebhookConfig = async () => {
+        setSaving(true);
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ webhook_url: webhookUrl })
+                .eq('id', user.id);
+
+            if (error) throw error;
+
+            updateIntegrationStatus(2, webhookUrl ? 'connected' : 'disconnected', { url: webhookUrl });
+            alert('Configuration Webhook sauvegardée !');
+        } catch (error) {
+            console.error('Error saving webhook config:', error);
+            alert('Erreur lors de la sauvegarde.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const updateIntegrationStatus = (id, status, config) => {
+        setIntegrations(prev => prev.map(int =>
+            int.id === id ? { ...int, status, config: { ...int.config, ...config } } : int
+        ));
+    };
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -76,18 +136,39 @@ const Integrations = () => {
                         <p className="integration-desc">{integration.desc}</p>
 
                         <div className="config-section">
-                            {integration.status === 'connected' || integration.status === 'error' ? (
+                            {integration.isWebhook ? (
                                 <div className="config-fields">
-                                    {Object.keys(integration.config).map(key => (
-                                        <div key={key} className="input-group">
-                                            <label>{key.toUpperCase()}</label>
-                                            <input type="text" value={integration.config[key]} readOnly />
-                                        </div>
-                                    ))}
-                                    <button className="btn-secondary w-full">Configurer</button>
+                                    <div className="input-group">
+                                        <label>WEBHOOK URL</label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://hooks.zapier.com/..."
+                                            value={webhookUrl}
+                                            onChange={(e) => setWebhookUrl(e.target.value)}
+                                        />
+                                    </div>
+                                    <button
+                                        className="btn-primary w-full flex items-center justify-center gap-2"
+                                        onClick={saveWebhookConfig}
+                                        disabled={saving}
+                                    >
+                                        {saving ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
+                                    </button>
                                 </div>
                             ) : (
-                                <button className="btn-primary w-full">Connecter</button>
+                                integration.status === 'connected' ? (
+                                    <div className="config-fields">
+                                        {Object.keys(integration.config).map(key => (
+                                            <div key={key} className="input-group">
+                                                <label>{key.toUpperCase()}</label>
+                                                <input type="text" value={integration.config[key]} readOnly />
+                                            </div>
+                                        ))}
+                                        <button className="btn-secondary w-full">Configurer</button>
+                                    </div>
+                                ) : (
+                                    <button className="btn-primary w-full">Connecter</button>
+                                )
                             )}
                         </div>
                     </div>
