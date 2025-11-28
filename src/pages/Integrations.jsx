@@ -40,6 +40,8 @@ const Integrations = () => {
 
     const [selectedError, setSelectedError] = useState(null);
 
+    const [showJson, setShowJson] = useState(false);
+
     useEffect(() => {
         if (user) {
             fetchWebhookConfig();
@@ -168,9 +170,18 @@ const Integrations = () => {
                         </div>
 
                         <div className="input-group">
-                            <label>EXEMPLE DE PAYLOAD JSON</label>
-                            <pre className="json-preview">
-                                {`{
+                            <button
+                                className="btn-secondary text-sm w-fit"
+                                onClick={() => setShowJson(!showJson)}
+                            >
+                                {showJson ? 'Masquer l\'exemple JSON' : 'Voir le format JSON attendu'}
+                            </button>
+
+                            {showJson && (
+                                <div className="mt-4 animate-fade-in">
+                                    <label>EXEMPLE DE PAYLOAD JSON</label>
+                                    <pre className="json-preview">
+                                        {`{
   "name": "Jean Dupont",
   "phone": "+33612345678",
   "email": "jean@example.com",
@@ -179,7 +190,9 @@ const Integrations = () => {
   "source": "LinkedIn",
   "budget_range": "5k-10k"
 }`}
-                            </pre>
+                                    </pre>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
