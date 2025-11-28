@@ -6,9 +6,7 @@ import Conversations from './pages/Conversations';
 import Contacts from './pages/Contacts';
 import AgentSettings from './pages/AgentSettings';
 import Integrations from './pages/Integrations';
-import LeadQuality from './pages/LeadQuality';
 import Onboarding from './pages/Onboarding';
-import AgentSetup from './pages/AgentSetup';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -35,8 +33,6 @@ function App() {
               <Route path="contacts" element={<Contacts />} />
               <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />
-              <Route path="quality" element={<LeadQuality />} />
-              <Route path="agent-setup" element={<AgentSetup />} />
             </Route>
           </Route>
         </Routes>

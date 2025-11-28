@@ -18,7 +18,6 @@ const Sidebar = () => {
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
     { icon: Users, label: 'Contacts', path: '/contacts' },
-    { icon: Sliders, label: 'Qualité des Leads', path: '/quality' },
     { icon: Link2, label: 'Intégrations', path: '/integrations' },
     { icon: Settings, label: 'Configuration', path: '/settings' },
   ];
