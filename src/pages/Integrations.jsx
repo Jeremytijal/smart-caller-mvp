@@ -152,7 +152,7 @@ const Integrations = () => {
                             <label>URL DE VOTRE WEBHOOK</label>
                             <div className="url-container">
                                 <code className="webhook-url">
-                                    {`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`}
+                                    {`https://app-smart-caller.../webhooks/${user?.id?.slice(0, 8)}.../leads`}
                                 </code>
                                 <button
                                     className="btn-icon-copy"
@@ -162,7 +162,7 @@ const Integrations = () => {
                                     }}
                                     title="Copier l'URL"
                                 >
-                                    <span className="copy-text">Copier</span>
+                                    <span className="copy-text">Copier le lien</span>
                                 </button>
                             </div>
                         </div>
