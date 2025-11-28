@@ -141,7 +141,10 @@ const Contacts = () => {
                         <thead>
                             <tr>
                                 <th>Nom</th>
+                                <th>Entreprise</th>
+                                <th>Poste</th>
                                 <th>Téléphone</th>
+                                <th>Source</th>
                                 <th>Statut</th>
                                 <th>Date d'ajout</th>
                             </tr>
@@ -149,8 +152,14 @@ const Contacts = () => {
                         <tbody>
                             {contacts.map((contact) => (
                                 <tr key={contact.id}>
-                                    <td>{contact.name}</td>
+                                    <td>
+                                        <div className="font-medium">{contact.name}</div>
+                                        <div className="text-xs text-muted">{contact.email}</div>
+                                    </td>
+                                    <td>{contact.company_name || '-'}</td>
+                                    <td>{contact.job_title || '-'}</td>
                                     <td>{contact.phone}</td>
+                                    <td>{contact.source || '-'}</td>
                                     <td>
                                         <span className={`status-badge ${contact.status}`}>
                                             {contact.status}

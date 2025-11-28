@@ -135,40 +135,51 @@ const Integrations = () => {
 
             <div className="integrations-grid">
                 {/* Inbound Webhook Section */}
-                <div className="integration-card">
+                {/* Inbound Webhook Section - Full Width */}
+                <div className="integration-card full-width webhook-card">
                     <div className="card-header">
                         <div className="icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
                             <Webhook size={24} />
                         </div>
                         <div>
                             <h3>Webhook Entrant</h3>
-                            <p>Recevez des leads depuis Zapier, votre site, etc.</p>
+                            <p>Recevez des leads enrichis depuis Zapier, votre site, etc.</p>
                         </div>
                     </div>
-                    <div className="config-fields">
+
+                    <div className="webhook-content">
                         <div className="input-group">
                             <label>URL DE VOTRE WEBHOOK</label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`}
-                                    className="bg-dark-lighter"
-                                />
+                            <div className="url-container">
+                                <code className="webhook-url">
+                                    {`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`}
+                                </code>
                                 <button
-                                    className="btn-secondary"
+                                    className="btn-icon-copy"
                                     onClick={() => {
                                         navigator.clipboard.writeText(`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`);
                                         alert('URL copiée !');
                                     }}
+                                    title="Copier l'URL"
                                 >
-                                    Copier
+                                    <span className="copy-text">Copier</span>
                                 </button>
                             </div>
-                            <small className="text-muted mt-2 block">
-                                Envoyez une requête POST avec le JSON : <br />
-                                <code>{`{ "name": "Jean", "phone": "+336..." }`}</code>
-                            </small>
+                        </div>
+
+                        <div className="input-group">
+                            <label>EXEMPLE DE PAYLOAD JSON</label>
+                            <pre className="json-preview">
+                                {`{
+  "name": "Jean Dupont",
+  "phone": "+33612345678",
+  "email": "jean@example.com",
+  "company_name": "Tech Corp",
+  "job_title": "CTO",
+  "source": "LinkedIn",
+  "budget_range": "5k-10k"
+}`}
+                            </pre>
                         </div>
                     </div>
                 </div>
