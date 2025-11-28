@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, FileText, Check, AlertCircle, User, Send, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Contacts.css';
@@ -116,9 +117,14 @@ const Contacts = () => {
                     <h1>Contacts</h1>
                     <p className="text-muted">Gérez votre base de prospects</p>
                 </div>
-                <button className="btn-primary" onClick={() => setShowImportModal(true)}>
-                    <Plus size={18} /> Importer CSV
-                </button>
+                <div className="flex gap-3">
+                    <Link to="/integrations" className="btn-secondary flex items-center gap-2">
+                        <Webhook size={18} /> Connecter un Webhook
+                    </Link>
+                    <button className="btn-primary" onClick={() => setShowImportModal(true)}>
+                        <Plus size={18} /> Importer CSV
+                    </button>
+                </div>
             </header>
 
             <div className="glass-panel">
