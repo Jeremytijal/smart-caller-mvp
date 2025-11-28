@@ -108,100 +108,116 @@ const Integrations = () => {
             default: return 'Déconnecté';
         }
     };
+    // const getStatusIcon = (status) => {
+    //     switch (status) {
+    //         case 'connected': return <CheckCircle size={18} className="text-success" />;
+    //         case 'error': return <AlertCircle size={18} className="text-danger" />;
+    //         default: return <XCircle size={18} className="text-muted" />;
+    //     }
+    // };
+
+    // const getStatusLabel = (status) => {
+    //     switch (status) {
+    //         case 'connected': return 'Connecté';
+    //         case 'error': return 'Erreur';
+    //         default: return 'Déconnecté';
+    //     }
+    // };
 
     return (
         <div className="page-container integrations-page">
             <header className="page-header">
                 <div>
                     <h1>Intégrations</h1>
-                    <p className="text-muted">Gérez vos connexions externes</p>
+                    <p className="text-muted">Connectez vos outils préférés</p>
                 </div>
-                <button className="btn-secondary">Documentation API</button>
             </header>
 
             <div className="integrations-grid">
-                {integrations.map((integration) => (
-                    <div key={integration.id} className="glass-panel integration-card">
-                        <div className="card-header">
-                            <div className="integration-icon">
-                                <integration.icon size={24} />
-                            </div>
-                            <div className={`status-badge ${integration.status} ${integration.status === 'error' ? 'error' : ''}`} onClick={() => integration.status === 'error' && setSelectedError(integration)}>
-                                {getStatusIcon(integration.status)}
-                                <span>{getStatusLabel(integration.status)}</span>
-                            </div>
+                {/* Inbound Webhook Section */}
+                <div className="integration-card">
+                    <div className="card-header">
+                        <div className="icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
+                            <Webhook size={24} />
                         </div>
-
-                        <h3>{integration.name}</h3>
-                        <p className="integration-desc">{integration.desc}</p>
-
-                        <div className="config-section">
-                            {integration.isWebhook ? (
-                                <div className="config-fields">
-                                    <div className="input-group">
-                                        <label>WEBHOOK URL</label>
-                                        <input
-                                            type="text"
-                                            placeholder="https://hooks.zapier.com/..."
-                                            value={webhookUrl}
-                                            onChange={(e) => setWebhookUrl(e.target.value)}
-                                        />
-                                    </div>
-                                    <button
-                                        className="btn-primary w-full flex items-center justify-center gap-2"
-                                        onClick={saveWebhookConfig}
-                                        disabled={saving}
-                                    >
-                                        {saving ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
-                                    </button>
-                                </div>
-                            ) : (
-                                integration.status === 'connected' ? (
-                                    <div className="config-fields">
-                                        {Object.keys(integration.config).map(key => (
-                                            <div key={key} className="input-group">
-                                                <label>{key.toUpperCase()}</label>
-                                                <input type="text" value={integration.config[key]} readOnly />
-                                            </div>
-                                        ))}
-                                        <button className="btn-secondary w-full">Configurer</button>
-                                    </div>
-                                ) : (
-                                    <button className="btn-primary w-full">Connecter</button>
-                                )
-                            )}
+                        <div>
+                            <h3>Webhook Entrant</h3>
+                            <p>Recevez des leads depuis Zapier, votre site, etc.</p>
                         </div>
                     </div>
-                ))}
-            </div>
-
-            {/* Error Modal */}
-            {selectedError && (
-                <div className="modal-overlay" onClick={() => setSelectedError(null)}>
-                    <div className="glass-panel modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3 className="text-danger flex items-center gap-2">
-                                <AlertCircle size={20} />
-                                Erreur de Connexion
-                            </h3>
-                            <button className="btn-icon" onClick={() => setSelectedError(null)}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                            <p className="mb-4">Une erreur est survenue lors de la dernière tentative de connexion avec <strong>{selectedError.name}</strong>.</p>
-                            <div className="code-block">
-                                <code>{selectedError.errorLog}</code>
+                    <div className="config-fields">
+                        <div className="input-group">
+                            <label>URL DE VOTRE WEBHOOK</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`}
+                                    className="bg-dark-lighter"
+                                />
+                                <button
+                                    className="btn-secondary"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`);
+                                        alert('URL copiée !');
+                                    }}
+                                >
+                                    Copier
+                                </button>
                             </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button className="btn-secondary" onClick={() => setSelectedError(null)}>Fermer</button>
-                            <button className="btn-primary">Réessayer</button>
+                            <small className="text-muted mt-2 block">
+                                Envoyez une requête POST avec le JSON : <br />
+                                <code>{`{ "name": "Jean", "phone": "+336..." }`}</code>
+                            </small>
                         </div>
                     </div>
                 </div>
-            )}
+
+                {integrations.map((integration) => (
+                    <div key={integration.id} className={`integration-card ${!integration.connected && !integration.isWebhook ? 'disabled' : ''}`}>
+                        <div className="card-header">
+                            <div className="icon-wrapper" style={{ background: integration.color + '20', color: integration.color }}>
+                                <integration.icon size={24} />
+                            </div>
+                        </div>
+                        ) : (
+                        <button className="btn-primary w-full">Connecter</button>
+                        )
+                            )}
+                    </div>
+                    </div>
+                ))}
         </div>
+
+            {/* Error Modal */ }
+    {
+        selectedError && (
+            <div className="modal-overlay" onClick={() => setSelectedError(null)}>
+                <div className="glass-panel modal-content" onClick={e => e.stopPropagation()}>
+                    <div className="modal-header">
+                        <h3 className="text-danger flex items-center gap-2">
+                            <AlertCircle size={20} />
+                            Erreur de Connexion
+                        </h3>
+                        <button className="btn-icon" onClick={() => setSelectedError(null)}>
+                            <X size={20} />
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <p className="mb-4">Une erreur est survenue lors de la dernière tentative de connexion avec <strong>{selectedError.name}</strong>.</p>
+                        <div className="code-block">
+                            <code>{selectedError.errorLog}</code>
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button className="btn-secondary" onClick={() => setSelectedError(null)}>Fermer</button>
+                        <button className="btn-primary">Réessayer</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+        </div >
     );
 };
 
