@@ -1,14 +1,16 @@
+```javascript
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  MessageSquare,
-  Settings,
-  Sliders,
-  Zap,
-  LogOut,
-  Bot,
-  User // Added User icon
+    LayoutDashboard,
+    MessageSquare,
+    Users,
+    Settings,
+    LogOut,
+    Menu,
+    X,
+    Link2,
+    Sliders
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -16,10 +18,10 @@ const Sidebar = () => {
   const navItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
-    { icon: User, label: 'Contacts', path: '/contacts' }, // Added Contacts link
+    { icon: Users, label: 'Contacts', path: '/contacts' }, // Corrected icon to Users
     { icon: Sliders, label: 'Qualité des Leads', path: '/quality' },
-    { icon: Bot, label: 'Configuration Agent', path: '/agent-setup' },
-    { icon: Zap, label: 'Intégrations', path: '/integrations' },
+    { icon: Link2, label: 'Intégrations', path: '/integrations' }, // Corrected icon to Link2
+    { icon: Settings, label: 'Configuration', path: '/settings' }, // Added Settings menu item
   ];
 
   return (
@@ -37,7 +39,7 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `nav-item ${isActive ? 'active' : ''}`
+              `nav - item ${ isActive ? 'active' : '' } `
             }
           >
             <item.icon size={20} />

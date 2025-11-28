@@ -4,6 +4,7 @@ import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Conversations from './pages/Conversations';
 import Contacts from './pages/Contacts';
+import AgentSettings from './pages/AgentSettings';
 import Integrations from './pages/Integrations';
 import LeadQuality from './pages/LeadQuality';
 import Onboarding from './pages/Onboarding';
@@ -32,6 +33,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="conversations" element={<Conversations />} />
               <Route path="contacts" element={<Contacts />} />
+              <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />
               <Route path="quality" element={<LeadQuality />} />
               <Route path="agent-setup" element={<AgentSetup />} />

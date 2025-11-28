@@ -145,6 +145,7 @@ const Contacts = () => {
                                 <th>Poste</th>
                                 <th>Téléphone</th>
                                 <th>Source</th>
+                                <th>Score</th>
                                 <th>Statut</th>
                                 <th>Date d'ajout</th>
                             </tr>
@@ -160,6 +161,21 @@ const Contacts = () => {
                                     <td>{contact.job_title || '-'}</td>
                                     <td>{contact.phone}</td>
                                     <td>{contact.source || '-'}</td>
+                                    <td>
+                                        {contact.score !== null ? (
+                                            <div className="flex items-center gap-2" title={contact.score_reason}>
+                                                <div className="w-16 h-2 bg-dark-lighter rounded-full overflow-hidden">
+                                                    <div
+                                                        className={`h-full ${contact.score > 70 ? 'bg-success' : contact.score > 40 ? 'bg-warning' : 'bg-danger'}`}
+                                                        style={{ width: `${contact.score}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs font-medium">{contact.score}</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted text-xs">-</span>
+                                        )}
+                                    </td>
                                     <td>
                                         <span className={`status-badge ${contact.status}`}>
                                             {contact.status}
