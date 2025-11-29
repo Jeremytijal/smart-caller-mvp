@@ -1,41 +1,105 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, CheckCircle, XCircle, MessageSquare, Clock, ArrowRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, FunnelChart, Funnel, LabelList } from 'recharts';
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import './Dashboard.css';
 
 const Dashboard = () => {
-    // Mock Data
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(true);
+    const [metrics, setMetrics] = useState({
+        total: 0,
+        qualified: 0,
+        disqualified: 0,
+        avgScore: 0,
+        qualificationRate: 0
+    });
+    const [recentActivity, setRecentActivity] = useState([]);
+    const [funnelData, setFunnelData] = useState([]);
+    const [activityData, setActivityData] = useState([]);
+
+    useEffect(() => {
+        if (user) fetchData();
+    }, [user]);
+
+    const fetchData = async () => {
+        try {
+            const { data: contacts, error } = await supabase
+                .from('contacts')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            // 1. Calculate Metrics
+            const total = contacts.length;
+            const qualified = contacts.filter(c => c.score >= 70).length;
+            const disqualified = contacts.filter(c => c.score !== null && c.score < 30).length;
+            const scoredContacts = contacts.filter(c => c.score !== null);
+            const avgScore = scoredContacts.length > 0
+                ? Math.round(scoredContacts.reduce((acc, c) => acc + c.score, 0) / scoredContacts.length)
+                : 0;
+            const qualificationRate = total > 0 ? Math.round((qualified / total) * 100) : 0;
+
+            setMetrics({ total, qualified, disqualified, avgScore, qualificationRate });
+
+            // 2. Recent Activity (Last 5 contacts)
+            setRecentActivity(contacts.slice(0, 5).map(c => ({
+                id: c.id,
+                user: c.name,
+                action: c.score >= 70 ? 'Qualifié' : c.score < 30 && c.score !== null ? 'Disqualifié' : 'Nouveau Lead',
+                time: new Date(c.created_at).toLocaleDateString(),
+                status: c.score >= 70 ? 'qualified' : c.score < 30 && c.score !== null ? 'disqualified' : 'pending',
+                details: c.score_reason || c.source || 'En attente'
+            })));
+
+            // 3. Funnel Data
+            setFunnelData([
+                { value: total, name: 'Total Leads', fill: 'var(--accent-primary)' },
+                { value: scoredContacts.length, name: 'Scorés', fill: 'var(--accent-secondary)' },
+                { value: qualified, name: 'Qualifiés', fill: 'var(--success)' },
+            ]);
+
+            // 4. Weekly Activity (Mocking distribution for now based on real counts if dates match, 
+            // but for simplicity let's just show a static distribution scaled to real total or just keep mock if no dates)
+            // Let's try to group by day if possible, otherwise fallback.
+            // Simple grouping by day of week:
+            const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            const activityMap = { 'Dim': 0, 'Lun': 0, 'Mar': 0, 'Mer': 0, 'Jeu': 0, 'Ven': 0, 'Sam': 0 };
+
+            contacts.forEach(c => {
+                const day = days[new Date(c.created_at).getDay()];
+                activityMap[day]++;
+            });
+
+            const chartData = Object.keys(activityMap).map(day => ({
+                name: day,
+                leads: activityMap[day]
+            }));
+            // Reorder to start from Monday
+            const orderedChartData = [
+                ...chartData.slice(1),
+                chartData[0]
+            ];
+            setActivityData(orderedChartData);
+
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const stats = [
-        { label: 'Total Leads', value: '1,234', icon: Users, color: 'var(--accent-primary)' },
-        { label: 'Qualifiés', value: '856', icon: CheckCircle, color: 'var(--success)' },
-        { label: 'Disqualifiés', value: '342', icon: XCircle, color: 'var(--danger)' },
-        { label: 'Chats Actifs', value: '28', icon: MessageSquare, color: 'var(--warning)' },
-        { label: 'Temps de Réponse', value: '12s', icon: Clock, color: '#8b5cf6' },
+        { label: 'Total Leads', value: metrics.total, icon: Users, color: 'var(--accent-primary)' },
+        { label: 'Qualifiés', value: metrics.qualified, icon: CheckCircle, color: 'var(--success)' },
+        { label: 'Disqualifiés', value: metrics.disqualified, icon: XCircle, color: 'var(--danger)' },
+        { label: 'Score Moyen', value: `${metrics.avgScore}/100`, icon: MessageSquare, color: 'var(--warning)' },
+        { label: 'Taux de Qualif.', value: `${metrics.qualificationRate}%`, icon: Clock, color: '#8b5cf6' },
     ];
 
-    const funnelData = [
-        { value: 1234, name: 'Total Leads', fill: 'var(--accent-primary)' },
-        { value: 980, name: 'Engagés', fill: 'var(--accent-secondary)' },
-        { value: 856, name: 'Qualifiés', fill: 'var(--success)' },
-        { value: 120, name: 'Rendez-vous', fill: '#8b5cf6' },
-    ];
-
-    const activityData = [
-        { name: 'Lun', qualified: 45, disqualified: 20 },
-        { name: 'Mar', qualified: 52, disqualified: 18 },
-        { name: 'Mer', qualified: 48, disqualified: 25 },
-        { name: 'Jeu', qualified: 61, disqualified: 15 },
-        { name: 'Ven', qualified: 55, disqualified: 22 },
-        { name: 'Sam', qualified: 38, disqualified: 10 },
-        { name: 'Dim', qualified: 42, disqualified: 12 },
-    ];
-
-    const recentActivity = [
-        { id: 1, user: 'Alice Smith', action: 'Qualifié via SMS', time: 'il y a 2 min', status: 'qualified' },
-        { id: 2, user: 'Bob Jones', action: 'Disqualifié (Pas de budget)', time: 'il y a 15 min', status: 'disqualified' },
-        { id: 3, user: 'Charlie Brown', action: 'Nouvelle conversation', time: 'il y a 1h', status: 'pending' },
-        { id: 4, user: 'David Wilson', action: 'Rendez-vous planifié', time: 'il y a 2h', status: 'qualified' },
-    ];
+    if (loading) return <div className="p-8 text-center">Chargement du tableau de bord...</div>;
 
     return (
         <div className="page-container dashboard-page">
@@ -44,7 +108,7 @@ const Dashboard = () => {
                     <h1>Tableau de bord</h1>
                     <p className="text-muted">Aperçu des performances de votre agent IA</p>
                 </div>
-                <button className="btn-primary">Exporter le rapport</button>
+                {/* <button className="btn-primary">Exporter le rapport</button> */}
             </header>
 
             {/* Stats Grid */}
@@ -87,7 +151,7 @@ const Dashboard = () => {
 
                 {/* Weekly Activity Chart */}
                 <div className="glass-panel chart-card">
-                    <h3>Activité Hebdomadaire</h3>
+                    <h3>Nouveaux Leads par Jour</h3>
                     <div className="chart-container">
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={activityData}>
@@ -99,8 +163,7 @@ const Dashboard = () => {
                                     contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: 'var(--glass-border)', borderRadius: '8px' }}
                                     itemStyle={{ color: 'var(--text-primary)' }}
                                 />
-                                <Bar dataKey="qualified" fill="var(--success)" radius={[4, 4, 0, 0]} stackId="a" />
-                                <Bar dataKey="disqualified" fill="var(--danger)" radius={[4, 4, 0, 0]} stackId="a" />
+                                <Bar dataKey="leads" fill="var(--accent-primary)" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
@@ -110,20 +173,29 @@ const Dashboard = () => {
             {/* Recent Activity */}
             <div className="glass-panel recent-activity">
                 <div className="activity-header">
-                    <h3>Activité Récente</h3>
-                    <button className="btn-secondary text-sm">Voir tout</button>
+                    <h3>Derniers Contacts</h3>
+                    {/* <button className="btn-secondary text-sm">Voir tout</button> */}
                 </div>
                 <div className="activity-list">
-                    {recentActivity.map((item) => (
-                        <div key={item.id} className="activity-item">
-                            <div className={`status-indicator ${item.status}`}></div>
-                            <div className="activity-details">
-                                <span className="activity-user">{item.user}</span>
-                                <span className="activity-action">{item.action}</span>
+                    {recentActivity.length === 0 ? (
+                        <div className="text-muted text-center py-4">Aucune activité récente</div>
+                    ) : (
+                        recentActivity.map((item) => (
+                            <div key={item.id} className="activity-item">
+                                <div className={`status-indicator ${item.status}`}></div>
+                                <div className="activity-details">
+                                    <span className="activity-user">{item.user}</span>
+                                    <span className="activity-action text-xs text-muted">{item.details}</span>
+                                </div>
+                                <div className="flex flex-col items-end">
+                                    <span className={`badge ${item.status === 'qualified' ? 'bg-success-dim text-success' : item.status === 'disqualified' ? 'bg-danger-dim text-danger' : 'bg-primary-dim text-primary'}`}>
+                                        {item.action}
+                                    </span>
+                                    <span className="activity-time mt-1">{item.time}</span>
+                                </div>
                             </div>
-                            <span className="activity-time">{item.time}</span>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>
