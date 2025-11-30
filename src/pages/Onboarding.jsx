@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -35,7 +35,7 @@ const Onboarding = () => {
     const analyzeBusiness = async () => {
         if (!formData.website) return alert("Veuillez entrer une URL.");
         setLoading(true);
-        setLoadingText("Analyse de votre site web...");
+        setLoadingText("Analyse en cours...");
         try {
             const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/analyze', {
                 method: 'POST',
@@ -60,7 +60,7 @@ const Onboarding = () => {
 
     const generatePreview = async () => {
         setLoading(true);
-        setLoadingText("Génération de la conversation...");
+        setLoadingText("Génération de la simulation...");
         try {
             const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/simulate', {
                 method: 'POST',
@@ -80,7 +80,7 @@ const Onboarding = () => {
 
     const generatePersona = async () => {
         setLoading(true);
-        setLoadingText("Création de l'agent...");
+        setLoadingText("Configuration de l'agent...");
         try {
             const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/generate-persona', {
                 method: 'POST',
@@ -137,9 +137,9 @@ const Onboarding = () => {
 
     // --- UI Variants ---
     const variants = {
-        enter: { opacity: 0, x: 20 },
-        center: { opacity: 1, x: 0 },
-        exit: { opacity: 0, x: -20 },
+        enter: { opacity: 0, y: 10 },
+        center: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -10 },
     };
 
     return (
@@ -147,12 +147,12 @@ const Onboarding = () => {
             {/* Header / Progress */}
             <div className="onboarding-header">
                 <div className="logo-area">
-                    <Rocket className="text-accent" size={24} />
-                    <span className="font-bold text-xl text-white">Smart Caller</span>
+                    <Rocket className="text-accent" size={18} />
+                    <span>Smart Caller</span>
                 </div>
                 <div className="progress-bar">
                     {[0, 1, 2, 3, 4, 5, 6, 7].map(s => (
-                        <div key={s} className={`progress-dot ${step >= s ? 'active' : ''}`} />
+                        <div key={s} className={`progress-step ${step === s ? 'active' : step > s ? 'completed' : ''}`} />
                     ))}
                 </div>
             </div>
@@ -161,17 +161,17 @@ const Onboarding = () => {
                 {/* STEP 0: WELCOME */}
                 {step === 0 && (
                     <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel">
-                            <h1 className="hero-title">Créez votre Agent IA en <span className="text-accent">60 secondes</span></h1>
-                            <p className="subtitle">Votre agent qualifie les leads, détecte l'intention et prend des rendez-vous — automatiquement.</p>
+                        <div className="center-card">
+                            <h1 className="hero-title">Configuration de votre assistant</h1>
+                            <p className="subtitle text-center">Analysez votre site web pour générer un agent IA capable de qualifier vos leads et prendre des rendez-vous.</p>
 
                             <div className="input-group mt-8">
-                                <label>Site Web de votre entreprise</label>
+                                <label>Site Web de l'entreprise</label>
                                 <div className="input-with-icon">
-                                    <Globe size={20} />
+                                    <Globe />
                                     <input
                                         type="text"
-                                        placeholder="https://votre-site.com"
+                                        placeholder="exemple.com"
                                         value={formData.website}
                                         onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                                         onKeyDown={(e) => e.key === 'Enter' && analyzeBusiness()}
@@ -180,7 +180,7 @@ const Onboarding = () => {
                             </div>
 
                             <button className="btn-primary full-width mt-6" onClick={analyzeBusiness} disabled={loading}>
-                                {loading ? <><Loader2 className="animate-spin" /> {loadingText}</> : "Commencer l'analyse"}
+                                {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Lancer l'analyse"}
                             </button>
                         </div>
                     </motion.div>
@@ -189,26 +189,25 @@ const Onboarding = () => {
                 {/* STEP 1: BUSINESS SUMMARY */}
                 {step === 1 && (
                     <motion.div key="step1" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel">
-                            <h2>Analyse terminée ✅</h2>
-                            <p className="subtitle">Voici ce que nous avons détecté sur votre activité.</p>
+                        <div className="center-card">
+                            <h2>Résultats de l'analyse</h2>
+                            <p className="subtitle">Vérifiez les informations détectées avant de continuer.</p>
 
                             <div className="summary-list">
                                 <div className="summary-item-card">
-                                    <span className="label">Activité</span>
+                                    <span className="label">Activité détectée</span>
                                     <div className="value-row">
-                                        <Briefcase size={16} className="text-accent" />
+                                        <Briefcase size={14} className="text-muted" />
                                         <input
                                             value={formData.businessType}
                                             onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
                                         />
-                                        <Edit2 size={14} className="edit-icon" />
                                     </div>
                                 </div>
                                 <div className="summary-item-card">
                                     <span className="label">Questions fréquentes</span>
                                     {formData.commonQuestions.map((q, i) => (
-                                        <div key={i} className="value-row small">
+                                        <div key={i} className="value-row">
                                             <MessageSquare size={14} className="text-muted" />
                                             <span>{q}</span>
                                         </div>
@@ -217,7 +216,7 @@ const Onboarding = () => {
                                 <div className="summary-item-card">
                                     <span className="label">Critères de qualification</span>
                                     {formData.qualificationCriteria.map((c, i) => (
-                                        <div key={i} className="value-row small">
+                                        <div key={i} className="value-row">
                                             <Check size={14} className="text-success" />
                                             <span>{c}</span>
                                         </div>
@@ -226,7 +225,7 @@ const Onboarding = () => {
                             </div>
 
                             <button className="btn-primary full-width mt-6" onClick={() => setStep(2)}>
-                                Continuer <ArrowRight size={18} />
+                                Continuer
                             </button>
                         </div>
                     </motion.div>
@@ -235,30 +234,31 @@ const Onboarding = () => {
                 {/* STEP 2: GOAL SELECTION */}
                 {step === 2 && (
                     <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel">
-                            <h2>Quel est votre objectif principal ?</h2>
+                        <div className="center-card">
+                            <h2>Objectif principal</h2>
+                            <p className="subtitle">Définissez la priorité de votre agent.</p>
 
-                            <div className="goals-grid mt-6">
+                            <div className="goals-grid">
                                 <div
                                     className={`goal-card ${formData.goal === 'qualify' ? 'active' : ''}`}
                                     onClick={() => setFormData({ ...formData, goal: 'qualify' })}
                                 >
-                                    <div className="goal-icon"><Zap size={24} /></div>
-                                    <h3>Qualifier les leads entrants</h3>
-                                    <p>Filtrer les curieux et identifier les vrais projets.</p>
+                                    <div className="goal-icon"><Zap size={20} /></div>
+                                    <h3>Qualification</h3>
+                                    <p>Filtrer les leads et identifier les projets sérieux.</p>
                                 </div>
                                 <div
                                     className={`goal-card ${formData.goal === 'book' ? 'active' : ''}`}
                                     onClick={() => setFormData({ ...formData, goal: 'book' })}
                                 >
-                                    <div className="goal-icon"><Target size={24} /></div>
-                                    <h3>Prise de rendez-vous</h3>
-                                    <p>Remplir votre agenda automatiquement.</p>
+                                    <div className="goal-icon"><Target size={20} /></div>
+                                    <h3>Rendez-vous</h3>
+                                    <p>Maximiser le nombre de créneaux réservés.</p>
                                 </div>
                             </div>
 
                             <button className="btn-primary full-width mt-8" onClick={generatePreview} disabled={loading}>
-                                {loading ? <><Loader2 className="animate-spin" /> {loadingText}</> : "Générer la preview"}
+                                {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Générer la simulation"}
                             </button>
                         </div>
                     </motion.div>
@@ -266,54 +266,55 @@ const Onboarding = () => {
 
                 {/* STEP 3: CONVERSATION PREVIEW */}
                 {step === 3 && (
-                    <motion.div key="step3" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                    <motion.div key="step3" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
                         <div className="preview-layout">
                             <div className="info-column">
-                                <h2>L'Avantage Smart Caller</h2>
-                                <p className="subtitle">Voici comment votre agent répondra à votre prochain lead.</p>
+                                <h2>Simulation</h2>
+                                <p className="subtitle">Aperçu du comportement de l'agent.</p>
                                 <div className="feature-list">
                                     <div className="feature-item">
-                                        <Zap size={20} className="text-accent" />
+                                        <Zap size={18} className="text-accent" />
                                         <div>
-                                            <h4>Réponse Instantanée</h4>
-                                            <p>Engage le lead en moins de 10 secondes.</p>
+                                            <h4>Réactivité</h4>
+                                            <p>Réponse immédiate aux sollicitations.</p>
                                         </div>
                                     </div>
                                     <div className="feature-item">
-                                        <Check size={20} className="text-accent" />
+                                        <Check size={18} className="text-accent" />
                                         <div>
-                                            <h4>Qualification Naturelle</h4>
-                                            <p>Pose les bonnes questions sans être robotique.</p>
+                                            <h4>Pertinence</h4>
+                                            <p>Questions adaptées au contexte métier.</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="actions-row mt-8">
+                                <div className="actions-row mt-8 flex gap-4">
                                     <button className="btn-secondary" onClick={generatePreview}>
                                         <Loader2 size={16} /> Régénérer
                                     </button>
                                     <button className="btn-primary" onClick={generatePersona} disabled={loading}>
-                                        {loading ? <><Loader2 className="animate-spin" /> {loadingText}</> : <>C'est parfait <ArrowRight size={18} /></>}
+                                        {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Valider et continuer"}
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="phone-column">
-                                <div className="iphone-mockup">
-                                    <div className="screen">
-                                        <div className="chat-header">
-                                            <div className="avatar-small">IA</div>
-                                            <span>Assistant {formData.businessType}</span>
-                                        </div>
-                                        <div className="chat-body scrollable">
-                                            {simulation.map((msg, i) => (
-                                                <div key={i} className={`message ${msg.sender === 'agent' ? 'received' : 'sent'}`}>
-                                                    {msg.text}
-                                                </div>
-                                            ))}
-                                        </div>
+                            <div className="chat-preview-container">
+                                <div className="chat-header">
+                                    <div className="avatar-small">IA</div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-medium">Assistant {formData.businessType}</span>
+                                        <span className="text-xs text-muted">En ligne</span>
                                     </div>
                                 </div>
-                                <p className="text-center text-xs text-muted mt-4">★ Généré pour {formData.website}</p>
+                                <div className="chat-body">
+                                    {simulation.map((msg, i) => (
+                                        <div key={i} className={`message ${msg.sender === 'agent' ? 'received' : 'sent'}`}>
+                                            {msg.text}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="micro-text pb-4">
+                                    Généré pour {formData.website} sur la base de l'analyse d'activité.
+                                </div>
                             </div>
                         </div>
                     </motion.div>
@@ -322,20 +323,20 @@ const Onboarding = () => {
                 {/* STEP 4: AGENT PERSONA */}
                 {step === 4 && formData.agentPersona && (
                     <motion.div key="step4" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel">
-                            <h2>Personnalité de l'Agent</h2>
-                            <p className="subtitle">Optimisé pour être humain, rapide et utile.</p>
+                        <div className="center-card">
+                            <h2>Identité de l'agent</h2>
+                            <p className="subtitle">Configuration du ton et des directives.</p>
 
                             <div className="persona-card">
                                 <div className="persona-header">
-                                    <div className="avatar-placeholder">{formData.agentPersona.role[0]}</div>
+                                    <div className="avatar-small"><User size={16} /></div>
                                     <div>
                                         <h3>{formData.agentPersona.role}</h3>
                                         <span className="tag">{formData.agentPersona.tone}</span>
                                     </div>
                                 </div>
                                 <div className="persona-section">
-                                    <label>Premier Message</label>
+                                    <label>Message d'introduction</label>
                                     <textarea
                                         value={formData.agentPersona.firstMessage}
                                         onChange={(e) => setFormData({
@@ -346,17 +347,17 @@ const Onboarding = () => {
                                     />
                                 </div>
                                 <div className="persona-section">
-                                    <label>Règles de comportement</label>
+                                    <label>Directives comportementales</label>
                                     <ul className="rules-list">
-                                        {formData.agentPersona.behaviors.map((b, i) => (
-                                            <li key={i}>• {b}</li>
+                                        {formData.agentPersona.behaviors.slice(0, 3).map((b, i) => (
+                                            <li key={i}>{b}</li>
                                         ))}
                                     </ul>
                                 </div>
                             </div>
 
                             <button className="btn-primary full-width mt-6" onClick={() => setStep(5)}>
-                                Enregistrer & Continuer
+                                Enregistrer et continuer
                             </button>
                         </div>
                     </motion.div>
@@ -365,28 +366,22 @@ const Onboarding = () => {
                 {/* STEP 5: CHANNELS */}
                 {step === 5 && (
                     <motion.div key="step5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel">
-                            <h2>Canaux de communication</h2>
-                            <p className="subtitle">Où votre agent doit-il intervenir ?</p>
+                        <div className="center-card">
+                            <h2>Canaux actifs</h2>
+                            <p className="subtitle">Sélectionnez les points de contact.</p>
 
                             <div className="channels-list">
                                 <div className="channel-item active">
                                     <div className="channel-info">
-                                        <Smartphone size={24} />
-                                        <div>
-                                            <h3>SMS</h3>
-                                            <p>Le canal le plus rapide (98% d'ouverture).</p>
-                                        </div>
+                                        <h3>SMS</h3>
+                                        <p>Canal prioritaire (98% d'ouverture).</p>
                                     </div>
                                     <div className="toggle-switch on"></div>
                                 </div>
-                                <div className="channel-item disabled">
+                                <div className="channel-item">
                                     <div className="channel-info">
-                                        <MessageSquare size={24} />
-                                        <div>
-                                            <h3>WhatsApp</h3>
-                                            <p>Bientôt disponible.</p>
-                                        </div>
+                                        <h3>WhatsApp</h3>
+                                        <p>Intégration à venir.</p>
                                     </div>
                                     <div className="toggle-switch off"></div>
                                 </div>
@@ -402,25 +397,25 @@ const Onboarding = () => {
                 {/* STEP 6: CRM */}
                 {step === 6 && (
                     <motion.div key="step6" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel">
-                            <h2>Connecter votre CRM</h2>
-                            <p className="subtitle">Synchronisez les leads qualifiés automatiquement.</p>
+                        <div className="center-card">
+                            <h2>Synchronisation CRM</h2>
+                            <p className="subtitle">Destination des leads qualifiés.</p>
 
                             <div className="crm-grid">
                                 {['HubSpot', 'Salesforce', 'Pipedrive'].map(crm => (
-                                    <div key={crm} className="crm-card" onClick={() => alert("Intégration bientôt disponible !")}>
+                                    <div key={crm} className="crm-card" onClick={() => alert("Intégration bientôt disponible")}>
                                         <div className="crm-icon">{crm[0]}</div>
                                         <span>{crm}</span>
                                     </div>
                                 ))}
                                 <div className="crm-card active" onClick={() => setFormData({ ...formData, crm: 'none' })}>
                                     <div className="crm-icon"><Rocket size={16} /></div>
-                                    <span>Smart Caller Inbox</span>
+                                    <span>Smart Caller</span>
                                 </div>
                             </div>
 
                             <button className="btn-primary full-width mt-8" onClick={() => setStep(7)}>
-                                Continuer avec Smart Caller Inbox
+                                Finaliser la configuration
                             </button>
                         </div>
                     </motion.div>
@@ -429,31 +424,31 @@ const Onboarding = () => {
                 {/* STEP 7: FINAL */}
                 {step === 7 && (
                     <motion.div key="step7" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="center-card glass-panel text-center">
-                            <div className="success-icon mb-4">
-                                <Rocket size={48} className="text-accent" />
+                        <div className="center-card text-center">
+                            <div className="success-icon flex justify-center">
+                                <Rocket size={40} />
                             </div>
-                            <h2>Votre Agent est prêt ! 🚀</h2>
-                            <p className="subtitle">Il est configuré pour {formData.businessType} et prêt à qualifier.</p>
+                            <h2>Configuration terminée</h2>
+                            <p className="subtitle">Votre agent est prêt à être déployé.</p>
 
                             <div className="final-preview-card">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="avatar-small">IA</div>
                                     <div className="text-left">
-                                        <div className="font-bold">{formData.agentPersona?.role}</div>
-                                        <div className="text-xs text-success">● Actif sur SMS</div>
+                                        <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
+                                        <div className="text-xs text-success">● Actif</div>
                                     </div>
                                 </div>
-                                <div className="bg-black/30 p-3 rounded text-left text-sm text-muted italic">
+                                <div className="text-sm text-muted italic">
                                     "{formData.agentPersona?.firstMessage}"
                                 </div>
                             </div>
 
                             <button className="btn-primary full-width mt-6" onClick={finishOnboarding} disabled={loading}>
-                                {loading ? <Loader2 className="animate-spin" /> : "Ajouter un moyen de paiement pour activer"}
+                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
                             </button>
                             <button className="btn-text" onClick={finishOnboarding}>
-                                Tester gratuitement (Mode Démo)
+                                Essayer en mode démo
                             </button>
                         </div>
                     </motion.div>
