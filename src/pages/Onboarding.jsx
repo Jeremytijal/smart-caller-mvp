@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -22,6 +22,7 @@ const Onboarding = () => {
         commonQuestions: [],
         qualificationCriteria: [],
         goal: 'qualify', // 'qualify' or 'book'
+        selectedAgentId: null, // New field for the selected agent option
         agentPersona: null, // { role, goal, firstMessage, behaviors, constraints, tone }
         channels: { sms: true, whatsapp: false, email: false, webchat: false },
         crm: null, // 'hubspot', 'pipedrive', 'salesforce', 'none'
@@ -29,6 +30,7 @@ const Onboarding = () => {
     });
 
     const [simulation, setSimulation] = useState([]);
+    const [agentOptions, setAgentOptions] = useState([]); // Store the generated options
 
     // --- Consultant Guide Content ---
     const guideContent = {
@@ -52,13 +54,13 @@ const Onboarding = () => {
             note: "Basé sur des modèles conversationnels spécialisés."
         },
         2: {
-            why: "Votre agent doit se concentrer sur une mission principale pour rester efficace et prévisible.",
-            how: "Objectif qualification → questionnement approfondi, validation du contexte. Objectif rendez-vous → messages plus courts, déclencheurs de planification. Le comportement de redirection change selon ce choix.",
+            why: "Nous avons conçu trois agents sur mesure adaptés à votre modèle d'affaires.",
+            how: "Chaque option possède une stratégie de conversation, des déclencheurs et un objectif final différents. Choisissez celui qui correspond à votre priorité actuelle.",
             guarantee: [
-                "Vous pouvez changer cela à tout moment",
-                "Les deux stratégies suivent des standards éprouvés"
+                "Vous pourrez ajuster le comportement plus tard",
+                "Tous les agents incluent la protection anti-hallucination"
             ],
-            note: "Définit la stratégie de conversion."
+            note: "Sélectionnez l'agent qui correspond à votre KPI principal."
         },
         3: {
             why: "Cette prévisualisation montre comment votre agent parlera aux vrais leads en fonction de votre activité, du ton et des besoins détectés.",
@@ -110,8 +112,61 @@ const Onboarding = () => {
     };
 
     const breadcrumbs = [
-        "Analyse", "Résultats", "Objectif", "Simulation", "Identité", "Canaux", "CRM", "Activation"
+        "Analyse", "Résultats", "Sélection", "Simulation", "Identité", "Canaux", "CRM", "Activation"
     ];
+
+    // --- Helper: Generate Agent Options ---
+    const generateAgentOptions = (businessType) => {
+        // In a real app, this would come from the backend.
+        // We generate 3 archetypes based on the business type string.
+
+        const baseTitle = businessType || "Service";
+
+        return [
+            {
+                id: 'qualifier',
+                title: `${baseTitle} Qualification Agent`,
+                description: `Gère les demandes entrantes pour ${baseTitle}, qualifie les prospects en évaluant leurs besoins et leur budget.`,
+                audience: "Prospects en phase de recherche d'information.",
+                benefits: [
+                    "Identifie rapidement les acheteurs à forte intention",
+                    "Questions ciblées sur l'usage et le budget",
+                    "S'intègre au CRM pour tracker les leads"
+                ],
+                example: `"Bonjour ! Je suis l'assistant ${baseTitle}. Quel type de service recherchez-vous aujourd'hui ? Avez-vous un budget spécifique ?"`,
+                premium: false,
+                icon: Zap
+            },
+            {
+                id: 'scheduler',
+                title: `${baseTitle} Booking Assistant`,
+                description: `Se concentre sur la conversion immédiate en proposant des créneaux de rendez-vous ou d'intervention.`,
+                audience: "Clients prêts à passer à l'action ou nécessitant une intervention.",
+                benefits: [
+                    "Maximise le taux de remplissage de l'agenda",
+                    "Gère les annulations et reprogrammations",
+                    "Envoie des rappels automatiques"
+                ],
+                example: `"Bonjour, je vois que vous souhaitez un ${baseTitle}. J'ai un créneau disponible demain à 14h, cela vous convient-il ?"`,
+                premium: true,
+                icon: Calendar
+            },
+            {
+                id: 'support',
+                title: `${baseTitle} Expert Advisor`,
+                description: `Approche consultative pour guider les clients complexes vers la bonne solution ${baseTitle}.`,
+                audience: "Clients avec des besoins techniques ou spécifiques.",
+                benefits: [
+                    "Répond aux questions techniques fréquentes",
+                    "Suggère des produits/services complémentaires",
+                    "Escalade les cas complexes aux humains"
+                ],
+                example: `"Je comprends votre besoin pour ${baseTitle}. Pour vous orienter, préférez-vous l'option performance ou économie ?"`,
+                premium: true,
+                icon: Star
+            }
+        ];
+    };
 
     // --- API Calls ---
 
@@ -132,6 +187,10 @@ const Onboarding = () => {
                 commonQuestions: data.commonQuestions,
                 qualificationCriteria: data.qualificationCriteria
             }));
+
+            // Generate options based on the result
+            setAgentOptions(generateAgentOptions(data.businessType));
+
             setStep(1);
         } catch (error) {
             console.error("Error analyzing:", error);
@@ -139,6 +198,17 @@ const Onboarding = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const selectAgent = (agent) => {
+        setFormData(prev => ({
+            ...prev,
+            selectedAgentId: agent.id,
+            goal: agent.id === 'scheduler' ? 'book' : 'qualify' // Map to existing logic
+        }));
+        // Trigger simulation generation immediately or after a pause? 
+        // Let's go to simulation generation.
+        generatePreview();
     };
 
     const generatePreview = async () => {
@@ -292,6 +362,151 @@ const Onboarding = () => {
             </div>
 
             <AnimatePresence mode="wait">
+                {/* STEP 0: WELCOME */}
+                {step === 0 && (
+                    <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                        <div className="step-container-split">
+                            <div className="center-card">
+                                <h1 className="hero-title">Configuration de votre assistant</h1>
+                                <p className="subtitle">Analysez votre site web pour générer un agent IA capable de qualifier vos leads.</p>
+                                <div className="input-group mt-8">
+                                    <label>Site Web de l'entreprise</label>
+                                    <div className="input-with-icon">
+                                        <Globe />
+                                        <input
+                                            type="text"
+                                            placeholder="exemple.com"
+                                            value={formData.website}
+                                            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                            onKeyDown={(e) => e.key === 'Enter' && analyzeBusiness()}
+                                        />
+                                    </div>
+                                </div>
+                                <button className="btn-primary full-width mt-6" onClick={analyzeBusiness} disabled={loading}>
+                                    {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Lancer l'analyse"}
+                                </button>
+                            </div>
+                            <GuidePanel stepIndex={0} />
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* STEP 1: BUSINESS SUMMARY */}
+                {step === 1 && (
+                    <motion.div key="step1" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                        <div className="step-container-split">
+                            <div className="center-card">
+                                <h2>Résultats de l'analyse</h2>
+                                <p className="subtitle">Vérifiez les informations détectées.</p>
+                                <div className="summary-list">
+                                    <div className="summary-item-card">
+                                        <span className="label">Activité détectée</span>
+                                        <div className="value-row">
+                                            <Briefcase size={14} className="text-muted" />
+                                            <input
+                                                value={formData.businessType}
+                                                onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="summary-item-card">
+                                        <span className="label">Questions fréquentes</span>
+                                        {formData.commonQuestions.map((q, i) => (
+                                            <div key={i} className="value-row">
+                                                <MessageSquare size={14} className="text-muted" />
+                                                <span>{q}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="summary-item-card">
+                                        <span className="label">Critères de qualification</span>
+                                        {formData.qualificationCriteria.map((c, i) => (
+                                            <div key={i} className="value-row">
+                                                <Check size={14} className="text-success" />
+                                                <span>{c}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button className="btn-primary full-width mt-6" onClick={() => setStep(2)}>
+                                    Continuer vers la sélection
+                                </button>
+                            </div>
+                            <GuidePanel stepIndex={1} />
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* STEP 2: AGENT SELECTION (NEW) */}
+                {step === 2 && (
+                    <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="step-container-split">
+                            <div className="agent-selection-container">
+                                <div className="text-center mb-8">
+                                    <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
+                                        Recommandations sur mesure
+                                    </div>
+                                    <h2>Agents IA créés pour {formData.businessType}</h2>
+                                    <p className="subtitle max-w-xl mx-auto">
+                                        Basé sur votre site web, nous avons conçu des agents adaptés à vos besoins. Explorez-les et choisissez celui qui boostera vos ventes.
+                                    </p>
+                                </div>
+
+                                <div className="agents-grid">
+                                    {agentOptions.map((agent) => (
+                                        <div key={agent.id} className="agent-card-detailed">
+                                            {agent.premium && (
+                                                <div className="premium-badge">
+                                                    <Star size={10} fill="currentColor" /> Premium
+                                                </div>
+                                            )}
+                                            <div className="agent-icon-wrapper">
+                                                <agent.icon size={24} className="text-accent" />
+                                            </div>
+                                            <h3 className="agent-title">{agent.title}</h3>
+                                            <p className="agent-description">{agent.description}</p>
+
+                                            <div className="agent-section">
+                                                <span className="section-label">Cible :</span>
+                                                <p className="section-text">{agent.audience}</p>
+                                            </div>
+
+                                            <div className="agent-section">
+                                                <span className="section-label">Bénéfices clés :</span>
+                                                <ul className="benefits-list">
+                                                    {agent.benefits.map((benefit, i) => (
+                                                        <li key={i}>
+                                                            <Check size={12} className="text-accent" />
+                                                            {benefit}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            <div className="agent-example">
+                                                <span className="example-label">Exemple :</span>
+                                                <p className="example-text">{agent.example}</p>
+                                            </div>
+
+                                            <button
+                                                className="btn-primary full-width mt-auto"
+                                                onClick={() => selectAgent(agent)}
+                                                disabled={loading}
+                                            >
+                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Sélectionner cet Agent"}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* We keep the guide panel even in this wide view, but maybe adjust CSS to fit */}
+                            <div className="hidden-on-mobile">
+                                <GuidePanel stepIndex={2} />
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* STEP 3: PREVIEW (Special Layout) */}
                 {step === 3 ? (
                     <motion.div key="step3" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
@@ -335,229 +550,138 @@ const Onboarding = () => {
                         </div>
                     </motion.div>
                 ) : (
-                    /* ALL OTHER STEPS (Split Layout) */
-                    <motion.div key={`step${step}`} variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="step-container-split">
-                            <div className="center-card">
-                                {/* STEP 0: WELCOME */}
-                                {step === 0 && (
-                                    <>
-                                        <h1 className="hero-title">Configuration de votre assistant</h1>
-                                        <p className="subtitle">Analysez votre site web pour générer un agent IA capable de qualifier vos leads.</p>
-                                        <div className="input-group mt-8">
-                                            <label>Site Web de l'entreprise</label>
-                                            <div className="input-with-icon">
-                                                <Globe />
-                                                <input
-                                                    type="text"
-                                                    placeholder="exemple.com"
-                                                    value={formData.website}
-                                                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                                                    onKeyDown={(e) => e.key === 'Enter' && analyzeBusiness()}
-                                                />
-                                            </div>
-                                        </div>
-                                        <button className="btn-primary full-width mt-6" onClick={analyzeBusiness} disabled={loading}>
-                                            {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Lancer l'analyse"}
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* STEP 1: BUSINESS SUMMARY */}
-                                {step === 1 && (
-                                    <>
-                                        <h2>Résultats de l'analyse</h2>
-                                        <p className="subtitle">Vérifiez les informations détectées.</p>
-                                        <div className="summary-list">
-                                            <div className="summary-item-card">
-                                                <span className="label">Activité détectée</span>
-                                                <div className="value-row">
-                                                    <Briefcase size={14} className="text-muted" />
-                                                    <input
-                                                        value={formData.businessType}
-                                                        onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
+                    /* ALL OTHER STEPS (Split Layout) - Logic handled above for steps 0, 1, 2 */
+                    /* We need to render steps 4, 5, 6, 7 here if they are not special layouts */
+                    step >= 4 && (
+                        <motion.div key={`step${step}`} variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                            <div className="step-container-split">
+                                <div className="center-card">
+                                    {/* STEP 4: AGENT PERSONA */}
+                                    {step === 4 && formData.agentPersona && (
+                                        <>
+                                            <h2>Identité de l'agent</h2>
+                                            <p className="subtitle">Configuration du ton et des directives.</p>
+                                            <div className="persona-card">
+                                                <div className="persona-header">
+                                                    <div className="avatar-small"><User size={16} /></div>
+                                                    <div>
+                                                        <h3>{formData.agentPersona.role}</h3>
+                                                        <span className="tag">{formData.agentPersona.tone}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="persona-section">
+                                                    <label>Message d'introduction</label>
+                                                    <textarea
+                                                        value={formData.agentPersona.firstMessage}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
+                                                        })}
+                                                        rows={3}
                                                     />
                                                 </div>
+                                                <div className="persona-section">
+                                                    <label>Directives comportementales</label>
+                                                    <ul className="rules-list">
+                                                        {formData.agentPersona.behaviors.slice(0, 3).map((b, i) => (
+                                                            <li key={i}>{b}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
                                             </div>
-                                            <div className="summary-item-card">
-                                                <span className="label">Questions fréquentes</span>
-                                                {formData.commonQuestions.map((q, i) => (
-                                                    <div key={i} className="value-row">
-                                                        <MessageSquare size={14} className="text-muted" />
-                                                        <span>{q}</span>
+                                            <button className="btn-primary full-width mt-6" onClick={() => setStep(5)}>
+                                                Enregistrer et continuer
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {/* STEP 5: CHANNELS */}
+                                    {step === 5 && (
+                                        <>
+                                            <h2>Canaux actifs</h2>
+                                            <p className="subtitle">Sélectionnez les points de contact.</p>
+                                            <div className="channels-list">
+                                                <div className="channel-item active">
+                                                    <div className="channel-info">
+                                                        <h3>SMS</h3>
+                                                        <p>Canal prioritaire (98% d'ouverture).</p>
+                                                    </div>
+                                                    <div className="toggle-switch on"></div>
+                                                </div>
+                                                <div className="channel-item">
+                                                    <div className="channel-info">
+                                                        <h3>WhatsApp</h3>
+                                                        <p>Intégration à venir.</p>
+                                                    </div>
+                                                    <div className="toggle-switch off"></div>
+                                                </div>
+                                            </div>
+                                            <button className="btn-primary full-width mt-8" onClick={() => setStep(6)}>
+                                                Continuer
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {/* STEP 6: CRM */}
+                                    {step === 6 && (
+                                        <>
+                                            <h2>Synchronisation CRM</h2>
+                                            <p className="subtitle">Destination des leads qualifiés.</p>
+                                            <div className="crm-grid">
+                                                {['HubSpot', 'Salesforce', 'Pipedrive'].map(crm => (
+                                                    <div key={crm} className="crm-card" onClick={() => alert("Intégration bientôt disponible")}>
+                                                        <div className="crm-icon">{crm[0]}</div>
+                                                        <span>{crm}</span>
                                                     </div>
                                                 ))}
+                                                <div className="crm-card active" onClick={() => setFormData({ ...formData, crm: 'none' })}>
+                                                    <div className="crm-icon"><Rocket size={16} /></div>
+                                                    <span>Smart Caller</span>
+                                                </div>
                                             </div>
-                                            <div className="summary-item-card">
-                                                <span className="label">Critères de qualification</span>
-                                                {formData.qualificationCriteria.map((c, i) => (
-                                                    <div key={i} className="value-row">
-                                                        <Check size={14} className="text-success" />
-                                                        <span>{c}</span>
+                                            <button className="btn-primary full-width mt-8" onClick={() => setStep(7)}>
+                                                Finaliser la configuration
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {/* STEP 7: FINAL */}
+                                    {step === 7 && (
+                                        <>
+                                            <div className="text-center">
+                                                <div className="success-icon flex justify-center">
+                                                    <Rocket size={40} />
+                                                </div>
+                                                <h2>Configuration terminée</h2>
+                                                <p className="subtitle">Votre agent est prêt à être déployé.</p>
+                                                <div className="final-preview-card">
+                                                    <div className="flex items-center gap-3 mb-4">
+                                                        <div className="avatar-small">IA</div>
+                                                        <div className="text-left">
+                                                            <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
+                                                            <div className="text-xs text-success">● Actif</div>
+                                                        </div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <button className="btn-primary full-width mt-6" onClick={() => setStep(2)}>
-                                            Continuer
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* STEP 2: GOAL SELECTION */}
-                                {step === 2 && (
-                                    <>
-                                        <h2>Objectif principal</h2>
-                                        <p className="subtitle">Définissez la priorité de votre agent.</p>
-                                        <div className="goals-grid">
-                                            <div
-                                                className={`goal-card ${formData.goal === 'qualify' ? 'active' : ''}`}
-                                                onClick={() => setFormData({ ...formData, goal: 'qualify' })}
-                                            >
-                                                <div className="goal-icon"><Zap size={20} /></div>
-                                                <h3>Qualification</h3>
-                                                <p>Filtrer les leads et identifier les projets sérieux.</p>
-                                            </div>
-                                            <div
-                                                className={`goal-card ${formData.goal === 'book' ? 'active' : ''}`}
-                                                onClick={() => setFormData({ ...formData, goal: 'book' })}
-                                            >
-                                                <div className="goal-icon"><Target size={20} /></div>
-                                                <h3>Rendez-vous</h3>
-                                                <p>Maximiser le nombre de créneaux réservés.</p>
-                                            </div>
-                                        </div>
-                                        <button className="btn-primary full-width mt-8" onClick={generatePreview} disabled={loading}>
-                                            {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Générer la simulation"}
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* STEP 4: AGENT PERSONA */}
-                                {step === 4 && formData.agentPersona && (
-                                    <>
-                                        <h2>Identité de l'agent</h2>
-                                        <p className="subtitle">Configuration du ton et des directives.</p>
-                                        <div className="persona-card">
-                                            <div className="persona-header">
-                                                <div className="avatar-small"><User size={16} /></div>
-                                                <div>
-                                                    <h3>{formData.agentPersona.role}</h3>
-                                                    <span className="tag">{formData.agentPersona.tone}</span>
-                                                </div>
-                                            </div>
-                                            <div className="persona-section">
-                                                <label>Message d'introduction</label>
-                                                <textarea
-                                                    value={formData.agentPersona.firstMessage}
-                                                    onChange={(e) => setFormData({
-                                                        ...formData,
-                                                        agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
-                                                    })}
-                                                    rows={3}
-                                                />
-                                            </div>
-                                            <div className="persona-section">
-                                                <label>Directives comportementales</label>
-                                                <ul className="rules-list">
-                                                    {formData.agentPersona.behaviors.slice(0, 3).map((b, i) => (
-                                                        <li key={i}>{b}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <button className="btn-primary full-width mt-6" onClick={() => setStep(5)}>
-                                            Enregistrer et continuer
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* STEP 5: CHANNELS */}
-                                {step === 5 && (
-                                    <>
-                                        <h2>Canaux actifs</h2>
-                                        <p className="subtitle">Sélectionnez les points de contact.</p>
-                                        <div className="channels-list">
-                                            <div className="channel-item active">
-                                                <div className="channel-info">
-                                                    <h3>SMS</h3>
-                                                    <p>Canal prioritaire (98% d'ouverture).</p>
-                                                </div>
-                                                <div className="toggle-switch on"></div>
-                                            </div>
-                                            <div className="channel-item">
-                                                <div className="channel-info">
-                                                    <h3>WhatsApp</h3>
-                                                    <p>Intégration à venir.</p>
-                                                </div>
-                                                <div className="toggle-switch off"></div>
-                                            </div>
-                                        </div>
-                                        <button className="btn-primary full-width mt-8" onClick={() => setStep(6)}>
-                                            Continuer
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* STEP 6: CRM */}
-                                {step === 6 && (
-                                    <>
-                                        <h2>Synchronisation CRM</h2>
-                                        <p className="subtitle">Destination des leads qualifiés.</p>
-                                        <div className="crm-grid">
-                                            {['HubSpot', 'Salesforce', 'Pipedrive'].map(crm => (
-                                                <div key={crm} className="crm-card" onClick={() => alert("Intégration bientôt disponible")}>
-                                                    <div className="crm-icon">{crm[0]}</div>
-                                                    <span>{crm}</span>
-                                                </div>
-                                            ))}
-                                            <div className="crm-card active" onClick={() => setFormData({ ...formData, crm: 'none' })}>
-                                                <div className="crm-icon"><Rocket size={16} /></div>
-                                                <span>Smart Caller</span>
-                                            </div>
-                                        </div>
-                                        <button className="btn-primary full-width mt-8" onClick={() => setStep(7)}>
-                                            Finaliser la configuration
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* STEP 7: FINAL */}
-                                {step === 7 && (
-                                    <>
-                                        <div className="text-center">
-                                            <div className="success-icon flex justify-center">
-                                                <Rocket size={40} />
-                                            </div>
-                                            <h2>Configuration terminée</h2>
-                                            <p className="subtitle">Votre agent est prêt à être déployé.</p>
-                                            <div className="final-preview-card">
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className="avatar-small">IA</div>
-                                                    <div className="text-left">
-                                                        <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
-                                                        <div className="text-xs text-success">● Actif</div>
+                                                    <div className="text-sm text-muted italic">
+                                                        "{formData.agentPersona?.firstMessage}"
                                                     </div>
                                                 </div>
-                                                <div className="text-sm text-muted italic">
-                                                    "{formData.agentPersona?.firstMessage}"
-                                                </div>
+                                                <button className="btn-primary full-width mt-6" onClick={finishOnboarding} disabled={loading}>
+                                                    {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
+                                                </button>
+                                                <button className="btn-text" onClick={finishOnboarding}>
+                                                    Essayer en mode démo
+                                                </button>
                                             </div>
-                                            <button className="btn-primary full-width mt-6" onClick={finishOnboarding} disabled={loading}>
-                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
-                                            </button>
-                                            <button className="btn-text" onClick={finishOnboarding}>
-                                                Essayer en mode démo
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* RIGHT PANEL: CONSULTANT GUIDE */}
+                                <GuidePanel stepIndex={step} />
                             </div>
-
-                            {/* RIGHT PANEL: CONSULTANT GUIDE */}
-                            <GuidePanel stepIndex={step} />
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    )
                 )}
             </AnimatePresence>
         </div>
