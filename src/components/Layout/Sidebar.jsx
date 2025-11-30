@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   MessageSquare,
@@ -11,9 +11,22 @@ import {
   Link2,
   Sliders
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
 
 const Sidebar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Failed to logout', error);
+    }
+  };
+
   const navItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
@@ -47,7 +60,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="nav-item logout-btn">
+        <button className="nav-item logout-btn" onClick={handleLogout}>
           <LogOut size={20} />
           <span>Déconnexion</span>
         </button>
