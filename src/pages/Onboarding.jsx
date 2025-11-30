@@ -18,6 +18,7 @@ const Onboarding = () => {
         website: '',
         country: 'France',
         language: 'Français',
+        businessDescription: '', // Optional description
         businessType: '',
         commonQuestions: [],
         qualificationCriteria: [],
@@ -362,31 +363,94 @@ const Onboarding = () => {
             </div>
 
             <AnimatePresence mode="wait">
-                {/* STEP 0: WELCOME */}
+                {/* STEP 0: WELCOME & ANALYSIS */}
                 {step === 0 && (
-                    <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="step-container-split">
-                            <div className="center-card">
-                                <h1 className="hero-title">Configuration de votre assistant</h1>
-                                <p className="subtitle">Analysez votre site web pour générer un agent IA capable de qualifier vos leads.</p>
-                                <div className="input-group mt-8">
-                                    <label>Site Web de l'entreprise</label>
-                                    <div className="input-with-icon">
-                                        <Globe />
+                    <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="analysis-step-container">
+                            <div className="text-center mb-12">
+                                <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-4">
+                                    Business Information
+                                </div>
+                                <h1 className="hero-title mb-4">Tell us about your business</h1>
+                                <p className="subtitle max-w-2xl mx-auto">
+                                    Just share your site, country, and language.
+                                    We'll take care of the rest, creating AI agents that understand your business.
+                                </p>
+                            </div>
+
+                            <div className="analysis-form max-w-3xl mx-auto">
+                                <div className="input-group mb-6">
+                                    <label className="text-sm font-semibold mb-2 block">Your Company Website</label>
+                                    <div className="input-with-icon large-input">
+                                        <Globe size={20} />
                                         <input
                                             type="text"
-                                            placeholder="exemple.com"
+                                            placeholder="https://example.com"
                                             value={formData.website}
                                             onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                                             onKeyDown={(e) => e.key === 'Enter' && analyzeBusiness()}
+                                            className="text-lg"
                                         />
                                     </div>
                                 </div>
-                                <button className="btn-primary full-width mt-6" onClick={analyzeBusiness} disabled={loading}>
-                                    {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Lancer l'analyse"}
-                                </button>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div className="input-group">
+                                        <label className="text-sm font-semibold mb-2 block">Agent Language</label>
+                                        <div className="select-wrapper">
+                                            <select
+                                                value={formData.language}
+                                                onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                                                className="custom-select"
+                                            >
+                                                <option value="Français">Français</option>
+                                                <option value="English">English</option>
+                                                <option value="Spanish">Spanish</option>
+                                                <option value="German">German</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="input-group">
+                                        <label className="text-sm font-semibold mb-2 block">Agent Country</label>
+                                        <div className="select-wrapper">
+                                            <select
+                                                value={formData.country}
+                                                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                                className="custom-select"
+                                            >
+                                                <option value="France">France</option>
+                                                <option value="United States">United States</option>
+                                                <option value="United Kingdom">United Kingdom</option>
+                                                <option value="Germany">Germany</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="input-group mb-8">
+                                    <label className="text-sm font-semibold mb-2 block">Business Description <span className="text-muted font-normal">(Optional)</span></label>
+                                    <textarea
+                                        placeholder="Describe your business activity, key services, and target audience..."
+                                        value={formData.businessDescription}
+                                        onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
+                                        rows={3}
+                                        className="resize-none"
+                                    />
+                                </div>
+
+                                <div className="analysis-footer flex flex-col md:flex-row justify-between items-center gap-6">
+                                    <button className="btn-text flex items-center gap-2 text-muted hover:text-primary transition-colors">
+                                        Lost? Talk to Sales <HelpCircle size={16} />
+                                    </button>
+                                    <button
+                                        className="btn-primary px-8 py-3 text-lg"
+                                        onClick={analyzeBusiness}
+                                        disabled={loading}
+                                    >
+                                        {loading ? <><Loader2 className="animate-spin" size={20} /> {loadingText}</> : "Analyze my business"}
+                                    </button>
+                                </div>
                             </div>
-                            <GuidePanel stepIndex={0} />
                         </div>
                     </motion.div>
                 )}
