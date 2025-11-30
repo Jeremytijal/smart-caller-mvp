@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -546,137 +546,169 @@ const Onboarding = () => {
                 ) : (
                     /* ALL OTHER STEPS (Split Layout) - Logic handled above for steps 0, 1, 2 */
                     /* We need to render steps 4, 5, 6, 7 here if they are not special layouts */
-                    step >= 4 && (
-                        <motion.div key={`step${step}`} variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                            <div className="step-container-split">
-                                <div className="center-card">
-                                    {/* STEP 4: AGENT PERSONA */}
-                                    {step === 4 && formData.agentPersona && (
-                                        <>
-                                            <h2>Identité de l'agent</h2>
-                                            <p className="subtitle">Configuration du ton et des directives.</p>
-                                            <div className="persona-card">
-                                                <div className="persona-header">
-                                                    <div className="avatar-small"><User size={16} /></div>
-                                                    <div>
-                                                        <h3>{formData.agentPersona.role}</h3>
-                                                        <span className="tag">{formData.agentPersona.tone}</span>
-                                                    </div>
-                                                </div>
-                                                <div className="persona-section">
-                                                    <label>Message d'introduction</label>
-                                                    <textarea
-                                                        value={formData.agentPersona.firstMessage}
-                                                        onChange={(e) => setFormData({
-                                                            ...formData,
-                                                            agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
-                                                        })}
-                                                        rows={3}
-                                                    />
-                                                </div>
-                                                <div className="persona-section">
-                                                    <label>Directives comportementales</label>
-                                                    <ul className="rules-list">
-                                                        {formData.agentPersona.behaviors.slice(0, 3).map((b, i) => (
-                                                            <li key={i}>{b}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <button className="btn-primary full-width mt-6" onClick={() => setStep(5)}>
-                                                Enregistrer et continuer
-                                            </button>
-                                        </>
-                                    )}
-
-                                    {/* STEP 5: CHANNELS */}
-                                    {step === 5 && (
-                                        <>
-                                            <h2>Canaux actifs</h2>
-                                            <p className="subtitle">Sélectionnez les points de contact.</p>
-                                            <div className="channels-list">
-                                                <div className="channel-item active">
-                                                    <div className="channel-info">
-                                                        <h3>SMS</h3>
-                                                        <p>Canal prioritaire (98% d'ouverture).</p>
-                                                    </div>
-                                                    <div className="toggle-switch on"></div>
-                                                </div>
-                                                <div className="channel-item">
-                                                    <div className="channel-info">
-                                                        <h3>WhatsApp</h3>
-                                                        <p>Intégration à venir.</p>
-                                                    </div>
-                                                    <div className="toggle-switch off"></div>
-                                                </div>
-                                            </div>
-                                            <button className="btn-primary full-width mt-8" onClick={() => setStep(6)}>
-                                                Continuer
-                                            </button>
-                                        </>
-                                    )}
-
-                                    {/* STEP 6: CRM */}
-                                    {step === 6 && (
-                                        <>
-                                            <h2>Synchronisation CRM</h2>
-                                            <p className="subtitle">Destination des leads qualifiés.</p>
-                                            <div className="crm-grid">
-                                                {['HubSpot', 'Salesforce', 'Pipedrive'].map(crm => (
-                                                    <div key={crm} className="crm-card" onClick={() => alert("Intégration bientôt disponible")}>
-                                                        <div className="crm-icon">{crm[0]}</div>
-                                                        <span>{crm}</span>
-                                                    </div>
-                                                ))}
-                                                <div className="crm-card active" onClick={() => setFormData({ ...formData, crm: 'none' })}>
-                                                    <div className="crm-icon"><Rocket size={16} /></div>
-                                                    <span>Smart Caller</span>
-                                                </div>
-                                            </div>
-                                            <button className="btn-primary full-width mt-8" onClick={() => setStep(7)}>
-                                                Finaliser la configuration
-                                            </button>
-                                        </>
-                                    )}
-
-                                    {/* STEP 7: FINAL */}
-                                    {step === 7 && (
-                                        <>
-                                            <div className="text-center">
-                                                <div className="success-icon flex justify-center">
-                                                    <Rocket size={40} />
-                                                </div>
-                                                <h2>Configuration terminée</h2>
-                                                <p className="subtitle">Votre agent est prêt à être déployé.</p>
-                                                <div className="final-preview-card">
-                                                    <div className="flex items-center gap-3 mb-4">
-                                                        <div className="avatar-small">IA</div>
-                                                        <div className="text-left">
-                                                            <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
-                                                            <div className="text-xs text-success">● Actif</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-sm text-muted italic">
-                                                        "{formData.agentPersona?.firstMessage}"
-                                                    </div>
-                                                </div>
-                                                <button className="btn-primary full-width mt-6" onClick={finishOnboarding} disabled={loading}>
-                                                    {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
-                                                </button>
-                                                <button className="btn-text" onClick={finishOnboarding}>
-                                                    Essayer en mode démo
-                                                </button>
-                                            </div>
-                                        </>
-                                    )}
+                    /* STEP 5: CHANNELS (New Wide Layout) */
+                    step === 5 ? (
+                        <motion.div key="step5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                            <div className="channel-selection-container">
+                                <div className="text-center mb-12">
+                                    <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
+                                        Channel Selection
+                                    </div>
+                                    <h2>Choose where to deploy your AI agent</h2>
+                                    <p className="subtitle max-w-xl mx-auto">
+                                        Select one or more channels to connect with your customers. You can always add or change channels later.
+                                    </p>
                                 </div>
 
-                                {/* RIGHT PANEL: CONSULTANT GUIDE */}
-                                <GuidePanel stepIndex={step} />
+                                <div className="channels-grid">
+                                    {[
+                                        { id: 'instagram', label: 'Instagram', desc: 'Connect with customers through Instagram Direct Messages.', icon: Instagram },
+                                        { id: 'whatsapp', label: 'WhatsApp', desc: 'Engage leads via WhatsApp Business conversations.', icon: MessageCircle },
+                                        { id: 'messenger', label: 'Meta', desc: 'Integrate with Messenger to provide instant support.', icon: Facebook },
+                                        { id: 'email', label: 'Email', desc: 'Automate replies and follow-ups for customer emails.', icon: Mail },
+                                        { id: 'webchat', label: 'Web Chat', desc: 'Add a live chat widget directly to your website.', icon: MessageSquare },
+                                    ].map(channel => (
+                                        <div key={channel.id} className="channel-card">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="channel-icon-wrapper">
+                                                    <channel.icon size={24} />
+                                                </div>
+                                                <div
+                                                    className={`toggle-switch ${formData.channels[channel.id] ? 'on' : 'off'}`}
+                                                    onClick={() => setFormData(prev => ({
+                                                        ...prev,
+                                                        channels: { ...prev.channels, [channel.id]: !prev.channels[channel.id] }
+                                                    }))}
+                                                ></div>
+                                            </div>
+                                            <h3 className="channel-title">{channel.label}</h3>
+                                            <p className="channel-desc">{channel.desc}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="channel-footer">
+                                    <div className="footer-notes">
+                                        <div className="note-item">
+                                            <Check size={14} className="text-accent" /> We'll set up the integrations automatically.
+                                        </div>
+                                        <div className="note-item">
+                                            <Check size={14} className="text-accent" /> Your agent will be ready to handle conversations.
+                                        </div>
+                                    </div>
+                                    <div className="footer-actions">
+                                        <button className="btn-secondary" onClick={() => setStep(4)}>Back</button>
+                                        <button className="btn-primary" onClick={() => setStep(6)}>Continue to Integrations <ArrowRight size={16} /></button>
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
-                    )
-                )}
+                    ) : (
+                        /* STEPS 4, 6, 7 (Split Layout) */
+                        (step === 4 || step === 6 || step === 7) && (
+                            <motion.div key={`step${step}`} variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                                <div className="step-container-split">
+                                    <div className="center-card">
+                                        {/* STEP 4: AGENT PERSONA */}
+                                        {step === 4 && formData.agentPersona && (
+                                            <>
+                                                <h2>Identité de l'agent</h2>
+                                                <p className="subtitle">Configuration du ton et des directives.</p>
+                                                <div className="persona-card">
+                                                    <div className="persona-header">
+                                                        <div className="avatar-small"><User size={16} /></div>
+                                                        <div>
+                                                            <h3>{formData.agentPersona.role}</h3>
+                                                            <span className="tag">{formData.agentPersona.tone}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="persona-section">
+                                                        <label>Message d'introduction</label>
+                                                        <textarea
+                                                            value={formData.agentPersona.firstMessage}
+                                                            onChange={(e) => setFormData({
+                                                                ...formData,
+                                                                agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
+                                                            })}
+                                                            rows={3}
+                                                        />
+                                                    </div>
+                                                    <div className="persona-section">
+                                                        <label>Directives comportementales</label>
+                                                        <ul className="rules-list">
+                                                            {formData.agentPersona.behaviors.slice(0, 3).map((b, i) => (
+                                                                <li key={i}>{b}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <button className="btn-primary full-width mt-6" onClick={() => setStep(5)}>
+                                                    Enregistrer et continuer
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {/* STEP 6: CRM */}
+                                        {step === 6 && (
+                                            <>
+                                                <h2>Synchronisation CRM</h2>
+                                                <p className="subtitle">Destination des leads qualifiés.</p>
+                                                <div className="crm-grid">
+                                                    {['HubSpot', 'Salesforce', 'Pipedrive'].map(crm => (
+                                                        <div key={crm} className="crm-card" onClick={() => alert("Intégration bientôt disponible")}>
+                                                            <div className="crm-icon">{crm[0]}</div>
+                                                            <span>{crm}</span>
+                                                        </div>
+                                                    ))}
+                                                    <div className="crm-card active" onClick={() => setFormData({ ...formData, crm: 'none' })}>
+                                                        <div className="crm-icon"><Rocket size={16} /></div>
+                                                        <span>Smart Caller</span>
+                                                    </div>
+                                                </div>
+                                                <button className="btn-primary full-width mt-8" onClick={() => setStep(7)}>
+                                                    Finaliser la configuration
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {/* STEP 7: FINAL */}
+                                        {step === 7 && (
+                                            <>
+                                                <div className="text-center">
+                                                    <div className="success-icon flex justify-center">
+                                                        <Rocket size={40} />
+                                                    </div>
+                                                    <h2>Configuration terminée</h2>
+                                                    <p className="subtitle">Votre agent est prêt à être déployé.</p>
+                                                    <div className="final-preview-card">
+                                                        <div className="flex items-center gap-3 mb-4">
+                                                            <div className="avatar-small">IA</div>
+                                                            <div className="text-left">
+                                                                <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
+                                                                <div className="text-xs text-success">● Actif</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-sm text-muted italic">
+                                                            "{formData.agentPersona?.firstMessage}"
+                                                        </div>
+                                                    </div>
+                                                    <button className="btn-primary full-width mt-6" onClick={finishOnboarding} disabled={loading}>
+                                                        {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
+                                                    </button>
+                                                    <button className="btn-text" onClick={finishOnboarding}>
+                                                        Essayer en mode démo
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* RIGHT PANEL: CONSULTANT GUIDE */}
+                                    <GuidePanel stepIndex={step} />
+                                </div>
+                            </motion.div>
+                        )
+                    )}
             </AnimatePresence>
         </div>
     );
