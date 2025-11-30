@@ -440,68 +440,62 @@ const Onboarding = () => {
                 {/* STEP 2: AGENT SELECTION (NEW) */}
                 {step === 2 && (
                     <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                        <div className="step-container-split">
-                            <div className="agent-selection-container">
-                                <div className="text-center mb-8">
-                                    <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
-                                        Recommandations sur mesure
-                                    </div>
-                                    <h2>Agents IA créés pour {formData.businessType}</h2>
-                                    <p className="subtitle max-w-xl mx-auto">
-                                        Basé sur votre site web, nous avons conçu des agents adaptés à vos besoins. Explorez-les et choisissez celui qui boostera vos ventes.
-                                    </p>
+                        <div className="agent-selection-container">
+                            <div className="text-center mb-8">
+                                <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
+                                    Recommandations sur mesure
                                 </div>
-
-                                <div className="agents-grid">
-                                    {agentOptions.map((agent) => (
-                                        <div key={agent.id} className="agent-card-detailed">
-                                            {agent.premium && (
-                                                <div className="premium-badge">
-                                                    <Star size={10} fill="currentColor" /> Premium
-                                                </div>
-                                            )}
-                                            <div className="agent-icon-wrapper">
-                                                <agent.icon size={24} className="text-accent" />
-                                            </div>
-                                            <h3 className="agent-title">{agent.title}</h3>
-                                            <p className="agent-description">{agent.description}</p>
-
-                                            <div className="agent-section">
-                                                <span className="section-label">Cible :</span>
-                                                <p className="section-text">{agent.audience}</p>
-                                            </div>
-
-                                            <div className="agent-section">
-                                                <span className="section-label">Bénéfices clés :</span>
-                                                <ul className="benefits-list">
-                                                    {agent.benefits.map((benefit, i) => (
-                                                        <li key={i}>
-                                                            <Check size={12} className="text-accent" />
-                                                            {benefit}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-
-                                            <div className="agent-example">
-                                                <span className="example-label">Exemple :</span>
-                                                <p className="example-text">{agent.example}</p>
-                                            </div>
-
-                                            <button
-                                                className="btn-primary full-width mt-auto"
-                                                onClick={() => selectAgent(agent)}
-                                                disabled={loading}
-                                            >
-                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Sélectionner cet Agent"}
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
+                                <h2>Agents IA créés pour {formData.businessType}</h2>
+                                <p className="subtitle max-w-xl mx-auto">
+                                    Basé sur votre site web, nous avons conçu des agents adaptés à vos besoins. Explorez-les et choisissez celui qui boostera vos ventes.
+                                </p>
                             </div>
-                            {/* We keep the guide panel even in this wide view, but maybe adjust CSS to fit */}
-                            <div className="hidden-on-mobile">
-                                <GuidePanel stepIndex={2} />
+
+                            <div className="agents-grid">
+                                {agentOptions.map((agent) => (
+                                    <div key={agent.id} className="agent-card-detailed">
+                                        {agent.premium && (
+                                            <div className="premium-badge">
+                                                <Star size={10} fill="currentColor" /> Premium
+                                            </div>
+                                        )}
+                                        <div className="agent-icon-wrapper">
+                                            <agent.icon size={24} className="text-accent" />
+                                        </div>
+                                        <h3 className="agent-title">{agent.title}</h3>
+                                        <p className="agent-description">{agent.description}</p>
+
+                                        <div className="agent-section">
+                                            <span className="section-label">Cible :</span>
+                                            <p className="section-text">{agent.audience}</p>
+                                        </div>
+
+                                        <div className="agent-section">
+                                            <span className="section-label">Bénéfices clés :</span>
+                                            <ul className="benefits-list">
+                                                {agent.benefits.map((benefit, i) => (
+                                                    <li key={i}>
+                                                        <Check size={12} className="text-accent" />
+                                                        {benefit}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        <div className="agent-example">
+                                            <span className="example-label">Exemple :</span>
+                                            <p className="example-text">{agent.example}</p>
+                                        </div>
+
+                                        <button
+                                            className="btn-primary full-width mt-auto"
+                                            onClick={() => selectAgent(agent)}
+                                            disabled={loading}
+                                        >
+                                            {loading ? <Loader2 className="animate-spin" size={16} /> : "Sélectionner cet Agent"}
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </motion.div>

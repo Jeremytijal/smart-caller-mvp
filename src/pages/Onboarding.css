@@ -711,11 +711,26 @@ textarea:focus {
     width: 100%;
 }
 
+.step-wrapper.wide {
+    max-width: 1400px;
+    /* Increased to fit 3 cards comfortably */
+}
+
+/* ... existing styles ... */
+
 .agents-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    /* Force 3 columns */
     gap: var(--space-lg);
     margin-top: var(--space-lg);
+}
+
+@media (max-width: 1200px) {
+    .agents-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        /* Fallback for smaller screens */
+    }
 }
 
 .agent-card-detailed {
