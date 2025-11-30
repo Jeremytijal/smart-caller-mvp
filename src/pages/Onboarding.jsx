@@ -708,7 +708,8 @@ const Onboarding = () => {
                                 </div>
                             </motion.div>
                         )
-                    )}
+                    )
+                )}
             </AnimatePresence>
         </div>
     );

@@ -869,9 +869,8 @@ textarea:focus {
 .agent-card-detailed .btn-primary {
     width: 100%;
     justify-content: center;
-    background: var(--text-primary);
-    /* Black/White contrast */
-    color: var(--bg-app);
+    background: var(--accent);
+    color: white;
     border: none;
     font-weight: 600;
 }
