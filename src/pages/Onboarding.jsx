@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -32,6 +32,8 @@ const Onboarding = () => {
 
     const [simulation, setSimulation] = useState([]);
     const [agentOptions, setAgentOptions] = useState([]); // Store the generated options
+    const [newMessage, setNewMessage] = useState('');
+    const [senderRole, setSenderRole] = useState('lead'); // 'agent' or 'lead'
 
     // --- Consultant Guide Content ---
     const guideContent = {
@@ -568,42 +570,123 @@ const Onboarding = () => {
                 {/* STEP 3: PREVIEW (Special Layout) */}
                 {step === 3 ? (
                     <motion.div key="step3" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                        <div className="preview-layout-integrated">
-                            <div className="info-column">
-                                <h2>Simulation</h2>
-                                <p className="subtitle">Aperçu du comportement de l'agent.</p>
-
-                                {/* Integrated Guide for Preview */}
-                                <GuidePanel stepIndex={3} />
-
-                                <div className="actions-row mt-8 flex gap-4">
-                                    <button className="btn-secondary" onClick={generatePreview}>
-                                        <Loader2 size={16} /> Régénérer
-                                    </button>
-                                    <button className="btn-primary" onClick={generatePersona} disabled={loading}>
-                                        {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Valider et continuer"}
+                        <div className="simulation-layout">
+                            {/* Left Panel: Conversation */}
+                            <div className="conversation-panel">
+                                <div className="panel-header">
+                                    <h3>Conversation Script</h3>
+                                    <button className="btn-text-small" onClick={generatePreview}>
+                                        <RefreshCw size={14} /> Try a Different Version
                                     </button>
                                 </div>
-                            </div>
 
-                            <div className="chat-preview-container">
-                                <div className="chat-header">
-                                    <div className="avatar-small">IA</div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-medium">Assistant {formData.businessType}</span>
-                                        <span className="text-xs text-muted">En ligne</span>
-                                    </div>
+                                <div className="conversation-timeline">
+                                    <span>CONVERSATION STARTED ON: {new Date().toLocaleDateString()}</span>
                                 </div>
-                                <div className="chat-body">
+
+                                <div className="messages-list">
                                     {simulation.map((msg, i) => (
-                                        <div key={i} className={`message ${msg.sender === 'agent' ? 'received' : 'sent'}`}>
-                                            {msg.text}
+                                        <div key={i} className={`message-row ${msg.sender}`}>
+                                            <div className="avatar-circle">
+                                                {msg.sender === 'agent' ? <Zap size={16} /> : <User size={16} />}
+                                            </div>
+                                            <div className="message-content">
+                                                <div className="message-bubble">
+                                                    {msg.text}
+                                                </div>
+                                                <div className="message-time">
+                                                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="micro-text pb-4">
-                                    Généré pour {formData.website} sur la base de l'analyse d'activité.
+
+                                <div className="input-area-wrapper">
+                                    <div className="role-selector">
+                                        <button
+                                            className={`role-btn ${senderRole === 'agent' ? 'active' : ''}`}
+                                            onClick={() => setSenderRole('agent')}
+                                        >
+                                            Agent
+                                        </button>
+                                        <button
+                                            className={`role-btn ${senderRole === 'lead' ? 'active' : ''}`}
+                                            onClick={() => setSenderRole('lead')}
+                                        >
+                                            Lead
+                                        </button>
+                                    </div>
+                                    <div className="input-row">
+                                        <input
+                                            type="text"
+                                            placeholder="Type your message here"
+                                            value={newMessage}
+                                            onChange={(e) => setNewMessage(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && newMessage.trim()) {
+                                                    setSimulation([...simulation, { sender: senderRole, text: newMessage }]);
+                                                    setNewMessage('');
+                                                }
+                                            }}
+                                        />
+                                        <button
+                                            className="send-btn"
+                                            onClick={() => {
+                                                if (newMessage.trim()) {
+                                                    setSimulation([...simulation, { sender: senderRole, text: newMessage }]);
+                                                    setNewMessage('');
+                                                }
+                                            }}
+                                        >
+                                            <Send size={16} />
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
+
+                            {/* Right Panel: Sidebar */}
+                            <div className="simulation-sidebar">
+                                <div className="sidebar-card">
+                                    <div className="card-label">Business</div>
+                                    <div className="card-value font-bold">{formData.businessType || "Your Business"}</div>
+                                    <div className="card-sub">{formData.website}</div>
+                                    <div className="card-desc mt-2 text-sm text-secondary">
+                                        {formData.businessDescription || "Leading provider in the industry."}
+                                    </div>
+                                </div>
+
+                                <div className="sidebar-card">
+                                    <div className="card-label">Agent</div>
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <div className="agent-icon-box">
+                                            <Zap size={20} />
+                                        </div>
+                                        <div>
+                                            <div className="font-bold">AI Assistant</div>
+                                            <div className="text-sm text-secondary">Lead Qualification Agent</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="sidebar-card">
+                                    <div className="card-label">Agent Objective</div>
+                                    <div className="font-bold mt-1">Qualify & Convert</div>
+                                    <div className="text-sm text-secondary mt-1">
+                                        Handles inbound inquiries, qualifies prospects by assessing needs, and schedules appointments.
+                                    </div>
+                                </div>
+
+                                <div className="sidebar-card">
+                                    <div className="card-label">Target Audience</div>
+                                    <div className="text-sm font-medium mt-1">
+                                        Prospects interested in your services.
+                                    </div>
+                                </div>
+
+                                <button className="btn-primary full-width mt-4" onClick={generatePersona} disabled={loading}>
+                                    {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Valider et continuer"}
+                                </button>
                             </div>
                         </div>
                     </motion.div>
