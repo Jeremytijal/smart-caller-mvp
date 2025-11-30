@@ -370,7 +370,7 @@ const Onboarding = () => {
                     <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                         <div className="analysis-step-container">
                             <div className="text-center mb-12">
-                                <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-4">
+                                <div className="business-badge">
                                     Business Information
                                 </div>
                                 <h1 className="hero-title mb-4">Tell us about your business</h1>
