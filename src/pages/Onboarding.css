@@ -1441,3 +1441,142 @@ textarea:focus {
         height: 500px;
     }
 }
+
+/* --- Integration Step (Step 6) --- */
+
+.integration-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.integrations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.integration-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.integration-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.integration-card.connected {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: #10B981;
+}
+
+.integration-card.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+    background: var(--bg-app);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.integration-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--bg-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+.integration-icon.smart-caller {
+    background: var(--accent);
+    color: white;
+}
+
+.integration-icon.webhook {
+    background: #3B82F6;
+    color: white;
+}
+
+.integration-icon.disabled {
+    background: var(--border-subtle);
+    color: var(--text-tertiary);
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 100px;
+}
+
+.status-badge.connected {
+    background: #10B981;
+    color: white;
+}
+
+.btn-outline-sm {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline-sm:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-outline-sm.disabled {
+    border-color: var(--border-subtle);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.card-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    flex: 1;
+}
+
+.webhook-input-wrapper {
+    margin-top: auto;
+}
+
+.webhook-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.webhook-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
