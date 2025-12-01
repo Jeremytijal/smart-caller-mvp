@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -34,6 +34,16 @@ const Onboarding = () => {
     const [agentOptions, setAgentOptions] = useState([]); // Store the generated options
     const [newMessage, setNewMessage] = useState('');
     const [senderRole, setSenderRole] = useState('lead'); // 'agent' or 'lead'
+    const [theme, setTheme] = useState('light');
+
+    const toggleTheme = () => {
+        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    };
+
+    // Apply theme to body
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]);
 
     // --- Consultant Guide Content ---
     const guideContent = {
@@ -355,10 +365,15 @@ const Onboarding = () => {
                     <span>Smart Caller</span>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                    <div className="progress-bar">
-                        {[0, 1, 2, 3, 4, 5, 6, 7].map(s => (
-                            <div key={s} className={`progress-step ${step === s ? 'active' : step > s ? 'completed' : ''}`} />
-                        ))}
+                    <div className="flex items-center gap-4">
+                        <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+                            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                        </button>
+                        <div className="progress-bar">
+                            {[0, 1, 2, 3, 4, 5, 6, 7].map(s => (
+                                <div key={s} className={`progress-step ${step === s ? 'active' : step > s ? 'completed' : ''}`} />
+                            ))}
+                        </div>
                     </div>
                     <Breadcrumbs />
                 </div>

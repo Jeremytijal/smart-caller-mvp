@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 :root {
-    /* Colors - Light Theme */
+    /* Colors - Light Theme (Default) */
     --bg-root: #FCFCF9;
     /* Cream/Off-white background */
     --bg-card: #FFFFFF;
@@ -39,11 +39,36 @@
     --glass: rgba(255, 255, 255, 0.8);
 }
 
+[data-theme="dark"] {
+    /* Colors - Dark Theme */
+    --bg-root: #0A0A0A;
+    --bg-card: #111111;
+    --bg-input: #161616;
+    --bg-hover: #1A1A1A;
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.12);
+    --border-active: #FE6D10;
+
+    --accent: #FE6D10;
+    --accent-hover: #FF7D2E;
+    --accent-dim: rgba(254, 109, 16, 0.1);
+
+    --text-primary: #EDEDED;
+    --text-secondary: #A1A1A1;
+    --text-tertiary: #666666;
+
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --glass: rgba(255, 255, 255, 0.02);
+}
+
 body {
     background-color: var(--bg-root);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .onboarding-container {
@@ -187,6 +212,8 @@ h2 {
 /* Inputs */
 .input-group {
     margin-bottom: var(--space-md);
+    text-align: center;
+    /* Center content within input group */
 }
 
 .input-group label {
@@ -195,6 +222,8 @@ h2 {
     color: var(--text-secondary);
     margin-bottom: var(--space-xs);
     font-weight: 500;
+    text-align: center;
+    /* Explicitly center labels */
 }
 
 .input-with-icon {
@@ -409,6 +438,27 @@ textarea:focus {
     background: transparent;
     border-bottom: 1px solid var(--accent);
     border-radius: 0;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+    background: var(--bg-hover);
+    transform: rotate(15deg);
 }
 
 /* Goals Grid (Step 2) */
