@@ -2254,19 +2254,19 @@ const Onboarding = () => {
                                                             <table>
                                                                 <thead>
                                                                     <tr>
-                                                                        {csvPreview.headers.slice(0, 4).map((h, i) => (
-                                                                            <th key={i}>{h}</th>
+                                                                        {csvPreview.headers.slice(0, 3).map((h, i) => (
+                                                                            <th key={i}>{h?.length > 15 ? h.slice(0, 15) + '...' : h}</th>
                                                                         ))}
-                                                                        {csvPreview.headers.length > 4 && <th>...</th>}
+                                                                        {csvPreview.headers.length > 3 && <th>+{csvPreview.headers.length - 3}</th>}
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    {csvPreview.rows.slice(0, 3).map((row, i) => (
+                                                                    {csvPreview.rows.slice(0, 2).map((row, i) => (
                                                                         <tr key={i}>
-                                                                            {row.slice(0, 4).map((cell, j) => (
-                                                                                <td key={j}>{cell}</td>
+                                                                            {row.slice(0, 3).map((cell, j) => (
+                                                                                <td key={j} title={cell}>{cell?.length > 20 ? cell.slice(0, 20) + '...' : cell}</td>
                                                                             ))}
-                                                                            {row.length > 4 && <td>...</td>}
+                                                                            {row.length > 3 && <td>...</td>}
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>

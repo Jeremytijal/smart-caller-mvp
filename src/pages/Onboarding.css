@@ -4761,12 +4761,19 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px;
-    border-bottom: 1px solid var(--border-subtle);
+    padding: 14px 16px;
+    background: rgba(16, 185, 129, 0.08);
+    border-bottom: 1px solid rgba(16, 185, 129, 0.15);
 }
 
-.csv-file-info svg {
+.csv-file-info > svg {
     color: #10B981;
+    flex-shrink: 0;
+}
+
+.csv-file-info > div {
+    flex: 1;
+    min-width: 0;
 }
 
 .csv-file-info .file-name {
@@ -4774,12 +4781,16 @@ textarea:focus {
     font-weight: 600;
     color: var(--text-primary);
     font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .csv-file-info .file-rows {
     display: block;
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: #10B981;
+    font-weight: 500;
 }
 
 .btn-remove-file {
@@ -4788,8 +4799,9 @@ textarea:focus {
     border: none;
     color: var(--text-tertiary);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    padding: 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .btn-remove-file:hover {
@@ -4798,20 +4810,26 @@ textarea:focus {
 }
 
 .csv-table-preview {
-    overflow-x: auto;
+    overflow: hidden;
+    max-height: 120px;
 }
 
 .csv-table-preview table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    table-layout: fixed;
 }
 
 .csv-table-preview th,
 .csv-table-preview td {
-    padding: 10px 12px;
+    padding: 8px 10px;
     text-align: left;
     border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
 }
 
 .csv-table-preview th {
@@ -4819,12 +4837,14 @@ textarea:focus {
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 0.05em;
 }
 
 .csv-table-preview td {
     color: var(--text-primary);
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.7rem;
 }
 
 .csv-format-hint {
