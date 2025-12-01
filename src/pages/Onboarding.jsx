@@ -1784,42 +1784,313 @@ const Onboarding = () => {
                     )
                 }
 
-                {/* STEP 7: ACTIVATION (Final) */}
+                {/* STEP 7: ACTIVATION (Final) - Full Summary */}
                 {
                     step === 7 && (
-                        <motion.div key="step7" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                            <div className="step-container-split">
-                                <div className="center-card">
-                                    <div className="text-center">
-                                        <div className="success-icon flex justify-center">
-                                            <Rocket size={40} />
+                        <motion.div key="step7" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                            <div className="activation-container">
+                                {/* Header */}
+                                <div className="activation-header">
+                                    <div className="activation-header-left">
+                                        <div className="activation-icon-wrapper">
+                                            <Rocket size={28} />
                                         </div>
-                                        <h2>Configuration terminée</h2>
-                                        <p className="subtitle">Votre agent est prêt à être déployé.</p>
-                                        <div className="final-preview-card">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="avatar-small">IA</div>
-                                                <div className="text-left">
-                                                    <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
-                                                    <div className="text-xs text-success">● Actif</div>
+                                        <div>
+                                            <h1 className="activation-title">Récapitulatif avant lancement</h1>
+                                            <p className="activation-subtitle">
+                                                Vérifiez les informations de votre agent avant de l'activer.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button className="btn-primary btn-activate" onClick={finishOnboarding} disabled={loading}>
+                                        {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer l'agent</>}
+                                    </button>
+                                </div>
+
+                                <div className="activation-layout">
+                                    {/* Main Content */}
+                                    <div className="activation-main">
+                                        {/* Agent Identity Card */}
+                                        <div className="summary-card">
+                                            <div className="summary-card-header">
+                                                <div className="summary-card-title">
+                                                    <UserCircle size={20} />
+                                                    <h3>Identité de l'agent</h3>
+                                                </div>
+                                                <button className="btn-edit" onClick={() => setStep(4)}>
+                                                    <Edit2 size={14} /> Modifier
+                                                </button>
+                                            </div>
+                                            <div className="agent-identity-preview">
+                                                <div className="agent-avatar-large">
+                                                    <Zap size={24} />
+                                                </div>
+                                                <div className="agent-identity-info">
+                                                    <h4>{formData.agentPersona?.role || "Assistant IA"}</h4>
+                                                    <p className="agent-goal">{formData.agentPersona?.goal || "Qualifier les leads entrants"}</p>
+                                                    <div className="agent-tone-badge">
+                                                        <MessageCircle size={12} />
+                                                        Ton : {analysisData?.tone || "Professionnel"}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="text-sm text-muted italic">
-                                                "{formData.agentPersona?.firstMessage}"
+                                            <div className="first-message-preview">
+                                                <span className="first-message-label">Premier message :</span>
+                                                <p>"{formData.agentPersona?.firstMessage || "Bonjour ! Comment puis-je vous aider aujourd'hui ?"}"</p>
                                             </div>
                                         </div>
-                                        <div className="flex gap-3 mt-6">
-                                            <button className="btn-secondary" onClick={() => setStep(6)}>Retour</button>
-                                            <button className="btn-primary flex-1" onClick={finishOnboarding} disabled={loading}>
-                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
+
+                                        {/* Business Info Card */}
+                                        <div className="summary-card">
+                                            <div className="summary-card-header">
+                                                <div className="summary-card-title">
+                                                    <Building2 size={20} />
+                                                    <h3>Informations entreprise</h3>
+                                                </div>
+                                                <button className="btn-edit" onClick={() => setStep(1)}>
+                                                    <Edit2 size={14} /> Modifier
+                                                </button>
+                                            </div>
+                                            <div className="summary-grid">
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Entreprise</span>
+                                                    <span className="summary-value">{analysisData?.companyName || "Non défini"}</span>
+                                                </div>
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Secteur</span>
+                                                    <span className="summary-value">{analysisData?.industry || "Non défini"}</span>
+                                                </div>
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Marché cible</span>
+                                                    <span className="summary-value">{analysisData?.targetMarket || "Non défini"}</span>
+                                                </div>
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Langue</span>
+                                                    <span className="summary-value">{analysisData?.language || formData.language}</span>
+                                                </div>
+                                            </div>
+                                            <div className="summary-item full-width">
+                                                <span className="summary-label">Proposition de valeur</span>
+                                                <span className="summary-value">{analysisData?.valueProposition || "Non défini"}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* ICP Card */}
+                                        <div className="summary-card">
+                                            <div className="summary-card-header">
+                                                <div className="summary-card-title">
+                                                    <Target size={20} />
+                                                    <h3>Profil client idéal (ICP)</h3>
+                                                </div>
+                                                <button className="btn-edit" onClick={() => setStep(2)}>
+                                                    <Edit2 size={14} /> Modifier
+                                                </button>
+                                            </div>
+                                            <div className="summary-grid">
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Secteur cible</span>
+                                                    <span className="summary-value">{formData.icpSector || "Non défini"}</span>
+                                                </div>
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Taille entreprise</span>
+                                                    <span className="summary-value">{formData.icpSize || "Non défini"}</span>
+                                                </div>
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Décideur type</span>
+                                                    <span className="summary-value">{formData.icpDecider || "Non défini"}</span>
+                                                </div>
+                                                <div className="summary-item">
+                                                    <span className="summary-label">Budget</span>
+                                                    <span className="summary-value">{formData.icpBudget || "Non défini"}</span>
+                                                </div>
+                                            </div>
+                                            {formData.painPoints && formData.painPoints.length > 0 && (
+                                                <div className="pain-points-summary">
+                                                    <span className="summary-label">Points de douleur identifiés</span>
+                                                    <div className="pain-tags">
+                                                        {formData.painPoints.slice(0, 3).map((pain, idx) => (
+                                                            <span key={idx} className="pain-tag">{pain}</span>
+                                                        ))}
+                                                        {formData.painPoints.length > 3 && (
+                                                            <span className="pain-tag more">+{formData.painPoints.length - 3}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Channels & Integrations */}
+                                        <div className="summary-row">
+                                            <div className="summary-card half">
+                                                <div className="summary-card-header">
+                                                    <div className="summary-card-title">
+                                                        <MessageSquare size={20} />
+                                                        <h3>Canaux actifs</h3>
+                                                    </div>
+                                                    <button className="btn-edit" onClick={() => setStep(5)}>
+                                                        <Edit2 size={14} /> Modifier
+                                                    </button>
+                                                </div>
+                                                <div className="channels-summary">
+                                                    {formData.channels?.sms && (
+                                                        <div className="channel-badge active">
+                                                            <Smartphone size={16} /> SMS
+                                                        </div>
+                                                    )}
+                                                    {formData.channels?.whatsapp && (
+                                                        <div className="channel-badge active">
+                                                            <MessageCircle size={16} /> WhatsApp
+                                                        </div>
+                                                    )}
+                                                    {formData.channels?.email && (
+                                                        <div className="channel-badge active">
+                                                            <Mail size={16} /> Email
+                                                        </div>
+                                                    )}
+                                                    {formData.channels?.webchat && (
+                                                        <div className="channel-badge active">
+                                                            <MessageSquare size={16} /> Webchat
+                                                        </div>
+                                                    )}
+                                                    {!formData.channels?.sms && !formData.channels?.whatsapp && !formData.channels?.email && !formData.channels?.webchat && (
+                                                        <span className="text-muted">Aucun canal sélectionné</span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="summary-card half">
+                                                <div className="summary-card-header">
+                                                    <div className="summary-card-title">
+                                                        <Zap size={20} />
+                                                        <h3>Intégrations</h3>
+                                                    </div>
+                                                    <button className="btn-edit" onClick={() => setStep(6)}>
+                                                        <Edit2 size={14} /> Modifier
+                                                    </button>
+                                                </div>
+                                                <div className="integrations-summary">
+                                                    <div className="integration-badge connected">
+                                                        <Rocket size={14} /> Smart Caller
+                                                        <Check size={12} className="check-icon" />
+                                                    </div>
+                                                    {formData.webhookUrl && (
+                                                        <div className="integration-badge connected">
+                                                            <Zap size={14} /> Webhook
+                                                            <Check size={12} className="check-icon" />
+                                                        </div>
+                                                    )}
+                                                    {formData.crm && formData.crm !== 'none' && (
+                                                        <div className="integration-badge connected">
+                                                            <Briefcase size={14} /> {formData.crm}
+                                                            <Check size={12} className="check-icon" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact Info */}
+                                        {(analysisData?.contactEmail || analysisData?.contactPhone || analysisData?.businessHours) && (
+                                            <div className="summary-card">
+                                                <div className="summary-card-header">
+                                                    <div className="summary-card-title">
+                                                        <Phone size={20} />
+                                                        <h3>Informations de contact</h3>
+                                                    </div>
+                                                    <button className="btn-edit" onClick={() => setStep(1)}>
+                                                        <Edit2 size={14} /> Modifier
+                                                    </button>
+                                                </div>
+                                                <div className="summary-grid three-cols">
+                                                    {analysisData?.contactEmail && (
+                                                        <div className="summary-item">
+                                                            <span className="summary-label">Email</span>
+                                                            <span className="summary-value">{analysisData.contactEmail}</span>
+                                                        </div>
+                                                    )}
+                                                    {analysisData?.contactPhone && (
+                                                        <div className="summary-item">
+                                                            <span className="summary-label">Téléphone</span>
+                                                            <span className="summary-value">{analysisData.contactPhone}</span>
+                                                        </div>
+                                                    )}
+                                                    {analysisData?.businessHours && (
+                                                        <div className="summary-item">
+                                                            <span className="summary-label">Horaires</span>
+                                                            <span className="summary-value">{analysisData.businessHours}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Sidebar */}
+                                    <div className="activation-sidebar">
+                                        <div className="activation-checklist">
+                                            <h4>Checklist de lancement</h4>
+                                            <div className="checklist-items">
+                                                <div className={`checklist-item ${analysisData?.companyName ? 'checked' : ''}`}>
+                                                    <CheckCircle2 size={18} />
+                                                    <span>Informations entreprise</span>
+                                                </div>
+                                                <div className={`checklist-item ${formData.agentPersona?.role ? 'checked' : ''}`}>
+                                                    <CheckCircle2 size={18} />
+                                                    <span>Agent configuré</span>
+                                                </div>
+                                                <div className={`checklist-item ${formData.icpSector ? 'checked' : ''}`}>
+                                                    <CheckCircle2 size={18} />
+                                                    <span>ICP défini</span>
+                                                </div>
+                                                <div className={`checklist-item ${(formData.channels?.sms || formData.channels?.whatsapp) ? 'checked' : ''}`}>
+                                                    <CheckCircle2 size={18} />
+                                                    <span>Canaux sélectionnés</span>
+                                                </div>
+                                                <div className={`checklist-item checked`}>
+                                                    <CheckCircle2 size={18} />
+                                                    <span>Smart Caller connecté</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="activation-info-card">
+                                            <div className="info-card-icon">
+                                                <Shield size={20} />
+                                            </div>
+                                            <h4>Protection garantie</h4>
+                                            <p>Votre agent ne dira que ce que vous avez validé. Aucune hallucination, aucune invention.</p>
+                                        </div>
+
+                                        <div className="activation-info-card highlight">
+                                            <div className="info-card-icon">
+                                                <Zap size={20} />
+                                            </div>
+                                            <h4>Prêt en 30 secondes</h4>
+                                            <p>Une fois activé, votre agent sera immédiatement opérationnel pour traiter les leads.</p>
+                                        </div>
+
+                                        <div className="activation-help">
+                                            <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                                                <HelpCircle size={16} /> Besoin d'aide ?
                                             </button>
                                         </div>
-                                        <button className="btn-text mt-4" onClick={finishOnboarding}>
+                                    </div>
+                                </div>
+
+                                {/* Footer */}
+                                <div className="activation-footer">
+                                    <button className="btn-secondary" onClick={() => setStep(6)}>
+                                        <ArrowLeft size={16} /> Retour
+                                    </button>
+                                    <div className="activation-footer-right">
+                                        <button className="btn-text" onClick={finishOnboarding}>
                                             Essayer en mode démo
+                                        </button>
+                                        <button className="btn-primary btn-activate-large" onClick={finishOnboarding} disabled={loading}>
+                                            {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer mon agent</>}
                                         </button>
                                     </div>
                                 </div>
-                                <GuidePanel stepIndex={7} />
                             </div>
                         </motion.div>
                     )
