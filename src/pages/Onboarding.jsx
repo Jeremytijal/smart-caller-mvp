@@ -2176,7 +2176,10 @@ const Onboarding = () => {
                                         <div className="webhook-section">
                                             <label>Votre webhook Smart Caller :</label>
                                             <div className="webhook-url-box">
-                                                <code>{webhookUrl}</code>
+                                                <div className="webhook-url-display">
+                                                    <span className="webhook-prefix">https://api.smartcaller.ai/webhook/</span>
+                                                    <span className="webhook-id">{user?.id?.slice(0, 8) || 'xxxxxxxx'}...</span>
+                                                </div>
                                                 <button className="btn-copy" onClick={copyWebhook}>
                                                     {webhookCopied ? <Check size={16} /> : <Copy size={16} />}
                                                     {webhookCopied ? 'Copié !' : 'Copier'}
