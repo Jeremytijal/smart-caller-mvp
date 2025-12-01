@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon, Building2, Users, UserCircle, Euro, AlertCircle, MessageSquareWarning, CheckCircle2, X, Plus, ArrowLeft, Sparkles, Package, Layers, PlusCircle, Trophy, AlertTriangle, Phone, Trash2 } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon, Building2, Users, UserCircle, Euro, AlertCircle, MessageSquareWarning, CheckCircle2, X, Plus, ArrowLeft, Sparkles, Package, Layers, PlusCircle, Trophy, AlertTriangle, Phone, Trash2, Upload, FileText, Link2, Copy, ExternalLink, PartyPopper } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -196,8 +196,50 @@ const Onboarding = () => {
     };
 
     const breadcrumbs = [
-        "Analyse", "Résultats", "Définition de l'ICP", "Sélection", "Configuration", "Canaux", "CRM", "Activation"
+        "Analyse", "Résultats", "Définition de l'ICP", "Sélection", "Configuration", "Canaux", "CRM", "Activation", "Démarrage"
     ];
+
+    // CSV Import State
+    const [csvFile, setCsvFile] = useState(null);
+    const [csvPreview, setCsvPreview] = useState(null);
+    const [webhookCopied, setWebhookCopied] = useState(false);
+
+    // Generate unique webhook URL for user
+    const webhookUrl = user ? `https://api.smartcaller.ai/webhook/${user.id}` : 'https://api.smartcaller.ai/webhook/your-id';
+
+    const copyWebhook = () => {
+        navigator.clipboard.writeText(webhookUrl);
+        setWebhookCopied(true);
+        setTimeout(() => setWebhookCopied(false), 2000);
+    };
+
+    const handleCsvUpload = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type === 'text/csv') {
+            setCsvFile(file);
+            // Preview first 5 rows
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const text = event.target.result;
+                const lines = text.split('\n').slice(0, 6);
+                const headers = lines[0].split(',');
+                const rows = lines.slice(1).map(line => line.split(','));
+                setCsvPreview({ headers, rows, totalRows: text.split('\n').length - 1 });
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    const startWithCsv = async () => {
+        if (!csvFile) return;
+        setLoading(true);
+        setLoadingText("Import des leads...");
+        // Simulate upload - in real app, this would upload to backend
+        setTimeout(() => {
+            setLoading(false);
+            navigate('/');
+        }, 2000);
+    };
 
     // --- Helper: Generate Agent Options ---
     const generateAgentOptions = (businessType) => {
@@ -480,7 +522,7 @@ const Onboarding = () => {
                             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
                         <div className="progress-bar">
-                            {[0, 1, 2, 3, 4, 5, 6, 7].map(s => (
+                            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(s => (
                                 <div key={s} className={`progress-step ${step === s ? 'active' : step > s ? 'completed' : ''}`} />
                             ))}
                         </div>
@@ -1687,12 +1729,12 @@ const Onboarding = () => {
                                 <div className="integration-header">
                                     <div className="integration-header-left">
                                         <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-2">
-                                            Connect CRM
-                                        </div>
+                                        Connect CRM
+                                    </div>
                                         <h2 className="integration-title">Connect your agent to your CRM</h2>
                                         <p className="integration-subtitle">
-                                            Link your CRM to automatically sync leads, conversations, and qualification data.
-                                        </p>
+                                        Link your CRM to automatically sync leads, conversations, and qualification data.
+                                    </p>
                                     </div>
                                     <div className="integration-header-right">
                                         <button className="btn-primary btn-launch" onClick={() => setStep(7)}>
@@ -1775,9 +1817,9 @@ const Onboarding = () => {
                                     <button className="btn-secondary" onClick={() => setStep(5)}>
                                         <ArrowLeft size={16} /> Back
                                     </button>
-                                    <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
-                                        Lost? Talk to Sales <HelpCircle size={16} />
-                                    </button>
+                                        <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                                            Lost? Talk to Sales <HelpCircle size={16} />
+                                        </button>
                                 </div>
                             </div>
                         </motion.div>
@@ -1800,12 +1842,12 @@ const Onboarding = () => {
                                             <p className="activation-subtitle">
                                                 Vérifiez les informations de votre agent avant de l'activer.
                                             </p>
-                                        </div>
-                                    </div>
-                                    <button className="btn-primary btn-activate" onClick={finishOnboarding} disabled={loading}>
+                                                </div>
+                                            </div>
+                                    <button className="btn-primary btn-activate" onClick={() => setStep(8)} disabled={loading}>
                                         {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer l'agent</>}
                                     </button>
-                                </div>
+                                            </div>
 
                                 <div className="activation-layout">
                                     {/* Main Content */}
@@ -1816,11 +1858,11 @@ const Onboarding = () => {
                                                 <div className="summary-card-title">
                                                     <UserCircle size={20} />
                                                     <h3>Identité de l'agent</h3>
-                                                </div>
+                                        </div>
                                                 <button className="btn-edit" onClick={() => setStep(4)}>
                                                     <Edit2 size={14} /> Modifier
-                                                </button>
-                                            </div>
+                                            </button>
+                                        </div>
                                             <div className="agent-identity-preview">
                                                 <div className="agent-avatar-large">
                                                     <Zap size={24} />
@@ -2086,10 +2128,186 @@ const Onboarding = () => {
                                         <button className="btn-text" onClick={finishOnboarding}>
                                             Essayer en mode démo
                                         </button>
-                                        <button className="btn-primary btn-activate-large" onClick={finishOnboarding} disabled={loading}>
+                                        <button className="btn-primary btn-activate-large" onClick={() => setStep(8)} disabled={loading}>
                                             {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer mon agent</>}
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )
+                }
+
+                {/* STEP 8: GET STARTED - Connect or Import */}
+                {
+                    step === 8 && (
+                        <motion.div key="step8" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                            <div className="getstarted-container">
+                                {/* Success Header */}
+                                <div className="getstarted-header">
+                                    <div className="success-celebration">
+                                        <div className="success-icon-large">
+                                            <PartyPopper size={32} />
+                                        </div>
+                                        <div className="confetti-dots">
+                                            <span></span><span></span><span></span><span></span><span></span>
+                                        </div>
+                                    </div>
+                                    <h1 className="getstarted-title">Votre agent est prêt ! 🎉</h1>
+                                    <p className="getstarted-subtitle">
+                                        Choisissez comment vous voulez commencer à utiliser votre agent IA.
+                                    </p>
+                                </div>
+
+                                {/* Two Options */}
+                                <div className="getstarted-options">
+                                    {/* Option 1: Webhook Integration */}
+                                    <div className="getstarted-card">
+                                        <div className="card-icon-wrapper webhook-icon">
+                                            <Link2 size={28} />
+                                        </div>
+                                        <div className="card-badge recommended">Recommandé</div>
+                                        <h3>Connecter vos formulaires</h3>
+                                        <p className="card-description">
+                                            Intégrez Smart Caller à vos formulaires existants via webhook. 
+                                            Chaque nouveau lead sera automatiquement contacté.
+                                        </p>
+
+                                        <div className="webhook-section">
+                                            <label>Votre webhook Smart Caller :</label>
+                                            <div className="webhook-url-box">
+                                                <code>{webhookUrl}</code>
+                                                <button className="btn-copy" onClick={copyWebhook}>
+                                                    {webhookCopied ? <Check size={16} /> : <Copy size={16} />}
+                                                    {webhookCopied ? 'Copié !' : 'Copier'}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="integration-examples">
+                                            <span className="examples-label">Compatible avec :</span>
+                                            <div className="examples-logos">
+                                                <span className="logo-badge">Typeform</span>
+                                                <span className="logo-badge">Webflow</span>
+                                                <span className="logo-badge">WordPress</span>
+                                                <span className="logo-badge">Zapier</span>
+                                                <span className="logo-badge">+50</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="card-actions">
+                                            <button className="btn-primary full-width" onClick={() => {
+                                                finishOnboarding();
+                                            }}>
+                                                <Check size={18} /> C'est configuré, allons-y !
+                                            </button>
+                                            <a href="https://docs.smartcaller.ai/webhook" target="_blank" rel="noopener noreferrer" className="btn-text-link">
+                                                <ExternalLink size={14} /> Voir la documentation
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    {/* Option 2: CSV Import */}
+                                    <div className="getstarted-card">
+                                        <div className="card-icon-wrapper csv-icon">
+                                            <Upload size={28} />
+                                        </div>
+                                        <div className="card-badge free">100 leads gratuits</div>
+                                        <h3>Tester avec vos leads</h3>
+                                        <p className="card-description">
+                                            Importez un fichier CSV avec vos leads existants. 
+                                            Testez gratuitement sur 100 contacts pour voir la magie opérer.
+                                        </p>
+
+                                        <div className="csv-upload-section">
+                                            {!csvFile ? (
+                                                <label className="csv-dropzone">
+                                                    <input 
+                                                        type="file" 
+                                                        accept=".csv" 
+                                                        onChange={handleCsvUpload}
+                                                        hidden 
+                                                    />
+                                                    <div className="dropzone-content">
+                                                        <FileText size={32} />
+                                                        <span className="dropzone-title">Glissez votre fichier CSV ici</span>
+                                                        <span className="dropzone-subtitle">ou cliquez pour parcourir</span>
+                                                    </div>
+                                                </label>
+                                            ) : (
+                                                <div className="csv-preview">
+                                                    <div className="csv-file-info">
+                                                        <FileText size={20} />
+                                                        <div>
+                                                            <span className="file-name">{csvFile.name}</span>
+                                                            <span className="file-rows">{csvPreview?.totalRows || 0} leads détectés</span>
+                                                        </div>
+                                                        <button className="btn-remove-file" onClick={() => { setCsvFile(null); setCsvPreview(null); }}>
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                    {csvPreview && (
+                                                        <div className="csv-table-preview">
+                                                            <table>
+                                                                <thead>
+                                                                    <tr>
+                                                                        {csvPreview.headers.slice(0, 4).map((h, i) => (
+                                                                            <th key={i}>{h}</th>
+                                                                        ))}
+                                                                        {csvPreview.headers.length > 4 && <th>...</th>}
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {csvPreview.rows.slice(0, 3).map((row, i) => (
+                                                                        <tr key={i}>
+                                                                            {row.slice(0, 4).map((cell, j) => (
+                                                                                <td key={j}>{cell}</td>
+                                                                            ))}
+                                                                            {row.length > 4 && <td>...</td>}
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="csv-format-hint">
+                                            <Info size={14} />
+                                            <span>Colonnes requises : <strong>nom, téléphone</strong> (email optionnel)</span>
+                                        </div>
+
+                                        <div className="card-actions">
+                                            <button 
+                                                className={`btn-primary full-width ${!csvFile ? 'disabled' : ''}`} 
+                                                onClick={startWithCsv}
+                                                disabled={!csvFile || loading}
+                                            >
+                                                {loading ? (
+                                                    <><Loader2 className="animate-spin" size={18} /> Import en cours...</>
+                                                ) : (
+                                                    <><Upload size={18} /> Importer et démarrer</>
+                                                )}
+                                            </button>
+                                            <a href="/sample-leads.csv" download className="btn-text-link">
+                                                <FileText size={14} /> Télécharger un exemple CSV
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Skip Option */}
+                                <div className="getstarted-footer">
+                                    <p className="skip-text">
+                                        Vous pouvez aussi configurer cela plus tard depuis le dashboard.
+                                    </p>
+                                    <button className="btn-text" onClick={() => {
+                                        finishOnboarding();
+                                    }}>
+                                        Passer et aller au dashboard <ArrowRight size={16} />
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
