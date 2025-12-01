@@ -1683,25 +1683,33 @@ const Onboarding = () => {
                     step === 6 && (
                         <motion.div key="step6" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                             <div className="integration-container">
-                                <div className="text-center mb-12">
-                                    <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
-                                        Connect CRM
+                                {/* Header with title and Launch button on same row */}
+                                <div className="integration-header">
+                                    <div className="integration-header-left">
+                                        <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-2">
+                                            Connect CRM
+                                        </div>
+                                        <h2 className="integration-title">Connect your agent to your CRM</h2>
+                                        <p className="integration-subtitle">
+                                            Link your CRM to automatically sync leads, conversations, and qualification data.
+                                        </p>
                                     </div>
-                                    <h2>Connect your agent to your CRM</h2>
-                                    <p className="subtitle max-w-xl mx-auto">
-                                        Link your CRM to automatically sync leads, conversations, and qualification data.
-                                    </p>
+                                    <div className="integration-header-right">
+                                        <button className="btn-primary btn-launch" onClick={() => setStep(7)}>
+                                            Launch your Agent <ArrowRight size={16} />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="integrations-grid">
                                     {/* Smart Caller - Connected */}
                                     <div className="integration-card connected">
                                         <div className="card-header">
-                                            <div className="flex items-center gap-3">
+                                            <div className="integration-card-title">
                                                 <div className="integration-icon smart-caller">
-                                                    <Rocket size={24} />
+                                                    <Rocket size={20} />
                                                 </div>
-                                                <h3 className="font-bold text-lg">Smart Caller</h3>
+                                                <h3>Smart Caller</h3>
                                             </div>
                                             <div className="status-badge connected">
                                                 Connected <Check size={14} />
@@ -1715,15 +1723,15 @@ const Onboarding = () => {
                                     {/* Webhook */}
                                     <div className="integration-card">
                                         <div className="card-header">
-                                            <div className="flex items-center gap-3">
+                                            <div className="integration-card-title">
                                                 <div className="integration-icon webhook">
-                                                    <Zap size={24} />
+                                                    <Zap size={20} />
                                                 </div>
-                                                <h3 className="font-bold text-lg">Webhook</h3>
+                                                <h3>Webhook</h3>
                                             </div>
                                             <button className="btn-outline-sm">Connect</button>
                                         </div>
-                                        <p className="card-desc mb-4">
+                                        <p className="card-desc">
                                             Send leads to any external service via webhook.
                                         </p>
                                         <div className="webhook-input-wrapper">
@@ -1748,11 +1756,11 @@ const Onboarding = () => {
                                     ].map(crm => (
                                         <div key={crm.name} className="integration-card disabled">
                                             <div className="card-header">
-                                                <div className="flex items-center gap-3">
+                                                <div className="integration-card-title">
                                                     <div className="integration-icon disabled">
                                                         {crm.icon}
                                                     </div>
-                                                    <h3 className="font-bold text-lg text-muted">{crm.name}</h3>
+                                                    <h3 className="text-muted">{crm.name}</h3>
                                                 </div>
                                                 <button className="btn-outline-sm disabled" disabled>Connect</button>
                                             </div>
@@ -1763,16 +1771,13 @@ const Onboarding = () => {
                                     ))}
                                 </div>
 
-                                <div className="footer-actions mt-12">
-                                    <button className="btn-secondary" onClick={() => setStep(5)}>Back</button>
-                                    <div className="flex gap-4">
-                                        <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
-                                            Lost? Talk to Sales <HelpCircle size={16} />
-                                        </button>
-                                        <button className="btn-primary" onClick={() => setStep(7)}>
-                                            Launch your Agent
-                                        </button>
-                                    </div>
+                                <div className="integration-footer">
+                                    <button className="btn-secondary" onClick={() => setStep(5)}>
+                                        <ArrowLeft size={16} /> Back
+                                    </button>
+                                    <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                                        Lost? Talk to Sales <HelpCircle size={16} />
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
