@@ -370,7 +370,7 @@ const Onboarding = () => {
                     <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                         <div className="analysis-step-container">
                             <div className="text-center mb-12">
-                                <div className="business-badge">
+                                <div className="badge">
                                     Business Information
                                 </div>
                                 <h1 className="hero-title mb-4">Tell us about your business</h1>
@@ -396,7 +396,7 @@ const Onboarding = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                     <div className="input-group">
                                         <label className="text-sm font-semibold mb-2 block">Agent Language</label>
                                         <div className="select-wrapper">
@@ -429,19 +429,10 @@ const Onboarding = () => {
                                     </div>
                                 </div>
 
-                                <div className="input-group mb-8">
-                                    <label className="text-sm font-semibold mb-2 block">Business Description <span className="text-muted font-normal">(Optional)</span></label>
-                                    <textarea
-                                        placeholder="Describe your business activity, key services, and target audience..."
-                                        value={formData.businessDescription}
-                                        onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-                                        rows={3}
-                                        className="resize-none"
-                                    />
-                                </div>
-
-                                <div className="analysis-footer flex flex-col md:flex-row justify-between items-center gap-6">
-                                    <button className="btn-text flex items-center gap-2 text-muted hover:text-primary transition-colors">
+                                <div className="analysis-footer flex justify-center items-center gap-4">
+                                    <button
+                                        className="btn-secondary"
+                                    >
                                         Lost? Talk to Sales <HelpCircle size={16} />
                                     </button>
                                     <button

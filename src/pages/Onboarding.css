@@ -2,22 +2,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 :root {
-    /* Colors */
-    --bg-root: #0A0A0A;
-    --bg-card: #111111;
-    --bg-input: #161616;
-    --bg-hover: #1A1A1A;
+    /* Colors - Light Theme */
+    --bg-root: #FCFCF9;
+    /* Cream/Off-white background */
+    --bg-card: #FFFFFF;
+    --bg-input: #FFFFFF;
+    --bg-hover: #F5F5F5;
 
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.12);
+    --border-subtle: #E5E5E5;
+    --border-strong: #D4D4D4;
+    --border-active: #1A1A1A;
 
-    --accent: #FE6D10;
-    --accent-hover: #FF7D2E;
-    --accent-dim: rgba(254, 109, 16, 0.1);
+    --accent: #1A1A1A;
+    /* Black accent */
+    --accent-hover: #333333;
+    --accent-dim: rgba(26, 26, 26, 0.05);
 
-    --text-primary: #EDEDED;
-    --text-secondary: #A1A1A1;
-    --text-tertiary: #666666;
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --text-tertiary: #888888;
 
     /* Spacing & Layout */
     --radius-sm: 4px;
@@ -31,9 +34,9 @@
     --space-xl: 48px;
 
     /* Effects */
-    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
-    --glass: rgba(255, 255, 255, 0.02);
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --glass: rgba(255, 255, 255, 0.8);
 }
 
 body {
@@ -49,7 +52,11 @@ body {
     flex-direction: column;
     align-items: center;
     padding: var(--space-lg);
-    background: radial-gradient(circle at 50% 0%, #1a1a1a 0%, var(--bg-root) 60%);
+    background: var(--bg-root);
+    background-image:
+        linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+    background-size: 64px 64px;
 }
 
 /* Header & Progress */
@@ -210,24 +217,63 @@ textarea {
     background: var(--bg-input);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 10px 12px 10px 36px;
+    padding: 12px 16px 12px 42px;
     color: var(--text-primary);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-family: inherit;
     transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 textarea {
-    padding: 10px 12px;
+    padding: 12px 16px;
     resize: vertical;
-    min-height: 80px;
+    min-height: 100px;
 }
 
 .input-with-icon input:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--border-active);
-    background: var(--bg-hover);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-dim);
+    background: var(--bg-input);
+}
+
+.custom-select {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 6px;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    pointer-events: none;
 }
 
 /* Buttons */
@@ -260,8 +306,8 @@ textarea:focus {
 }
 
 .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border-subtle);
+    background: white;
+    border: 1px solid var(--border-strong);
     color: var(--text-primary);
     border-radius: var(--radius-md);
     padding: 10px 20px;
@@ -272,11 +318,24 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
     background: var(--bg-hover);
-    border-color: var(--border-active);
+    border-color: var(--text-primary);
+}
+
+.badge {
+    display: inline-block;
+    background-color: var(--accent-dim);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    border: 1px solid var(--border-subtle);
 }
 
 .btn-text {

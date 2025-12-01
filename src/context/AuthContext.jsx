@@ -12,14 +12,26 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Check active sessions and subscribe to auth changes
         const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
-            setLoading(false);
+            try {
+                console.log('AuthContext: Initializing Supabase session...');
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) {
+                    console.error('AuthContext: Error getting session:', error);
+                } else {
+                    console.log('AuthContext: Session loaded:', session ? 'User logged in' : 'No active session');
+                }
+                setUser(session?.user ?? null);
+            } catch (error) {
+                console.error('AuthContext: Exception during session initialization:', error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         getSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            console.log('AuthContext: Auth state changed:', _event);
             setUser(session?.user ?? null);
         });
 

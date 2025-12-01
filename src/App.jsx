@@ -16,6 +16,8 @@ const ProtectedRoute = () => {
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 };
 
+console.log('App.jsx: Rendering App component...');
+
 function App() {
   return (
     <AuthProvider>
