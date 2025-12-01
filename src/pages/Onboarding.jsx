@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon } from 'lucide-react';
+import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon, Building2, Users, UserCircle, Euro, AlertCircle, MessageSquareWarning, CheckCircle2, X, Plus, ArrowLeft, Sparkles } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Onboarding.css';
@@ -20,13 +20,34 @@ const Onboarding = () => {
         language: 'Français',
         businessDescription: '', // Optional description
         businessType: '',
-        icp: '', // New field for ICP
+        icp: '', // Legacy field for ICP
+        icpSector: 'PME et ETI - Télécommunications',
+        icpSize: '10-250 employés',
+        icpDecider: 'Directeur Commercial, CEO, Head of Sales',
+        icpBudget: '500€ - 5 000€ / mois',
+        painPoints: [
+            "Perte de leads par manque de réactivité",
+            "Standard téléphonique saturé",
+            "Équipe commerciale surchargée",
+            "Difficulté à qualifier les prospects"
+        ],
+        needs: [
+            "Réponse rapide aux demandes entrantes",
+            "Qualification automatique des leads",
+            "Intégration CRM native",
+            "Disponibilité 24/7"
+        ],
+        objections: [
+            { objection: "C'est trop cher", response: "ROI en 30 jours grâce aux leads récupérés" },
+            { objection: "J'ai déjà un commercial", response: "Smart Caller l'assiste, ne le remplace pas" },
+            { objection: "Je veux tester d'abord", response: "Essai gratuit de 14 jours disponible" }
+        ],
         commonQuestions: [],
         qualificationCriteria: [],
         goal: 'qualify', // 'qualify' or 'book'
         selectedAgentId: null, // New field for the selected agent option
         agentPersona: null, // { role, goal, firstMessage, behaviors, constraints, tone }
-        channels: { sms: true, whatsapp: true, email: false, webchat: false }, // Default SMS/WhatsApp true
+        channels: { sms: true, whatsapp: false, email: false, webchat: false }, // Default SMS/WhatsApp true
         crm: null, // 'hubspot', 'pipedrive', 'salesforce', 'none'
         crmApiKey: ''
     });
@@ -395,15 +416,15 @@ const Onboarding = () => {
                                 </div>
                                 <h1 className="hero-title mb-4">Tell us about your business</h1>
                                 <p className="subtitle max-w-2xl mx-auto">
-                                    Just share your site, country, and language.
+                                    Just share your site, country, and language.<br />
                                     We'll take care of the rest, creating AI agents that understand your business.
                                 </p>
                             </div>
 
                             <div className="analysis-form max-w-3xl mx-auto">
-                                <div className="input-group mb-6">
+                                <div className="input-group-vertical mb-6">
                                     <label className="text-sm font-semibold mb-2 block">Your Company Website</label>
-                                    <div className="input-with-icon large-input">
+                                    <div className="input-with-icon full-width-input">
                                         <Globe size={20} />
                                         <input
                                             type="text"
@@ -417,9 +438,9 @@ const Onboarding = () => {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                    <div className="input-group">
+                                    <div className="input-group-vertical">
                                         <label className="text-sm font-semibold mb-2 block">Agent Language</label>
-                                        <div className="select-wrapper">
+                                        <div className="select-wrapper full-width-select">
                                             <select
                                                 value={formData.language}
                                                 onChange={(e) => setFormData({ ...formData, language: e.target.value })}
@@ -432,9 +453,9 @@ const Onboarding = () => {
                                             </select>
                                         </div>
                                     </div>
-                                    <div className="input-group">
+                                    <div className="input-group-vertical">
                                         <label className="text-sm font-semibold mb-2 block">Agent Country</label>
-                                        <div className="select-wrapper">
+                                        <div className="select-wrapper full-width-select">
                                             <select
                                                 value={formData.country}
                                                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
@@ -449,7 +470,7 @@ const Onboarding = () => {
                                     </div>
                                 </div>
 
-                                <div className="analysis-footer flex justify-center items-center gap-4">
+                                <div className="analysis-footer-centered">
                                     <button
                                         className="btn-secondary"
                                     >
@@ -514,29 +535,228 @@ const Onboarding = () => {
                     </motion.div>
                 )}
 
-                {/* STEP 2: ICP DEFINITION (NEW) */}
+                {/* STEP 2: ICP DEFINITION - Enhanced Version */}
                 {step === 2 && (
-                    <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="step-container-split">
-                            <div className="center-card">
-                                <h2>Définition de votre Cible (ICP)</h2>
-                                <p className="subtitle">L'IA a identifié votre client idéal. Ajustez-le pour affiner le comportement de l'agent.</p>
+                    <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="icp-layout">
+                            {/* Main Content */}
+                            <div className="icp-main-content">
+                                <div className="icp-card">
+                                    <div className="icp-card-header">
+                                        <div>
+                                            <h2 className="icp-title">Définition de votre Cible (ICP)</h2>
+                                            <p className="icp-subtitle">
+                                                L'IA a analysé votre site et identifié votre client idéal.
+                                                Vérifiez et ajustez ces informations pour optimiser les conversations.
+                                            </p>
+                                        </div>
+                                        <div className="ai-confidence-badge">
+                                            <Sparkles size={14} />
+                                            <span>Confiance IA : 87%</span>
+                                        </div>
+                                    </div>
 
-                                <div className="input-group">
-                                    <label className="text-sm font-semibold mb-2 block text-left">Description du Client Idéal</label>
-                                    <textarea
-                                        value={formData.icp}
-                                        onChange={(e) => setFormData({ ...formData, icp: e.target.value })}
-                                        className="h-40"
-                                        placeholder="Décrivez votre client idéal..."
-                                    />
+                                    {/* ICP Structured Fields */}
+                                    <div className="icp-fields-grid">
+                                        {/* Secteur */}
+                                        <div className="icp-field-card">
+                                            <div className="field-header">
+                                                <div className="field-icon">
+                                                    <Building2 size={18} />
+                                                </div>
+                                                <label>Secteur d'activité cible</label>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formData.icpSector || "PME et ETI - Télécommunications"}
+                                                onChange={(e) => setFormData({ ...formData, icpSector: e.target.value })}
+                                                placeholder="Ex: SaaS B2B, E-commerce, Industrie..."
+                                            />
+                                        </div>
+
+                                        {/* Taille entreprise */}
+                                        <div className="icp-field-card">
+                                            <div className="field-header">
+                                                <div className="field-icon">
+                                                    <Users size={18} />
+                                                </div>
+                                                <label>Taille d'entreprise</label>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formData.icpSize || "10-250 employés"}
+                                                onChange={(e) => setFormData({ ...formData, icpSize: e.target.value })}
+                                                placeholder="Ex: 10-50 employés, +500 employés..."
+                                            />
+                                        </div>
+
+                                        {/* Décideur */}
+                                        <div className="icp-field-card">
+                                            <div className="field-header">
+                                                <div className="field-icon">
+                                                    <UserCircle size={18} />
+                                                </div>
+                                                <label>Décideur type</label>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formData.icpDecider || "Directeur Commercial, CEO, Head of Sales"}
+                                                onChange={(e) => setFormData({ ...formData, icpDecider: e.target.value })}
+                                                placeholder="Ex: CEO, Directeur Marketing, CTO..."
+                                            />
+                                        </div>
+
+                                        {/* Budget */}
+                                        <div className="icp-field-card">
+                                            <div className="field-header">
+                                                <div className="field-icon">
+                                                    <Euro size={18} />
+                                                </div>
+                                                <label>Budget moyen</label>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formData.icpBudget || "500€ - 5 000€ / mois"}
+                                                onChange={(e) => setFormData({ ...formData, icpBudget: e.target.value })}
+                                                placeholder="Ex: 1000-5000€/mois..."
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Pain Points Section */}
+                                    <div className="icp-section">
+                                        <div className="section-header">
+                                            <AlertCircle size={18} />
+                                            <h3>Pain Points identifiés</h3>
+                                            <span className="section-badge">Éditable</span>
+                                        </div>
+                                        <div className="pain-points-list">
+                                            {(formData.painPoints || []).map((point, index) => (
+                                                <div key={index} className="pain-point-tag">
+                                                    <span>{point}</span>
+                                                    <button className="remove-tag" onClick={() => {
+                                                        const newPoints = [...(formData.painPoints || [])];
+                                                        newPoints.splice(index, 1);
+                                                        setFormData({ ...formData, painPoints: newPoints });
+                                                    }}>
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <button className="add-tag-btn">
+                                                <Plus size={14} />
+                                                Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Besoins Section */}
+                                    <div className="icp-section">
+                                        <div className="section-header">
+                                            <Target size={18} />
+                                            <h3>Besoins principaux</h3>
+                                        </div>
+                                        <div className="needs-list">
+                                            {(formData.needs || []).map((need, index) => (
+                                                <div key={index} className="need-item">
+                                                    <CheckCircle2 size={16} className="need-check" />
+                                                    <input
+                                                        type="text"
+                                                        value={need}
+                                                        onChange={(e) => {
+                                                            const newNeeds = [...(formData.needs || [])];
+                                                            newNeeds[index] = e.target.value;
+                                                            setFormData({ ...formData, needs: newNeeds });
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Objections Section */}
+                                    <div className="icp-section">
+                                        <div className="section-header">
+                                            <MessageSquareWarning size={18} />
+                                            <h3>Objections fréquentes à anticiper</h3>
+                                        </div>
+                                        <div className="objections-grid">
+                                            {(formData.objections || []).map((item, index) => (
+                                                <div key={index} className="objection-card">
+                                                    <div className="objection-q">
+                                                        <span className="objection-label">Objection</span>
+                                                        <p>"{item.objection}"</p>
+                                                    </div>
+                                                    <div className="objection-a">
+                                                        <span className="objection-label">Réponse IA suggérée</span>
+                                                        <input
+                                                            type="text"
+                                                            value={item.response}
+                                                            onChange={(e) => {
+                                                                const newObjections = [...(formData.objections || [])];
+                                                                newObjections[index] = { ...newObjections[index], response: e.target.value };
+                                                                setFormData({ ...formData, objections: newObjections });
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="icp-actions">
+                                        <button className="btn-secondary" onClick={() => setStep(step - 1)}>
+                                            <ArrowLeft size={16} />
+                                            Retour
+                                        </button>
+                                        <button className="btn-primary" onClick={() => setStep(step + 1)}>
+                                            Valider et continuer
+                                            <ArrowRight size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Sidebar Guide */}
+                            <div className="icp-sidebar">
+                                <div className="sidebar-tip-card highlight">
+                                    <div className="tip-icon">
+                                        <Zap size={18} />
+                                    </div>
+                                    <h4>Conseil d'expert</h4>
+                                    <p>
+                                        Plus votre ICP est précis, plus les conversations de l'agent seront pertinentes et convertiront.
+                                    </p>
                                 </div>
 
-                                <button className="btn-primary full-width mt-6" onClick={() => setStep(3)}>
-                                    Valider et continuer
-                                </button>
+                                <div className="sidebar-tip-card">
+                                    <div className="tip-icon">
+                                        <Shield size={18} />
+                                    </div>
+                                    <h4>Protection anti-hallucination</h4>
+                                    <p>
+                                        L'agent ne parlera jamais de fonctionnalités ou prix que vous n'avez pas validés.
+                                    </p>
+                                </div>
+
+                                <div className="sidebar-tip-card">
+                                    <div className="tip-icon">
+                                        <RefreshCw size={18} />
+                                    </div>
+                                    <h4>Modifiable à tout moment</h4>
+                                    <p>
+                                        Vous pourrez ajuster ces paramètres depuis votre dashboard après l'activation.
+                                    </p>
+                                </div>
+
+                                <div className="sidebar-stats">
+                                    <div className="stat-item">
+                                        <span className="stat-value">+34%</span>
+                                        <span className="stat-label">de conversion avec un ICP bien défini</span>
+                                    </div>
+                                </div>
                             </div>
-                            <GuidePanel stepIndex={2} />
                         </div>
                     </motion.div>
                 )}

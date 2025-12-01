@@ -1955,3 +1955,644 @@ textarea:focus {
     border-radius: 100px;
     border: 1px solid var(--border-subtle);
 }
+
+/* --- Analysis Step Patagon Style --- */
+
+.analysis-step-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.analysis-step-container .hero-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.analysis-step-container .subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 48px;
+}
+
+.analysis-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Vertical Input Group - labels on top */
+.input-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.input-group-vertical label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+/* Full Width Input with Icon */
+.input-with-icon.full-width-input {
+    position: relative;
+    width: 100%;
+}
+
+.input-with-icon.full-width-input svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+}
+
+.input-with-icon.full-width-input input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    font-size: 0.95rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text-primary);
+    transition: border-color 0.2s ease;
+}
+
+.input-with-icon.full-width-input input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Full Width Select */
+.select-wrapper.full-width-select {
+    width: 100%;
+}
+
+.select-wrapper.full-width-select .custom-select {
+    width: 100%;
+    padding: 14px 40px 14px 16px;
+    font-size: 0.95rem;
+    background: var(--bg-input);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text-primary);
+    cursor: pointer;
+    appearance: none;
+    transition: border-color 0.2s ease;
+}
+
+.select-wrapper.full-width-select .custom-select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* Footer Centered */
+.analysis-footer-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 48px;
+}
+
+.analysis-footer-centered .btn-secondary {
+    background: white;
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.analysis-footer-centered .btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--text-primary);
+}
+
+.analysis-footer-centered .btn-primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.analysis-footer-centered .btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.analysis-footer-centered .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* === ICP DEFINITION PAGE - ENHANCED STYLES === */
+
+.icp-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.icp-main-content {
+    width: 100%;
+}
+
+.icp-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+}
+
+.icp-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.icp-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.icp-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    max-width: 500px;
+    margin: 0;
+}
+
+.ai-confidence-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #10B981;
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* === ICP Fields Grid === */
+.icp-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.icp-field-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.icp-field-card:hover {
+    border-color: var(--border-strong);
+}
+
+.icp-field-card:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.field-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.field-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.icp-field-card label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.icp-field-card input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0;
+}
+
+.icp-field-card input:focus {
+    outline: none;
+}
+
+.icp-field-card input::placeholder {
+    color: var(--text-tertiary);
+    font-weight: 400;
+}
+
+/* === ICP Sections === */
+.icp-section {
+    margin-bottom: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.section-header svg {
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.section-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.section-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+/* === Pain Points === */
+.pain-points-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pain-point-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    color: #DC2626;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pain-point-tag:hover {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.pain-point-tag .remove-tag {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pain-point-tag .remove-tag:hover {
+    opacity: 1;
+}
+
+.add-tag-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-input);
+    border: 1px dashed var(--border-strong);
+    color: var(--text-secondary);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-tag-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+}
+
+/* === Needs List === */
+.needs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.need-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: all 0.2s ease;
+}
+
+.need-item:hover {
+    border-color: var(--border-strong);
+}
+
+.need-item:focus-within {
+    border-color: var(--accent);
+}
+
+.need-check {
+    color: #10B981;
+    flex-shrink: 0;
+}
+
+.need-item input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.need-item input:focus {
+    outline: none;
+}
+
+/* === Objections Grid === */
+.objections-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.objection-card {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 16px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 18px;
+    transition: all 0.2s ease;
+}
+
+.objection-card:hover {
+    border-color: var(--border-strong);
+}
+
+.objection-q,
+.objection-a {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.objection-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+}
+
+.objection-q p {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-style: italic;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.objection-a input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    transition: border-color 0.2s;
+}
+
+.objection-a input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* === Actions === */
+.icp-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.icp-actions .btn-secondary,
+.icp-actions .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* === Sidebar === */
+.icp-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 24px;
+}
+
+.sidebar-tip-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.sidebar-tip-card.highlight {
+    background: linear-gradient(135deg, rgba(254, 109, 16, 0.08) 0%, rgba(254, 109, 16, 0.02) 100%);
+    border-color: rgba(254, 109, 16, 0.2);
+}
+
+.tip-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.sidebar-tip-card h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.sidebar-tip-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.sidebar-stats {
+    background: var(--accent);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.4;
+}
+
+/* === Responsive === */
+@media (max-width: 1100px) {
+    .icp-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .icp-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .sidebar-stats {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .icp-card {
+        padding: 20px;
+    }
+    
+    .icp-card-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .icp-fields-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .objection-card {
+        grid-template-columns: 1fr;
+    }
+    
+    .icp-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    
+    .icp-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .icp-sidebar {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-stats {
+        grid-column: span 1;
+    }
+}
