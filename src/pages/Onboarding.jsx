@@ -147,7 +147,7 @@ const Onboarding = () => {
     };
 
     const breadcrumbs = [
-        "Analyse", "Résultats", "Définition de l'ICP", "Sélection", "Simulation", "Identité", "Canaux", "CRM", "Activation"
+        "Analyse", "Résultats", "Définition de l'ICP", "Sélection", "Configuration", "Canaux", "CRM", "Activation"
     ];
 
     // --- Helper: Generate Agent Options ---
@@ -245,9 +245,45 @@ const Onboarding = () => {
             selectedAgentId: agent.id,
             goal: agent.id === 'scheduler' ? 'book' : 'qualify' // Map to existing logic
         }));
-        // Trigger simulation generation immediately or after a pause? 
-        // Let's go to simulation generation.
-        generatePreview();
+        // Go to loading screen first
+        setStep(3.5);
+        // Then generate the complete agent profile
+        setTimeout(() => {
+            generateAgentProfile(agent);
+        }, 2000); // 2 second loading animation
+    };
+
+    const generateAgentProfile = async (agent) => {
+        setLoading(true);
+        setLoadingText("Génération du profil de l'agent...");
+        try {
+            // Generate both simulation and persona in parallel
+            const [simulationResponse, personaResponse] = await Promise.all([
+                fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ businessType: formData.businessType, tone: 'Professional' })
+                }),
+                fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/generate-persona', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ businessType: formData.businessType })
+                })
+            ]);
+
+            const simulationData = await simulationResponse.json();
+            const personaData = await personaResponse.json();
+
+            setSimulation(simulationData.conversation || []);
+            setFormData(prev => ({ ...prev, agentPersona: personaData }));
+            setStep(4); // Go to combined configuration step
+        } catch (error) {
+            console.error("Error generating agent profile:", error);
+            alert("Erreur de génération du profil.");
+            setStep(3); // Go back to agent selection
+        } finally {
+            setLoading(false);
+        }
     };
 
     const generatePreview = async () => {
@@ -261,7 +297,6 @@ const Onboarding = () => {
             });
             const data = await response.json();
             setSimulation(data.conversation);
-            setStep(4);
         } catch (error) {
             console.error("Error simulating:", error);
             alert("Erreur de simulation.");
@@ -825,183 +860,249 @@ const Onboarding = () => {
                     </motion.div>
                 )}
 
-                {/* STEP 4: SIMULATION (Redesigned) */}
-                {step === 4 ? (
+                {/* STEP 3.5: LOADING SCREEN - Building the Agent */}
+                {step === 3.5 && (
+                    <motion.div key="step3-5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="loading-screen">
+                            <div className="loading-content">
+                                <div className="loading-icon-wrapper">
+                                    <Zap size={48} className="loading-icon" />
+                                </div>
+                                <h2 className="loading-title">Building the Agent</h2>
+                                <p className="loading-subtitle">Analyzing your business and creating the perfect AI assistant...</p>
+                                <div className="loading-steps">
+                                    <div className="loading-step active">
+                                        <div className="step-dot"></div>
+                                        <span>Analyzing business context</span>
+                                    </div>
+                                    <div className="loading-step active">
+                                        <div className="step-dot"></div>
+                                        <span>Generating conversation flows</span>
+                                    </div>
+                                    <div className="loading-step">
+                                        <div className="step-dot"></div>
+                                        <span>Configuring agent personality</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
+
+                {/* STEP 4: AGENT CONFIGURATION & TEST - Combined Simulation + Identity */}
+                {step === 4 && (
                     <motion.div key="step4" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                        <div className="simulation-layout dark-theme-forced">
-                            {/* Left Panel: Conversation */}
-                            <div className="conversation-panel">
-                                <div className="panel-header">
-                                    <h3>Conversation Script</h3>
-                                    <button className="btn-text-small" onClick={generatePreview}>
-                                        <RefreshCw size={14} /> Try a Different Version
+                        <div className="agent-config-layout">
+                            {/* Left Panel: Complete Agent Profile */}
+                            <div className="agent-profile-panel">
+                                <div className="profile-header">
+                                    <h2>Complete Agent Profile</h2>
+                                    <p className="subtitle">Review and customize each section to fine-tune how your agent interacts with customers</p>
+                                    <button className="btn-regenerate" onClick={() => generateAgentProfile({ id: formData.selectedAgentId })}>
+                                        <RefreshCw size={14} />
+                                        Regenerate Profile
                                     </button>
                                 </div>
 
-                                <div className="conversation-timeline">
-                                    <span>CONVERSATION STARTED ON: {new Date().toLocaleDateString()}</span>
-                                </div>
-
-                                <div className="messages-list">
-                                    {/* Initial Greeting */}
-                                    <div className="message-row agent">
-                                        <div className="avatar-circle">
-                                            <Zap size={16} />
-                                        </div>
-                                        <div className="message-content">
-                                            <div className="message-bubble">
-                                                Hello, this is AI Agent from {formData.businessType || "Business"}. How can I assist you today?
-                                            </div>
-                                            <div className="message-time">
-                                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {simulation.map((msg, i) => (
-                                        <div key={i} className={`message-row ${msg.sender}`}>
-                                            <div className="avatar-circle">
-                                                {msg.sender === 'agent' ? <Zap size={16} /> : <User size={16} />}
-                                            </div>
-                                            <div className="message-content">
-                                                <div className="message-bubble">
-                                                    {msg.text}
-                                                </div>
-                                                <div className="message-time">
-                                                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="input-area-wrapper">
-                                    <div className="role-selector">
-                                        <span className={`role-label ${senderRole === 'agent' ? 'active' : ''}`} onClick={() => setSenderRole('agent')}>Agent</span>
-                                        <span className={`role-label ${senderRole === 'lead' ? 'active' : ''}`} onClick={() => setSenderRole('lead')}>Lead</span>
-                                    </div>
-                                    <div className="input-row">
-                                        <input
-                                            type="text"
-                                            placeholder="Type your message here"
-                                            value={newMessage}
-                                            onChange={(e) => setNewMessage(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && newMessage.trim()) {
-                                                    setSimulation([...simulation, { sender: senderRole, text: newMessage }]);
-                                                    setNewMessage('');
-                                                }
-                                            }}
-                                        />
-                                        <button
-                                            className="send-btn-orange"
-                                            onClick={() => {
-                                                if (newMessage.trim()) {
-                                                    setSimulation([...simulation, { sender: senderRole, text: newMessage }]);
-                                                    setNewMessage('');
-                                                }
-                                            }}
-                                        >
-                                            <Send size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right Panel: Sidebar */}
-                            <div className="simulation-sidebar">
-                                <div className="sidebar-card">
-                                    <div className="card-label">BUSINESS</div>
-                                    <div className="card-value font-bold">{formData.businessType || "Your Business"}</div>
-                                    <div className="card-sub">{formData.website}</div>
-                                    <div className="card-desc mt-2 text-sm text-secondary">
-                                        {formData.businessDescription || "Leading provider in the industry."}
-                                    </div>
-                                </div>
-
-                                <div className="sidebar-card">
-                                    <div className="card-label">AGENT</div>
-                                    <div className="flex items-center gap-3 mt-1">
-                                        <div className="agent-icon-box">
-                                            <Zap size={20} />
-                                        </div>
-                                        <div>
-                                            <div className="font-bold">AI Assistant</div>
-                                            <div className="text-sm text-secondary">Lead Qualification Agent</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="sidebar-card">
-                                    <div className="card-label">AGENT OBJECTIVE</div>
-                                    <div className="font-bold mt-1">Qualify & Convert</div>
-                                    <div className="text-sm text-secondary mt-1">
-                                        Handles inbound inquiries, qualifies prospects by assessing needs, and schedules appointments.
-                                    </div>
-                                </div>
-
-                                <div className="sidebar-card">
-                                    <div className="card-label">TARGET AUDIENCE</div>
-                                    <div className="text-sm font-medium mt-1">
-                                        {formData.icp || "Prospects interested in your services."}
-                                    </div>
-                                </div>
-
-                                <button className="btn-primary-orange full-width mt-4" onClick={generatePersona} disabled={loading}>
-                                    {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Valider et continuer"}
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                ) : step === 5 ? (
-                    /* STEP 5: IDENTITY */
-                    <motion.div key="step5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                        <div className="step-container-split">
-                            <div className="center-card">
-                                <h2>Identité de l'Agent</h2>
-                                <p className="subtitle">Vérifiez et ajustez la personnalité de votre agent.</p>
-
                                 {formData.agentPersona && (
-                                    <div className="persona-card">
-                                        <div className="persona-header">
-                                            <div className="avatar-small">
-                                                <Zap size={16} />
-                                            </div>
-                                            <div>
-                                                <h3>{formData.agentPersona.role}</h3>
-                                                <span className="tag">{formData.agentPersona.tone || "Professionnel"}</span>
+                                    <div className="profile-content">
+                                        {/* Objective and Persona Section */}
+                                        <div className="profile-section">
+                                            <h3 className="section-title">Objective and Persona</h3>
+                                            <div className="section-content">
+                                                <p className="profile-text">
+                                                    You are <strong>{formData.agentPersona.role}</strong> at {formData.businessType}, helping customers get the best service.
+                                                    With extensive experience in the industry, you've assisted thousands of prospects, specializing in understanding their needs and providing tailored solutions.
+                                                </p>
+                                                <p className="profile-text mt-3">
+                                                    Your mission is to guide prospects through a consultative discovery process, uncovering their unique challenges to position {formData.businessType}'s solutions as the ideal fit.
+                                                </p>
                                             </div>
                                         </div>
 
-                                        <div className="input-group text-left">
-                                            <label className="text-sm font-semibold mb-2 block">Objectif</label>
-                                            <p className="text-sm text-secondary mb-4">{formData.agentPersona.goal}</p>
+                                        {/* Primary Goal Section */}
+                                        <div className="profile-section">
+                                            <h3 className="section-title">Primary Goal</h3>
+                                            <div className="section-content">
+                                                <div className="goal-item">
+                                                    <strong>Primary Objective:</strong> {formData.agentPersona.goal || "Qualify leads by gathering comprehensive information and assessing fit based on needs, budget, and timeline."}
+                                                </div>
+                                                <div className="goal-item mt-3">
+                                                    <strong>Information Gathering:</strong> Collect contact details, understand pain points, assess budget alignment, and determine urgency to qualify leads effectively.
+                                                </div>
+                                                <div className="goal-item mt-3">
+                                                    <strong>Qualification Approach:</strong> Assess fit based on specific pain points, budget alignment, and timeline. High-quality leads show clear pain, budget fit, and urgency.
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="input-group text-left">
-                                            <label className="text-sm font-semibold mb-2 block">Premier Message</label>
-                                            <textarea
-                                                value={formData.agentPersona.firstMessage}
-                                                onChange={(e) => setFormData({
-                                                    ...formData,
-                                                    agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
-                                                })}
-                                                className="h-24"
-                                            />
+                                        {/* Conversation Flow Section */}
+                                        <div className="profile-section">
+                                            <h3 className="section-title">Conversation Flow</h3>
+                                            <div className="section-content">
+                                                <div className="flow-step">
+                                                    <div className="step-number">1</div>
+                                                    <div className="step-content">
+                                                        <strong>GREETING & RAPPORT BUILDING:</strong> Introduce yourself warmly, share credibility, and ask an engaging question.
+                                                        <div className="example-box mt-2">
+                                                            <em>Example:</em><br />
+                                                            [Prospect]: Hi, interested in your services.<br />
+                                                            [{formData.agentPersona.role}]: {formData.agentPersona.firstMessage || "Hello! How can I assist you today?"}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flow-step">
+                                                    <div className="step-number">2</div>
+                                                    <div className="step-content">
+                                                        <strong>DISCOVERY & NEEDS ASSESSMENT:</strong> Use open-ended questions to uncover current situation and show empathy.
+                                                        <div className="example-box mt-2">
+                                                            <em>Example:</em><br />
+                                                            [Prospect]: Having issues with current provider.<br />
+                                                            [{formData.agentPersona.role}]: I understand how frustrating that can be. Tell me more about the specific challenges you're facing?
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flow-step">
+                                                    <div className="step-number">3</div>
+                                                    <div className="step-content">
+                                                        <strong>PAIN POINT EXPLORATION:</strong> Dig deeper to understand impact and urgency.
+                                                        <div className="example-box mt-2">
+                                                            <em>Example:</em><br />
+                                                            [Prospect]: Service is unreliable and expensive.<br />
+                                                            [{formData.agentPersona.role}]: That sounds challenging. How much is this affecting your daily operations, and what's your budget for a better solution?
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flow-step">
+                                                    <div className="step-number">4</div>
+                                                    <div className="step-content">
+                                                        <strong>VALUE BUILDING & SOLUTION ALIGNMENT:</strong> Connect their pains to your offering with proof points.
+                                                        <div className="example-box mt-2">
+                                                            <em>Example:</em><br />
+                                                            [{formData.agentPersona.role}]: Many customers in similar situations have found our solution helps reduce costs while improving reliability. Would you like to learn more about how we can help?
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flow-step">
+                                                    <div className="step-number">5</div>
+                                                    <div className="step-content">
+                                                        <strong>QUALIFICATION ASSESSMENT:</strong> Evaluate lead quality based on pain, budget, and timeline.
+                                                    </div>
+                                                </div>
+
+                                                <div className="flow-step">
+                                                    <div className="step-number">6</div>
+                                                    <div className="step-content">
+                                                        <strong>CLOSING & NEXT STEPS:</strong> For qualified leads, gather contact info and schedule follow-up.
+                                                        <div className="example-box mt-2">
+                                                            <em>Example:</em><br />
+                                                            [{formData.agentPersona.role}]: Based on what you've shared, I'd love to connect you with our team. Could you provide your email and phone number so we can send you a personalized quote?
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
+                            </div>
 
-                                <button className="btn-primary full-width mt-6" onClick={() => setStep(6)}>
-                                    Continuer vers les Canaux
+                            {/* Right Panel: Agent Preview */}
+                            <div className="agent-preview-panel">
+                                <div className="preview-header">
+                                    <div className="agent-info">
+                                        <div className="agent-avatar">
+                                            <Zap size={20} />
+                                        </div>
+                                        <div>
+                                            <h4>{formData.agentPersona?.role || "AI Assistant"}</h4>
+                                            <span className="agent-role-subtitle">Inbound Lead Qualification Agent</span>
+                                        </div>
+                                    </div>
+                                    <button className="btn-clear" onClick={() => setSimulation([])}>
+                                        <X size={16} />
+                                        Clear
+                                    </button>
+                                </div>
+
+                                <div className="preview-body">
+                                    {simulation.length === 0 ? (
+                                        <div className="preview-empty-state">
+                                            <MessageCircle size={48} className="empty-icon" />
+                                            <h4>Start a conversation with your agent</h4>
+                                            <p>Type a message below to begin testing</p>
+                                        </div>
+                                    ) : (
+                                        <div className="preview-messages">
+                                            {simulation.map((msg, i) => (
+                                                <div key={i} className={`preview-message ${msg.sender}`}>
+                                                    <div className="message-avatar">
+                                                        {msg.sender === 'agent' ? <Zap size={14} /> : <User size={14} />}
+                                                    </div>
+                                                    <div className="message-bubble">
+                                                        {msg.text}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="preview-input">
+                                    <input
+                                        type="text"
+                                        placeholder="Type your test message..."
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && newMessage.trim()) {
+                                                setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
+                                                setNewMessage('');
+                                                // Simulate agent response
+                                                setTimeout(() => {
+                                                    setSimulation(prev => [...prev, {
+                                                        sender: 'agent',
+                                                        text: formData.agentPersona?.firstMessage || "Thank you for your message. How can I assist you today?"
+                                                    }]);
+                                                }, 1000);
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        className="btn-send"
+                                        onClick={() => {
+                                            if (newMessage.trim()) {
+                                                setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
+                                                setNewMessage('');
+                                                setTimeout(() => {
+                                                    setSimulation(prev => [...prev, {
+                                                        sender: 'agent',
+                                                        text: formData.agentPersona?.firstMessage || "Thank you for your message. How can I assist you today?"
+                                                    }]);
+                                                }, 1000);
+                                            }
+                                        }}
+                                    >
+                                        Send
+                                    </button>
+                                </div>
+
+                                <button className="btn-primary full-width mt-4" onClick={() => setStep(5)}>
+                                    Continue to Channels
+                                    <ArrowRight size={16} />
                                 </button>
                             </div>
-                            <GuidePanel stepIndex={4} />
                         </div>
                     </motion.div>
-                ) : step === 6 ? (
-                    /* STEP 6: CHANNELS */
-                    <motion.div key="step6" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                )}
+
+                {/* STEP 5: CHANNELS */}
+                {step === 5 && (
+                    <motion.div key="step5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                         <div className="channel-selection-container">
                             <div className="text-center mb-12">
                                 <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
@@ -1055,15 +1156,17 @@ const Onboarding = () => {
                                     </div>
                                 </div>
                                 <div className="footer-actions">
-                                    <button className="btn-secondary" onClick={() => setStep(5)}>Back</button>
-                                    <button className="btn-primary" onClick={() => setStep(7)}>Continue to Integrations <ArrowRight size={16} /></button>
+                                    <button className="btn-secondary" onClick={() => setStep(4)}>Back</button>
+                                    <button className="btn-primary" onClick={() => setStep(6)}>Continue to Integrations <ArrowRight size={16} /></button>
                                 </div>
                             </div>
                         </div>
                     </motion.div>
-                ) : step === 7 ? (
-                    /* STEP 7: INTEGRATIONS */
-                    <motion.div key="step7" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                )}
+
+                {/* STEP 6: INTEGRATIONS */}
+                {step === 6 && (
+                    <motion.div key="step6" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                         <div className="integration-container">
                             <div className="text-center mb-12">
                                 <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
@@ -1146,57 +1249,57 @@ const Onboarding = () => {
                             </div>
 
                             <div className="footer-actions mt-12">
-                                <button className="btn-secondary" onClick={() => setStep(6)}>Back</button>
+                                <button className="btn-secondary" onClick={() => setStep(5)}>Back</button>
                                 <div className="flex gap-4">
                                     <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
                                         Lost? Talk to Sales <HelpCircle size={16} />
                                     </button>
-                                    <button className="btn-primary" onClick={() => setStep(8)}>
+                                    <button className="btn-primary" onClick={() => setStep(7)}>
                                         Launch your Agent
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </motion.div>
-                ) : (
-                    /* STEP 8: ACTIVATION (Final) */
-                    step === 8 && (
-                        <motion.div key="step8" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                            <div className="step-container-split">
-                                <div className="center-card">
-                                    <div className="text-center">
-                                        <div className="success-icon flex justify-center">
-                                            <Rocket size={40} />
-                                        </div>
-                                        <h2>Configuration terminée</h2>
-                                        <p className="subtitle">Votre agent est prêt à être déployé.</p>
-                                        <div className="final-preview-card">
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <div className="avatar-small">IA</div>
-                                                <div className="text-left">
-                                                    <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
-                                                    <div className="text-xs text-success">● Actif</div>
-                                                </div>
-                                            </div>
-                                            <div className="text-sm text-muted italic">
-                                                "{formData.agentPersona?.firstMessage}"
+                )}
+
+                {/* STEP 7: ACTIVATION (Final) */}
+                {step === 7 && (
+                    <motion.div key="step7" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                        <div className="step-container-split">
+                            <div className="center-card">
+                                <div className="text-center">
+                                    <div className="success-icon flex justify-center">
+                                        <Rocket size={40} />
+                                    </div>
+                                    <h2>Configuration terminée</h2>
+                                    <p className="subtitle">Votre agent est prêt à être déployé.</p>
+                                    <div className="final-preview-card">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="avatar-small">IA</div>
+                                            <div className="text-left">
+                                                <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
+                                                <div className="text-xs text-success">● Actif</div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-3 mt-6">
-                                            <button className="btn-secondary" onClick={() => setStep(7)}>Retour</button>
-                                            <button className="btn-primary flex-1" onClick={finishOnboarding} disabled={loading}>
-                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
-                                            </button>
+                                        <div className="text-sm text-muted italic">
+                                            "{formData.agentPersona?.firstMessage}"
                                         </div>
-                                        <button className="btn-text mt-4" onClick={finishOnboarding}>
-                                            Essayer en mode démo
+                                    </div>
+                                    <div className="flex gap-3 mt-6">
+                                        <button className="btn-secondary" onClick={() => setStep(6)}>Retour</button>
+                                        <button className="btn-primary flex-1" onClick={finishOnboarding} disabled={loading}>
+                                            {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
                                         </button>
                                     </div>
+                                    <button className="btn-text mt-4" onClick={finishOnboarding}>
+                                        Essayer en mode démo
+                                    </button>
                                 </div>
-                                <GuidePanel stepIndex={7} />
                             </div>
-                        </motion.div>
-                    )
+                            <GuidePanel stepIndex={7} />
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>
