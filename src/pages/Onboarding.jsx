@@ -20,12 +20,13 @@ const Onboarding = () => {
         language: 'Français',
         businessDescription: '', // Optional description
         businessType: '',
+        icp: '', // New field for ICP
         commonQuestions: [],
         qualificationCriteria: [],
         goal: 'qualify', // 'qualify' or 'book'
         selectedAgentId: null, // New field for the selected agent option
         agentPersona: null, // { role, goal, firstMessage, behaviors, constraints, tone }
-        channels: { sms: true, whatsapp: false, email: false, webchat: false },
+        channels: { sms: true, whatsapp: true, email: false, webchat: false }, // Default SMS/WhatsApp true
         crm: null, // 'hubspot', 'pipedrive', 'salesforce', 'none'
         crmApiKey: ''
     });
@@ -125,7 +126,7 @@ const Onboarding = () => {
     };
 
     const breadcrumbs = [
-        "Analyse", "Résultats", "Sélection", "Simulation", "Identité", "Canaux", "CRM", "Activation"
+        "Analyse", "Résultats", "Définition de l'ICP", "Sélection", "Simulation", "Identité", "Canaux", "CRM", "Activation"
     ];
 
     // --- Helper: Generate Agent Options ---
@@ -197,6 +198,10 @@ const Onboarding = () => {
             setFormData(prev => ({
                 ...prev,
                 businessType: data.businessType,
+                icp: `Clients idéaux pour ${data.businessType} :
+- Secteur : PME et ETI
+- Besoin : Amélioration de la gestion des appels
+- Pain points : Perte de leads, standard saturé`, // Mock AI proposition
                 commonQuestions: data.commonQuestions,
                 qualificationCriteria: data.qualificationCriteria
             }));
@@ -235,7 +240,7 @@ const Onboarding = () => {
             });
             const data = await response.json();
             setSimulation(data.conversation);
-            setStep(3);
+            setStep(4);
         } catch (error) {
             console.error("Error simulating:", error);
             alert("Erreur de simulation.");
@@ -255,7 +260,7 @@ const Onboarding = () => {
             });
             const data = await response.json();
             setFormData(prev => ({ ...prev, agentPersona: data }));
-            setStep(4);
+            setStep(5);
         } catch (error) {
             console.error("Error generating persona:", error);
             alert("Erreur de génération.");
@@ -509,9 +514,36 @@ const Onboarding = () => {
                     </motion.div>
                 )}
 
-                {/* STEP 2: AGENT SELECTION (NEW) */}
+                {/* STEP 2: ICP DEFINITION (NEW) */}
                 {step === 2 && (
-                    <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                    <motion.div key="step2" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                        <div className="step-container-split">
+                            <div className="center-card">
+                                <h2>Définition de votre Cible (ICP)</h2>
+                                <p className="subtitle">L'IA a identifié votre client idéal. Ajustez-le pour affiner le comportement de l'agent.</p>
+
+                                <div className="input-group">
+                                    <label className="text-sm font-semibold mb-2 block text-left">Description du Client Idéal</label>
+                                    <textarea
+                                        value={formData.icp}
+                                        onChange={(e) => setFormData({ ...formData, icp: e.target.value })}
+                                        className="h-40"
+                                        placeholder="Décrivez votre client idéal..."
+                                    />
+                                </div>
+
+                                <button className="btn-primary full-width mt-6" onClick={() => setStep(3)}>
+                                    Valider et continuer
+                                </button>
+                            </div>
+                            <GuidePanel stepIndex={2} />
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* STEP 3: AGENT SELECTION */}
+                {step === 3 && (
+                    <motion.div key="step3" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                         <div className="agent-selection-container">
                             <div className="text-center mb-8">
                                 <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
@@ -573,10 +605,10 @@ const Onboarding = () => {
                     </motion.div>
                 )}
 
-                {/* STEP 3: PREVIEW (Special Layout) */}
-                {step === 3 ? (
-                    <motion.div key="step3" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                        <div className="simulation-layout">
+                {/* STEP 4: SIMULATION (Redesigned) */}
+                {step === 4 ? (
+                    <motion.div key="step4" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="simulation-layout dark-theme-forced">
                             {/* Left Panel: Conversation */}
                             <div className="conversation-panel">
                                 <div className="panel-header">
@@ -591,6 +623,21 @@ const Onboarding = () => {
                                 </div>
 
                                 <div className="messages-list">
+                                    {/* Initial Greeting */}
+                                    <div className="message-row agent">
+                                        <div className="avatar-circle">
+                                            <Zap size={16} />
+                                        </div>
+                                        <div className="message-content">
+                                            <div className="message-bubble">
+                                                Hello, this is AI Agent from {formData.businessType || "Business"}. How can I assist you today?
+                                            </div>
+                                            <div className="message-time">
+                                                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {simulation.map((msg, i) => (
                                         <div key={i} className={`message-row ${msg.sender}`}>
                                             <div className="avatar-circle">
@@ -610,18 +657,8 @@ const Onboarding = () => {
 
                                 <div className="input-area-wrapper">
                                     <div className="role-selector">
-                                        <button
-                                            className={`role-btn ${senderRole === 'agent' ? 'active' : ''}`}
-                                            onClick={() => setSenderRole('agent')}
-                                        >
-                                            Agent
-                                        </button>
-                                        <button
-                                            className={`role-btn ${senderRole === 'lead' ? 'active' : ''}`}
-                                            onClick={() => setSenderRole('lead')}
-                                        >
-                                            Lead
-                                        </button>
+                                        <span className={`role-label ${senderRole === 'agent' ? 'active' : ''}`} onClick={() => setSenderRole('agent')}>Agent</span>
+                                        <span className={`role-label ${senderRole === 'lead' ? 'active' : ''}`} onClick={() => setSenderRole('lead')}>Lead</span>
                                     </div>
                                     <div className="input-row">
                                         <input
@@ -637,7 +674,7 @@ const Onboarding = () => {
                                             }}
                                         />
                                         <button
-                                            className="send-btn"
+                                            className="send-btn-orange"
                                             onClick={() => {
                                                 if (newMessage.trim()) {
                                                     setSimulation([...simulation, { sender: senderRole, text: newMessage }]);
@@ -654,7 +691,7 @@ const Onboarding = () => {
                             {/* Right Panel: Sidebar */}
                             <div className="simulation-sidebar">
                                 <div className="sidebar-card">
-                                    <div className="card-label">Business</div>
+                                    <div className="card-label">BUSINESS</div>
                                     <div className="card-value font-bold">{formData.businessType || "Your Business"}</div>
                                     <div className="card-sub">{formData.website}</div>
                                     <div className="card-desc mt-2 text-sm text-secondary">
@@ -663,7 +700,7 @@ const Onboarding = () => {
                                 </div>
 
                                 <div className="sidebar-card">
-                                    <div className="card-label">Agent</div>
+                                    <div className="card-label">AGENT</div>
                                     <div className="flex items-center gap-3 mt-1">
                                         <div className="agent-icon-box">
                                             <Zap size={20} />
@@ -676,7 +713,7 @@ const Onboarding = () => {
                                 </div>
 
                                 <div className="sidebar-card">
-                                    <div className="card-label">Agent Objective</div>
+                                    <div className="card-label">AGENT OBJECTIVE</div>
                                     <div className="font-bold mt-1">Qualify & Convert</div>
                                     <div className="text-sm text-secondary mt-1">
                                         Handles inbound inquiries, qualifies prospects by assessing needs, and schedules appointments.
@@ -684,48 +721,93 @@ const Onboarding = () => {
                                 </div>
 
                                 <div className="sidebar-card">
-                                    <div className="card-label">Target Audience</div>
+                                    <div className="card-label">TARGET AUDIENCE</div>
                                     <div className="text-sm font-medium mt-1">
-                                        Prospects interested in your services.
+                                        {formData.icp || "Prospects interested in your services."}
                                     </div>
                                 </div>
 
-                                <button className="btn-primary full-width mt-4" onClick={generatePersona} disabled={loading}>
+                                <button className="btn-primary-orange full-width mt-4" onClick={generatePersona} disabled={loading}>
                                     {loading ? <><Loader2 className="animate-spin" size={16} /> {loadingText}</> : "Valider et continuer"}
                                 </button>
                             </div>
                         </div>
                     </motion.div>
-                ) : (
-                    /* ALL OTHER STEPS (Split Layout) - Logic handled above for steps 0, 1, 2 */
-                    /* We need to render steps 4, 5, 6, 7 here if they are not special layouts */
-                    /* STEP 5: CHANNELS (New Wide Layout) */
-                    step === 5 ? (
-                        <motion.div key="step5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                            <div className="channel-selection-container">
-                                <div className="text-center mb-12">
-                                    <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
-                                        Channel Selection
-                                    </div>
-                                    <h2>Choose where to deploy your AI agent</h2>
-                                    <p className="subtitle max-w-xl mx-auto">
-                                        Select one or more channels to connect with your customers. You can always add or change channels later.
-                                    </p>
-                                </div>
+                ) : step === 5 ? (
+                    /* STEP 5: IDENTITY */
+                    <motion.div key="step5" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                        <div className="step-container-split">
+                            <div className="center-card">
+                                <h2>Identité de l'Agent</h2>
+                                <p className="subtitle">Vérifiez et ajustez la personnalité de votre agent.</p>
 
-                                <div className="channels-grid">
-                                    {[
-                                        { id: 'instagram', label: 'Instagram', desc: 'Connect with customers through Instagram Direct Messages.', icon: Instagram },
-                                        { id: 'whatsapp', label: 'WhatsApp', desc: 'Engage leads via WhatsApp Business conversations.', icon: MessageCircle },
-                                        { id: 'messenger', label: 'Meta', desc: 'Integrate with Messenger to provide instant support.', icon: Facebook },
-                                        { id: 'email', label: 'Email', desc: 'Automate replies and follow-ups for customer emails.', icon: Mail },
-                                        { id: 'webchat', label: 'Web Chat', desc: 'Add a live chat widget directly to your website.', icon: MessageSquare },
-                                    ].map(channel => (
-                                        <div key={channel.id} className="channel-card">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div className="channel-icon-wrapper">
-                                                    <channel.icon size={24} />
-                                                </div>
+                                {formData.agentPersona && (
+                                    <div className="persona-card">
+                                        <div className="persona-header">
+                                            <div className="avatar-small">
+                                                <Zap size={16} />
+                                            </div>
+                                            <div>
+                                                <h3>{formData.agentPersona.role}</h3>
+                                                <span className="tag">{formData.agentPersona.tone || "Professionnel"}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="input-group text-left">
+                                            <label className="text-sm font-semibold mb-2 block">Objectif</label>
+                                            <p className="text-sm text-secondary mb-4">{formData.agentPersona.goal}</p>
+                                        </div>
+
+                                        <div className="input-group text-left">
+                                            <label className="text-sm font-semibold mb-2 block">Premier Message</label>
+                                            <textarea
+                                                value={formData.agentPersona.firstMessage}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
+                                                })}
+                                                className="h-24"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button className="btn-primary full-width mt-6" onClick={() => setStep(6)}>
+                                    Continuer vers les Canaux
+                                </button>
+                            </div>
+                            <GuidePanel stepIndex={4} />
+                        </div>
+                    </motion.div>
+                ) : step === 6 ? (
+                    /* STEP 6: CHANNELS */
+                    <motion.div key="step6" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="channel-selection-container">
+                            <div className="text-center mb-12">
+                                <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
+                                    Channel Selection
+                                </div>
+                                <h2>Choose where to deploy your AI agent</h2>
+                                <p className="subtitle max-w-xl mx-auto">
+                                    Select one or more channels to connect with your customers.
+                                </p>
+                            </div>
+
+                            <div className="channels-grid">
+                                {[
+                                    { id: 'whatsapp', label: 'WhatsApp', desc: 'Engage leads via WhatsApp Business conversations.', icon: MessageCircle, available: true },
+                                    { id: 'sms', label: 'SMS', desc: 'Send and receive SMS messages.', icon: Smartphone, available: true },
+                                    { id: 'instagram', label: 'Instagram', desc: 'Connect with customers through Instagram Direct Messages.', icon: Instagram, available: false },
+                                    { id: 'messenger', label: 'Meta', desc: 'Integrate with Messenger to provide instant support.', icon: Facebook, available: false },
+                                    { id: 'email', label: 'Email', desc: 'Automate replies and follow-ups for customer emails.', icon: Mail, available: false },
+                                    { id: 'webchat', label: 'Web Chat', desc: 'Add a live chat widget directly to your website.', icon: MessageSquare, available: false },
+                                ].map(channel => (
+                                    <div key={channel.id} className={`channel-card ${!channel.available ? 'disabled' : ''}`}>
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="channel-icon-wrapper">
+                                                <channel.icon size={24} />
+                                            </div>
+                                            {channel.available ? (
                                                 <div
                                                     className={`toggle-switch ${formData.channels[channel.id] ? 'on' : 'off'}`}
                                                     onClick={() => setFormData(prev => ({
@@ -733,216 +815,167 @@ const Onboarding = () => {
                                                         channels: { ...prev.channels, [channel.id]: !prev.channels[channel.id] }
                                                     }))}
                                                 ></div>
-                                            </div>
-                                            <h3 className="channel-title">{channel.label}</h3>
-                                            <p className="channel-desc">{channel.desc}</p>
+                                            ) : (
+                                                <span className="badge-coming-soon">Bientôt disponible</span>
+                                            )}
                                         </div>
-                                    ))}
-                                </div>
+                                        <h3 className="channel-title">{channel.label}</h3>
+                                        <p className="channel-desc">{channel.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
 
-                                <div className="channel-footer">
-                                    <div className="footer-notes">
-                                        <div className="note-item">
-                                            <Check size={14} className="text-accent" /> We'll set up the integrations automatically.
-                                        </div>
-                                        <div className="note-item">
-                                            <Check size={14} className="text-accent" /> Your agent will be ready to handle conversations.
-                                        </div>
+                            <div className="channel-footer">
+                                <div className="footer-notes">
+                                    <div className="note-item">
+                                        <Check size={14} className="text-accent" /> We'll set up the integrations automatically.
                                     </div>
-                                    <div className="footer-actions">
-                                        <button className="btn-secondary" onClick={() => setStep(4)}>Back</button>
-                                        <button className="btn-primary" onClick={() => setStep(6)}>Continue to Integrations <ArrowRight size={16} /></button>
+                                    <div className="note-item">
+                                        <Check size={14} className="text-accent" /> Your agent will be ready to handle conversations.
                                     </div>
+                                </div>
+                                <div className="footer-actions">
+                                    <button className="btn-secondary" onClick={() => setStep(5)}>Back</button>
+                                    <button className="btn-primary" onClick={() => setStep(7)}>Continue to Integrations <ArrowRight size={16} /></button>
                                 </div>
                             </div>
-                        </motion.div>
-                    ) : (
-                        /* STEP 6: INTEGRATIONS (New Wide Layout) */
-                        step === 6 ? (
-                            <motion.div key="step6" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                                <div className="integration-container">
-                                    <div className="text-center mb-12">
-                                        <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
-                                            Connect CRM
+                        </div>
+                    </motion.div>
+                ) : step === 7 ? (
+                    /* STEP 7: INTEGRATIONS */
+                    <motion.div key="step7" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
+                        <div className="integration-container">
+                            <div className="text-center mb-12">
+                                <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
+                                    Connect CRM
+                                </div>
+                                <h2>Connect your agent to your CRM</h2>
+                                <p className="subtitle max-w-xl mx-auto">
+                                    Link your CRM to automatically sync leads, conversations, and qualification data.
+                                </p>
+                            </div>
+
+                            <div className="integrations-grid">
+                                {/* Smart Caller - Connected */}
+                                <div className="integration-card connected">
+                                    <div className="card-header">
+                                        <div className="flex items-center gap-3">
+                                            <div className="integration-icon smart-caller">
+                                                <Rocket size={24} />
+                                            </div>
+                                            <h3 className="font-bold text-lg">Smart Caller</h3>
                                         </div>
-                                        <h2>Connect your agent to your CRM</h2>
-                                        <p className="subtitle max-w-xl mx-auto">
-                                            Link your CRM to automatically sync leads, conversations, and qualification data.
-                                        </p>
+                                        <div className="status-badge connected">
+                                            Connected <Check size={14} />
+                                        </div>
                                     </div>
+                                    <p className="card-desc">
+                                        You already can manage your leads inside Smart Caller. All data is synced automatically.
+                                    </p>
+                                </div>
 
-                                    <div className="integrations-grid">
-                                        {/* Smart Caller - Connected */}
-                                        <div className="integration-card connected">
-                                            <div className="card-header">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="integration-icon smart-caller">
-                                                        <Rocket size={24} />
-                                                    </div>
-                                                    <h3 className="font-bold text-lg">Smart Caller</h3>
-                                                </div>
-                                                <div className="status-badge connected">
-                                                    Connected <Check size={14} />
-                                                </div>
+                                {/* Webhook */}
+                                <div className="integration-card">
+                                    <div className="card-header">
+                                        <div className="flex items-center gap-3">
+                                            <div className="integration-icon webhook">
+                                                <Zap size={24} />
                                             </div>
-                                            <p className="card-desc">
-                                                You already can manage your leads inside Smart Caller. All data is synced automatically.
-                                            </p>
+                                            <h3 className="font-bold text-lg">Webhook</h3>
                                         </div>
-
-                                        {/* Webhook */}
-                                        <div className="integration-card">
-                                            <div className="card-header">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="integration-icon webhook">
-                                                        <Zap size={24} />
-                                                    </div>
-                                                    <h3 className="font-bold text-lg">Webhook</h3>
-                                                </div>
-                                                <button className="btn-outline-sm">Connect</button>
-                                            </div>
-                                            <p className="card-desc mb-4">
-                                                Send leads to any external service via webhook.
-                                            </p>
-                                            <div className="webhook-input-wrapper">
-                                                <input
-                                                    type="text"
-                                                    placeholder="https://your-webhook-url.com/..."
-                                                    className="webhook-input"
-                                                    value={formData.webhookUrl || ''}
-                                                    onChange={(e) => setFormData({ ...formData, webhookUrl: e.target.value })}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Other CRMs (Coming Soon) */}
-                                        {[
-                                            { name: 'HubSpot', icon: 'H' },
-                                            { name: 'Salesforce', icon: 'S' },
-                                            { name: 'Pipedrive', icon: 'P' },
-                                            { name: 'ActiveCampaign', icon: 'A' },
-                                            { name: 'Zoho CRM', icon: 'Z' },
-                                            { name: 'Microsoft Dynamics', icon: 'M' }
-                                        ].map(crm => (
-                                            <div key={crm.name} className="integration-card disabled">
-                                                <div className="card-header">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="integration-icon disabled">
-                                                            {crm.icon}
-                                                        </div>
-                                                        <h3 className="font-bold text-lg text-muted">{crm.name}</h3>
-                                                    </div>
-                                                    <button className="btn-outline-sm disabled" disabled>Connect</button>
-                                                </div>
-                                                <p className="card-desc text-muted">
-                                                    Integration coming soon.
-                                                </p>
-                                            </div>
-                                        ))}
+                                        <button className="btn-outline-sm">Connect</button>
                                     </div>
-
-                                    <div className="footer-actions mt-12">
-                                        <button className="btn-secondary" onClick={() => setStep(5)}>Back</button>
-                                        <div className="flex gap-4">
-                                            <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
-                                                Lost? Talk to Sales <HelpCircle size={16} />
-                                            </button>
-                                            <button className="btn-primary" onClick={() => setStep(7)}>
-                                                Launch your Agent
-                                            </button>
-                                        </div>
+                                    <p className="card-desc mb-4">
+                                        Send leads to any external service via webhook.
+                                    </p>
+                                    <div className="webhook-input-wrapper">
+                                        <input
+                                            type="text"
+                                            placeholder="https://your-webhook-url.com/..."
+                                            className="webhook-input"
+                                            value={formData.webhookUrl || ''}
+                                            onChange={(e) => setFormData({ ...formData, webhookUrl: e.target.value })}
+                                        />
                                     </div>
                                 </div>
-                            </motion.div>
-                        ) : (
-                            /* STEPS 4, 7 (Split Layout) */
-                            (step === 4 || step === 7) && (
-                                <motion.div key={`step${step}`} variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
-                                    <div className="step-container-split">
-                                        <div className="center-card">
-                                            {/* STEP 4: AGENT PERSONA */}
-                                            {step === 4 && formData.agentPersona && (
-                                                <>
-                                                    <h2>Identité de l'agent</h2>
-                                                    <p className="subtitle">Configuration du ton et des directives.</p>
-                                                    <div className="persona-card">
-                                                        <div className="persona-header">
-                                                            <div className="avatar-small"><User size={16} /></div>
-                                                            <div>
-                                                                <h3>{formData.agentPersona.role}</h3>
-                                                                <span className="tag">{formData.agentPersona.tone}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="persona-section">
-                                                            <label>Message d'introduction</label>
-                                                            <textarea
-                                                                value={formData.agentPersona.firstMessage}
-                                                                onChange={(e) => setFormData({
-                                                                    ...formData,
-                                                                    agentPersona: { ...formData.agentPersona, firstMessage: e.target.value }
-                                                                })}
-                                                                rows={3}
-                                                            />
-                                                        </div>
-                                                        <div className="persona-section">
-                                                            <label>Directives comportementales</label>
-                                                            <ul className="rules-list">
-                                                                {formData.agentPersona.behaviors.slice(0, 3).map((b, i) => (
-                                                                    <li key={i}>{b}</li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-3 mt-6">
-                                                        <button className="btn-secondary" onClick={() => setStep(3)}>Retour</button>
-                                                        <button className="btn-primary flex-1" onClick={() => setStep(5)}>
-                                                            Enregistrer et continuer
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            )}
 
-                                            {/* STEP 7: FINAL */}
-                                            {step === 7 && (
-                                                <>
-                                                    <div className="text-center">
-                                                        <div className="success-icon flex justify-center">
-                                                            <Rocket size={40} />
-                                                        </div>
-                                                        <h2>Configuration terminée</h2>
-                                                        <p className="subtitle">Votre agent est prêt à être déployé.</p>
-                                                        <div className="final-preview-card">
-                                                            <div className="flex items-center gap-3 mb-4">
-                                                                <div className="avatar-small">IA</div>
-                                                                <div className="text-left">
-                                                                    <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
-                                                                    <div className="text-xs text-success">● Actif</div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-sm text-muted italic">
-                                                                "{formData.agentPersona?.firstMessage}"
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex gap-3 mt-6">
-                                                            <button className="btn-secondary" onClick={() => setStep(6)}>Retour</button>
-                                                            <button className="btn-primary flex-1" onClick={finishOnboarding} disabled={loading}>
-                                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
-                                                            </button>
-                                                        </div>
-                                                        <button className="btn-text mt-4" onClick={finishOnboarding}>
-                                                            Essayer en mode démo
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            )}
+                                {/* Other CRMs (Coming Soon) */}
+                                {[
+                                    { name: 'HubSpot', icon: 'H' },
+                                    { name: 'Salesforce', icon: 'S' },
+                                    { name: 'Pipedrive', icon: 'P' },
+                                    { name: 'ActiveCampaign', icon: 'A' },
+                                    { name: 'Zoho CRM', icon: 'Z' },
+                                    { name: 'Microsoft Dynamics', icon: 'M' }
+                                ].map(crm => (
+                                    <div key={crm.name} className="integration-card disabled">
+                                        <div className="card-header">
+                                            <div className="flex items-center gap-3">
+                                                <div className="integration-icon disabled">
+                                                    {crm.icon}
+                                                </div>
+                                                <h3 className="font-bold text-lg text-muted">{crm.name}</h3>
+                                            </div>
+                                            <button className="btn-outline-sm disabled" disabled>Connect</button>
                                         </div>
-
-                                        {/* RIGHT PANEL: CONSULTANT GUIDE */}
-                                        <GuidePanel stepIndex={step} />
+                                        <p className="card-desc text-muted">
+                                            Integration coming soon.
+                                        </p>
                                     </div>
-                                </motion.div>
-                            )
-                        )
+                                ))}
+                            </div>
+
+                            <div className="footer-actions mt-12">
+                                <button className="btn-secondary" onClick={() => setStep(6)}>Back</button>
+                                <div className="flex gap-4">
+                                    <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                                        Lost? Talk to Sales <HelpCircle size={16} />
+                                    </button>
+                                    <button className="btn-primary" onClick={() => setStep(8)}>
+                                        Launch your Agent
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    /* STEP 8: ACTIVATION (Final) */
+                    step === 8 && (
+                        <motion.div key="step8" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper">
+                            <div className="step-container-split">
+                                <div className="center-card">
+                                    <div className="text-center">
+                                        <div className="success-icon flex justify-center">
+                                            <Rocket size={40} />
+                                        </div>
+                                        <h2>Configuration terminée</h2>
+                                        <p className="subtitle">Votre agent est prêt à être déployé.</p>
+                                        <div className="final-preview-card">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="avatar-small">IA</div>
+                                                <div className="text-left">
+                                                    <div className="font-bold text-sm">{formData.agentPersona?.role}</div>
+                                                    <div className="text-xs text-success">● Actif</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-sm text-muted italic">
+                                                "{formData.agentPersona?.firstMessage}"
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3 mt-6">
+                                            <button className="btn-secondary" onClick={() => setStep(7)}>Retour</button>
+                                            <button className="btn-primary flex-1" onClick={finishOnboarding} disabled={loading}>
+                                                {loading ? <Loader2 className="animate-spin" size={16} /> : "Activer l'agent"}
+                                            </button>
+                                        </div>
+                                        <button className="btn-text mt-4" onClick={finishOnboarding}>
+                                            Essayer en mode démo
+                                        </button>
+                                    </div>
+                                </div>
+                                <GuidePanel stepIndex={7} />
+                            </div>
+                        </motion.div>
                     )
                 )}
             </AnimatePresence>
