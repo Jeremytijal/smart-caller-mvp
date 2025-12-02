@@ -9,6 +9,7 @@ import Integrations from './pages/Integrations';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import Campaigns from './pages/Campaigns';
 import CreateCampaign from './pages/CreateCampaign';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -34,6 +35,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="conversations" element={<Conversations />} />
               <Route path="contacts" element={<Contacts />} />
+              <Route path="campaigns" element={<Campaigns />} />
               <Route path="campaigns/new" element={<CreateCampaign />} />
               <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />
