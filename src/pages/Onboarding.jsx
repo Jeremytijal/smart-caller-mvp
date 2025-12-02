@@ -302,7 +302,7 @@ const Onboarding = () => {
             console.log('Import result:', result);
 
             setLoadingImport(false);
-            navigate('/contacts');
+            navigate('/campaigns/new');
         } catch (error) {
             console.error('Error importing CSV:', error);
             alert("Erreur lors de l'import: " + error.message);
@@ -2448,7 +2448,7 @@ const Onboarding = () => {
 
                                         <div className="card-actions">
                                             <button className="btn-primary full-width" onClick={() => {
-                                                finishOnboarding();
+                                                navigate('/');
                                             }} disabled={loadingFinish}>
                                                 {loadingFinish ? (
                                                     <><Loader2 className="animate-spin" size={18} /> Configuration...</>

@@ -9,7 +9,8 @@ import {
   Menu,
   X,
   Link2,
-  Sliders
+  Sliders,
+  Megaphone
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
@@ -31,6 +32,7 @@ const Sidebar = () => {
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
     { icon: Users, label: 'Contacts', path: '/contacts' },
+    { icon: Megaphone, label: 'Campagnes', path: '/campaigns/new' },
     { icon: Link2, label: 'Intégrations', path: '/integrations' },
     { icon: Settings, label: 'Configuration', path: '/settings' },
   ];

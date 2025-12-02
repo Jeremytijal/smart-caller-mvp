@@ -9,6 +9,7 @@ import Integrations from './pages/Integrations';
 import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import CreateCampaign from './pages/CreateCampaign';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -33,6 +34,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="conversations" element={<Conversations />} />
               <Route path="contacts" element={<Contacts />} />
+              <Route path="campaigns/new" element={<CreateCampaign />} />
               <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />
             </Route>
