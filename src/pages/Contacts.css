@@ -1,10 +1,76 @@
+/* ==========================================================================
+   CONTACTS PAGE - Light Theme
+   ========================================================================== */
+
+.contacts-page {
+    padding: 32px;
+    background: var(--bg-app, #F5F3EF);
+    min-height: 100vh;
+}
+
+.contacts-page .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.contacts-page .page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a1a);
+    margin-bottom: 8px;
+}
+
+.contacts-page .page-header .text-muted {
+    color: var(--text-secondary, #6b7280);
+    font-size: 0.95rem;
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Empty State */
 .contacts-page .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem;
-    color: var(--text-secondary);
+    padding: 80px 40px;
+    color: var(--text-secondary, #6b7280);
+    background: #fff;
+    border: 2px dashed var(--border-subtle, #e5e5e5);
+    border-radius: 16px;
+    text-align: center;
+}
+
+.contacts-page .empty-state svg {
+    color: var(--text-muted, #9ca3af);
+    margin-bottom: 16px;
+}
+
+.contacts-page .empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a1a);
+    margin-bottom: 8px;
+}
+
+.contacts-page .empty-state p {
+    color: var(--text-secondary, #6b7280);
+    font-size: 0.95rem;
+}
+
+/* Contacts Table */
+.contacts-table-wrapper {
+    background: #fff;
+    border: 1px solid var(--border-subtle, #e5e5e5);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .contacts-table {
@@ -14,51 +80,134 @@
 
 .contacts-table th,
 .contacts-table td {
-    padding: 1rem;
+    padding: 16px 20px;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-subtle, #e5e5e5);
 }
 
 .contacts-table th {
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.9rem;
+    background: var(--bg-secondary, #f9fafb);
+    color: var(--text-secondary, #6b7280);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
+.contacts-table td {
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.95rem;
+}
+
+.contacts-table tr:last-child td {
+    border-bottom: none;
+}
+
+.contacts-table tr:hover td {
+    background: var(--bg-secondary, #f9fafb);
+}
+
+/* Upload Area */
 .upload-area {
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-md);
-    padding: 2rem;
+    border: 2px dashed var(--border-subtle, #e5e5e5);
+    border-radius: 16px;
+    padding: 48px 32px;
     text-align: center;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
+    margin-bottom: 24px;
+    transition: all 0.2s ease;
+    background: #fff;
 }
 
 .upload-area:hover {
-    border-color: var(--primary-color);
-    background: rgba(255, 255, 255, 0.02);
+    border-color: var(--accent-primary, #FF470F);
+    background: rgba(255, 71, 15, 0.02);
 }
 
 .upload-label {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 12px;
     cursor: pointer;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #6b7280);
 }
 
+.upload-label svg {
+    color: var(--accent-primary, #FF470F);
+}
+
+.upload-label span {
+    font-size: 0.95rem;
+}
+
+/* Checkbox Group */
 .checkbox-group {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-sm);
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-secondary, #f9fafb);
+    border-radius: 10px;
+    border: 1px solid var(--border-subtle, #e5e5e5);
 }
 
 .checkbox-group input[type="checkbox"] {
-    width: 1.2rem;
-    height: 1.2rem;
-    accent-color: var(--primary-color);
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-primary, #FF470F);
+}
+
+.checkbox-group label {
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.95rem;
+}
+
+/* Buttons */
+.contacts-page .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.contacts-page .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 71, 15, 0.25);
+}
+
+.contacts-page .btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #fff;
+    border: 1px solid var(--border-subtle, #e5e5e5);
+    border-radius: 10px;
+    color: var(--text-primary, #1a1a1a);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.contacts-page .btn-secondary:hover {
+    background: var(--bg-secondary, #f9fafb);
+    border-color: var(--border-strong, #d1d5db);
+}
+
+/* Glass Panel Override */
+.contacts-page .glass-panel {
+    background: #fff;
+    border: 1px solid var(--border-subtle, #e5e5e5);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
