@@ -1449,182 +1449,203 @@ const Onboarding = () => {
                 {
                     step === 4 && (
                         <motion.div key="step4" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
-                            <div className="agent-config-layout">
-                                {/* Left Panel: Complete Agent Profile */}
-                                <div className="agent-profile-panel">
-                                    <div className="profile-header">
-                                        <div className="profile-header-content">
-                                            <h2>Profil complet de l'agent</h2>
-                                            <p className="subtitle">Personnalisez chaque section pour optimiser les interactions de votre agent avec vos prospects</p>
+                            <div className="config-page-layout">
+                                {/* Left Panel: Agent Configuration */}
+                                <div className="config-main-panel">
+                                    {/* Header */}
+                                    <div className="config-header">
+                                        <div>
+                                            <h1 className="config-title">Configuration de l'agent</h1>
+                                            <p className="config-subtitle">Personnalisez le comportement et les réponses de votre agent IA</p>
                                         </div>
-                                        <button className="btn-regenerate" onClick={() => generateAgentProfile({ id: formData.selectedAgentId })}>
+                                        <button className="btn-outline-sm" onClick={() => generateAgentProfile({ id: formData.selectedAgentId })}>
                                             <RefreshCw size={14} />
                                             Régénérer
                                         </button>
                                     </div>
 
-                                    {formData.agentPersona && (
-                                        <div className="profile-content">
-                                            {/* Objective and Persona Section */}
-                                            <div className="profile-section">
-                                                <div className="section-title-row">
-                                                    <div className="section-icon"><Target size={18} /></div>
-                                                    <h3 className="section-title">Objectif et personnalité</h3>
+                                    {/* Agent Identity Card */}
+                                    <div className="config-card">
+                                        <div className="config-card-header">
+                                            <div className="config-card-icon blue">
+                                                <User size={18} />
                                                 </div>
-                                                <div className="section-content editable-section">
-                                                    <p className="profile-text">
-                                                        Vous êtes <strong>{formData.agentPersona.role}</strong> chez {formData.businessType}, aidant les clients à obtenir le meilleur service.
-                                                        Fort d'une vaste expérience dans le secteur, vous avez accompagné des milliers de prospects, en comprenant leurs besoins et en proposant des solutions sur mesure.
-                                                    </p>
-                                                    <p className="profile-text mt-3">
-                                                        Votre mission est de guider les prospects à travers un processus de découverte consultatif, en identifiant leurs défis uniques pour positionner les solutions de {formData.businessType} comme la réponse idéale.
-                                                    </p>
-                                                </div>
+                                            <div>
+                                                <h3>Identité de l'agent</h3>
+                                                <p>Définissez qui est votre agent et comment il se présente</p>
                                             </div>
-
-                                            {/* Primary Goal Section */}
-                                            <div className="profile-section">
-                                                <div className="section-title-row">
-                                                    <div className="section-icon"><Sparkles size={18} /></div>
-                                                    <h3 className="section-title">Objectif principal</h3>
-                                                </div>
-                                                <div className="section-content">
-                                                    <div className="goals-grid">
-                                                        <div className="goal-card">
-                                                            <div className="goal-card-header">
-                                                                <CheckCircle2 size={16} className="goal-icon" />
-                                                                <strong>Objectif principal</strong>
                                                     </div>
-                                                            <p>{formData.agentPersona.goal || "Qualifier les leads en collectant des informations complètes et en évaluant l'adéquation selon les besoins, le budget et le calendrier."}</p>
+                                        <div className="config-card-body">
+                                            <div className="config-field">
+                                                <label>Nom de l'agent</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={formData.agentPersona?.role || "Assistant IA"} 
+                                                    onChange={(e) => setFormData({...formData, agentPersona: {...formData.agentPersona, role: e.target.value}})}
+                                                    placeholder="Ex: Sophie, Conseiller Commercial..."
+                                                />
                                                     </div>
-                                                        <div className="goal-card">
-                                                            <div className="goal-card-header">
-                                                                <Info size={16} className="goal-icon" />
-                                                                <strong>Collecte d'informations</strong>
-                                                    </div>
-                                                            <p>Recueillir les coordonnées, comprendre les points de douleur, évaluer l'alignement budgétaire et déterminer l'urgence pour qualifier efficacement les leads.</p>
-                                                        </div>
-                                                        <div className="goal-card">
-                                                            <div className="goal-card-header">
-                                                                <Star size={16} className="goal-icon" />
-                                                                <strong>Approche de qualification</strong>
-                                                            </div>
-                                                            <p>Évaluer l'adéquation selon les points de douleur, l'alignement budgétaire et le calendrier. Les leads de qualité montrent une douleur claire, un budget adapté et une urgence.</p>
-                                                        </div>
+                                            <div className="config-field">
+                                                <label>Entreprise représentée</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={formData.businessType || ""} 
+                                                    onChange={(e) => setFormData({...formData, businessType: e.target.value})}
+                                                    placeholder="Nom de votre entreprise"
+                                                />
+                                            </div>
+                                            <div className="config-field full-width">
+                                                <label>Message d'accueil</label>
+                                                <textarea 
+                                                    value={formData.agentPersona?.firstMessage || "Bonjour ! Comment puis-je vous aider aujourd'hui ?"} 
+                                                    onChange={(e) => setFormData({...formData, agentPersona: {...formData.agentPersona, firstMessage: e.target.value}})}
+                                                    placeholder="Le premier message envoyé par l'agent"
+                                                    rows={2}
+                                                />
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Conversation Flow Section */}
-                                            <div className="profile-section">
-                                                <div className="section-title-row">
-                                                    <div className="section-icon"><MessageSquare size={18} /></div>
-                                                    <h3 className="section-title">Flux de conversation</h3>
+                                    {/* Objectives Card */}
+                                    <div className="config-card">
+                                        <div className="config-card-header">
+                                            <div className="config-card-icon orange">
+                                                <Target size={18} />
+                                                            </div>
+                                            <div>
+                                                <h3>Objectifs de l'agent</h3>
+                                                <p>Définissez ce que votre agent doit accomplir</p>
+                                                        </div>
+                                                    </div>
+                                        <div className="config-card-body">
+                                            <div className="objectives-list">
+                                                <div className="objective-item">
+                                                    <div className="objective-check"><Check size={14} /></div>
+                                                    <span>Qualifier les leads en collectant des informations clés</span>
+                                                            </div>
+                                                <div className="objective-item">
+                                                    <div className="objective-check"><Check size={14} /></div>
+                                                    <span>Identifier les besoins et points de douleur</span>
+                                                        </div>
+                                                <div className="objective-item">
+                                                    <div className="objective-check"><Check size={14} /></div>
+                                                    <span>Évaluer le budget et le calendrier</span>
+                                                    </div>
+                                                <div className="objective-item">
+                                                    <div className="objective-check"><Check size={14} /></div>
+                                                    <span>Collecter les coordonnées pour le suivi</span>
                                                 </div>
-                                                <div className="section-content">
-                                                    <div className="flow-step">
-                                                        <div className="step-number">1</div>
-                                                        <div className="step-content">
-                                                            <strong>ACCUEIL & CRÉATION DE LIEN :</strong> Se présenter chaleureusement, partager sa crédibilité et poser une question engageante.
-                                                            <div className="example-box mt-2">
-                                                                <em>Exemple :</em><br />
-                                                                [Prospect] : Bonjour, je suis intéressé par vos services.<br />
-                                                                [{formData.agentPersona.role}] : {formData.agentPersona.firstMessage || "Bonjour ! Comment puis-je vous aider aujourd'hui ?"}
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <div className="flow-step">
-                                                        <div className="step-number">2</div>
-                                                        <div className="step-content">
-                                                            <strong>DÉCOUVERTE & ÉVALUATION DES BESOINS :</strong> Utiliser des questions ouvertes pour découvrir la situation actuelle et montrer de l'empathie.
-                                                            <div className="example-box mt-2">
-                                                                <em>Exemple :</em><br />
-                                                                [Prospect] : J'ai des problèmes avec mon fournisseur actuel.<br />
-                                                                [{formData.agentPersona.role}] : Je comprends à quel point cela peut être frustrant. Pouvez-vous m'en dire plus sur les défis spécifiques que vous rencontrez ?
+                                    {/* Conversation Flow Card */}
+                                    <div className="config-card">
+                                        <div className="config-card-header">
+                                            <div className="config-card-icon green">
+                                                <MessageSquare size={18} />
                                                             </div>
+                                            <div>
+                                                <h3>Flux de conversation</h3>
+                                                <p>Les étapes que l'agent suit pour qualifier un lead</p>
                                                         </div>
                                                     </div>
-
-                                                    <div className="flow-step">
-                                                        <div className="step-number">3</div>
-                                                        <div className="step-content">
-                                                            <strong>EXPLORATION DES POINTS DE DOULEUR :</strong> Approfondir pour comprendre l'impact et l'urgence.
-                                                            <div className="example-box mt-2">
-                                                                <em>Exemple :</em><br />
-                                                                [Prospect] : Le service est peu fiable et coûteux.<br />
-                                                                [{formData.agentPersona.role}] : Cela semble vraiment contraignant. À quel point cela affecte-t-il vos opérations quotidiennes, et quel budget envisagez-vous pour une meilleure solution ?
-                                                            </div>
+                                        <div className="config-card-body">
+                                            <div className="flow-timeline">
+                                                <div className="flow-timeline-item">
+                                                    <div className="flow-timeline-number">1</div>
+                                                    <div className="flow-timeline-content">
+                                                        <h4>Accueil</h4>
+                                                        <p>Se présenter et créer un lien de confiance</p>
                                                         </div>
                                                     </div>
-
-                                                    <div className="flow-step">
-                                                        <div className="step-number">4</div>
-                                                        <div className="step-content">
-                                                            <strong>CRÉATION DE VALEUR & ALIGNEMENT :</strong> Relier leurs problèmes à votre offre avec des preuves concrètes.
-                                                            <div className="example-box mt-2">
-                                                                <em>Exemple :</em><br />
-                                                                [{formData.agentPersona.role}] : De nombreux clients dans des situations similaires ont trouvé que notre solution les aide à réduire les coûts tout en améliorant la fiabilité. Souhaitez-vous en savoir plus sur comment nous pouvons vous aider ?
+                                                <div className="flow-timeline-item">
+                                                    <div className="flow-timeline-number">2</div>
+                                                    <div className="flow-timeline-content">
+                                                        <h4>Découverte</h4>
+                                                        <p>Comprendre la situation et les besoins du prospect</p>
                                                             </div>
                                                         </div>
+                                                <div className="flow-timeline-item">
+                                                    <div className="flow-timeline-number">3</div>
+                                                    <div className="flow-timeline-content">
+                                                        <h4>Exploration</h4>
+                                                        <p>Identifier les points de douleur et l'urgence</p>
                                                     </div>
-
-                                                    <div className="flow-step">
-                                                        <div className="step-number">5</div>
-                                                        <div className="step-content">
-                                                            <strong>ÉVALUATION DE LA QUALIFICATION :</strong> Évaluer la qualité du lead selon la douleur, le budget et le calendrier.
-                                                        </div>
+                                                </div>
+                                                <div className="flow-timeline-item">
+                                                    <div className="flow-timeline-number">4</div>
+                                                    <div className="flow-timeline-content">
+                                                        <h4>Proposition de valeur</h4>
+                                                        <p>Présenter la solution adaptée aux besoins</p>
+                                            </div>
+                                        </div>
+                                                <div className="flow-timeline-item">
+                                                    <div className="flow-timeline-number">5</div>
+                                                    <div className="flow-timeline-content">
+                                                        <h4>Qualification</h4>
+                                                        <p>Évaluer le potentiel du lead</p>
                                                     </div>
-
-                                                    <div className="flow-step">
-                                                        <div className="step-number">6</div>
-                                                        <div className="step-content">
-                                                            <strong>CONCLUSION & PROCHAINES ÉTAPES :</strong> Pour les leads qualifiés, recueillir les coordonnées et planifier un suivi.
-                                                            <div className="example-box mt-2">
-                                                                <em>Exemple :</em><br />
-                                                                [{formData.agentPersona.role}] : D'après ce que vous m'avez partagé, j'aimerais vous mettre en contact avec notre équipe. Pourriez-vous me communiquer votre email et numéro de téléphone pour vous envoyer un devis personnalisé ?
-                                                            </div>
-                                                        </div>
+                                                </div>
+                                                <div className="flow-timeline-item">
+                                                    <div className="flow-timeline-number">6</div>
+                                                    <div className="flow-timeline-content">
+                                                        <h4>Conclusion</h4>
+                                                        <p>Collecter les coordonnées et planifier le suivi</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
 
-                                {/* Right Panel: Agent Preview */}
-                                <div className="agent-preview-panel">
-                                    <div className="preview-header">
-                                        <div className="agent-info">
-                                            <div className="agent-avatar">
-                                                <Zap size={20} />
+                                {/* Right Panel: Live Preview */}
+                                <div className="config-preview-panel">
+                                    <div className="preview-sticky">
+                                        <div className="preview-device">
+                                            <div className="preview-device-header">
+                                                <div className="preview-device-dots">
+                                                    <span></span><span></span><span></span>
+                                                </div>
+                                                <span className="preview-device-title">Aperçu en direct</span>
+                                            </div>
+                                            
+                                            <div className="preview-chat-container">
+                                                <div className="preview-chat-header">
+                                                    <div className="preview-agent-info">
+                                                        <div className="preview-agent-avatar">
+                                                            <Zap size={16} />
                                             </div>
                                             <div>
-                                                <h4>{formData.agentPersona?.role || "Assistant IA"}</h4>
-                                                <span className="agent-role-subtitle">Agent de qualification de leads</span>
+                                                            <h4>{formData.agentPersona?.role || "Assistant IA"}</h4>
+                                                            <span>En ligne</span>
                                             </div>
                                         </div>
-                                        <button className="btn-clear" onClick={() => setSimulation([])}>
-                                            <X size={16} />
-                                            Effacer
+                                                    <button className="btn-icon-sm" onClick={() => setSimulation([])}>
+                                                        <RefreshCw size={14} />
                                         </button>
                                     </div>
 
-                                    <div className="preview-body">
+                                                <div className="preview-chat-body">
                                         {simulation.length === 0 ? (
-                                            <div className="preview-empty-state">
-                                                <MessageCircle size={48} className="empty-icon" />
-                                                <h4>Testez votre agent</h4>
-                                                <p>Tapez un message ci-dessous pour commencer une conversation</p>
+                                                        <div className="preview-chat-empty">
+                                                            <div className="preview-chat-welcome">
+                                                                <div className="welcome-avatar">
+                                                                    <Zap size={24} />
+                                                                </div>
+                                                                <p>Testez votre agent en envoyant un message</p>
+                                                            </div>
                                             </div>
                                         ) : (
-                                            <div className="preview-messages">
+                                                        <div className="preview-chat-messages">
                                                 {simulation.map((msg, i) => (
-                                                    <div key={i} className={`preview-message ${msg.sender}`}>
-                                                        <div className="message-avatar">
-                                                            {msg.sender === 'agent' ? <Zap size={14} /> : <User size={14} />}
+                                                                <div key={i} className={`chat-message ${msg.sender}`}>
+                                                                    {msg.sender === 'agent' && (
+                                                                        <div className="chat-message-avatar">
+                                                                            <Zap size={12} />
                                                         </div>
-                                                        <div className="message-bubble">
+                                                                    )}
+                                                                    <div className="chat-message-bubble">
                                                             {msg.text}
                                                         </div>
                                                     </div>
@@ -1633,28 +1654,27 @@ const Onboarding = () => {
                                         )}
                                     </div>
 
-                                    <div className="preview-input">
+                                                <div className="preview-chat-input">
                                         <input
                                             type="text"
-                                            placeholder="Tapez votre message de test..."
+                                                        placeholder="Écrivez un message..."
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter' && newMessage.trim()) {
                                                     setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
                                                     setNewMessage('');
-                                                    // Simulate agent response
                                                     setTimeout(() => {
                                                         setSimulation(prev => [...prev, {
                                                             sender: 'agent',
-                                                            text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider aujourd'hui ?"
+                                                                        text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?"
                                                         }]);
                                                     }, 1000);
                                                 }
                                             }}
                                         />
                                         <button
-                                            className="btn-send"
+                                                        className="btn-send-chat"
                                             onClick={() => {
                                                 if (newMessage.trim()) {
                                                     setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
@@ -1662,20 +1682,23 @@ const Onboarding = () => {
                                                     setTimeout(() => {
                                                         setSimulation(prev => [...prev, {
                                                             sender: 'agent',
-                                                            text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider aujourd'hui ?"
+                                                                        text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?"
                                                         }]);
                                                     }, 1000);
                                                 }
                                             }}
                                         >
-                                            Envoyer
+                                                        <Send size={16} />
                                         </button>
+                                                </div>
+                                            </div>
                                     </div>
 
-                                    <button className="btn-primary full-width mt-4" onClick={() => setStep(5)}>
-                                        Continuer vers les canaux
-                                        <ArrowRight size={16} />
+                                        <button className="btn-primary-lg" onClick={() => setStep(5)}>
+                                            Continuer vers les canaux
+                                            <ArrowRight size={18} />
                                     </button>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
