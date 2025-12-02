@@ -537,19 +537,19 @@ const Onboarding = () => {
                     <motion.div key="step0" variants={variants} initial="enter" animate="center" exit="exit" className="step-wrapper wide">
                         <div className="analysis-step-container">
                             <div className="text-center mb-12">
-                                <div className="badge">
-                                    Business Information
+                                <div className="badge badge-centered">
+                                    Informations entreprise
                                 </div>
-                                <h1 className="hero-title mb-4">Tell us about your business</h1>
+                                <h1 className="hero-title mb-4">Parlez-nous de votre entreprise</h1>
                                 <p className="subtitle max-w-2xl mx-auto">
-                                    Just share your site, country, and language.<br />
-                                    We'll take care of the rest, creating AI agents that understand your business.
+                                    Partagez simplement votre site web, votre pays et la langue souhaitée.<br />
+                                    Nous nous occupons du reste en créant des agents IA qui comprennent votre activité.
                                 </p>
                             </div>
 
                             <div className="analysis-form max-w-3xl mx-auto">
                                 <div className="input-group-vertical mb-6">
-                                    <label className="text-sm font-semibold mb-2 block">Your Company Website</label>
+                                    <label className="text-sm font-semibold mb-2 block">Site web de votre entreprise</label>
                                     <div className="input-with-icon full-width-input">
                                         <Globe size={20} />
                                         <input
@@ -565,7 +565,7 @@ const Onboarding = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                     <div className="input-group-vertical">
-                                        <label className="text-sm font-semibold mb-2 block">Agent Language</label>
+                                        <label className="text-sm font-semibold mb-2 block">Langue de l'agent</label>
                                         <div className="select-wrapper full-width-select">
                                             <select
                                                 value={formData.language}
@@ -574,13 +574,13 @@ const Onboarding = () => {
                                             >
                                                 <option value="Français">Français</option>
                                                 <option value="English">English</option>
-                                                <option value="Spanish">Spanish</option>
-                                                <option value="German">German</option>
+                                                <option value="Español">Español</option>
+                                                <option value="Deutsch">Deutsch</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div className="input-group-vertical">
-                                        <label className="text-sm font-semibold mb-2 block">Agent Country</label>
+                                        <label className="text-sm font-semibold mb-2 block">Pays de l'agent</label>
                                         <div className="select-wrapper full-width-select">
                                             <select
                                                 value={formData.country}
@@ -588,9 +588,12 @@ const Onboarding = () => {
                                                 className="custom-select"
                                             >
                                                 <option value="France">France</option>
-                                                <option value="United States">United States</option>
-                                                <option value="United Kingdom">United Kingdom</option>
-                                                <option value="Germany">Germany</option>
+                                                <option value="Belgique">Belgique</option>
+                                                <option value="Suisse">Suisse</option>
+                                                <option value="Canada">Canada</option>
+                                                <option value="États-Unis">États-Unis</option>
+                                                <option value="Royaume-Uni">Royaume-Uni</option>
+                                                <option value="Allemagne">Allemagne</option>
                                             </select>
                                         </div>
                                     </div>
@@ -600,14 +603,14 @@ const Onboarding = () => {
                                     <button
                                         className="btn-secondary"
                                     >
-                                        Lost? Talk to Sales <HelpCircle size={16} />
+                                        Besoin d'aide ? <HelpCircle size={16} />
                                     </button>
                                     <button
                                         className="btn-primary px-8 py-3 text-lg"
                                         onClick={analyzeBusiness}
                                         disabled={loading}
                                     >
-                                        {loading ? <><Loader2 className="animate-spin" size={20} /> {loadingText}</> : "Analyze my business"}
+                                        {loading ? <><Loader2 className="animate-spin" size={20} /> {loadingText}</> : "Analyser mon entreprise"}
                                     </button>
                                 </div>
                             </div>

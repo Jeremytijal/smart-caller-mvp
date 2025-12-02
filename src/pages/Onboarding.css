@@ -383,6 +383,14 @@ textarea:focus {
     border: 1px solid var(--border-subtle);
 }
 
+.badge-centered {
+    display: block;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: var(--space-sm);
+}
+
 .btn-text {
     background: none;
     border: none;
