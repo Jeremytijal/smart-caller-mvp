@@ -234,12 +234,131 @@ const Onboarding = () => {
         }
     };
 
+    // Save agent configuration (used by "C'est configuré" and CSV import buttons)
+    const saveAgentAndFinish = async () => {
+        if (!user) return false;
+
+        // Build complete agent configuration
+        const fullAgentConfig = {
+            name: formData.agentPersona?.name || `Agent ${formData.businessType || 'IA'}`,
+            role: formData.agentPersona?.role || 'Assistant Commercial',
+            company: analysisData.companyName || formData.businessType || 'Mon Entreprise',
+            tone: 50,
+            politeness: 'vous',
+            context: formData.agentPersona?.goal
+                ? `Objectif: ${formData.agentPersona.goal}. Comportements: ${formData.agentPersona.behaviors?.join(', ') || ''}.`
+                : analysisData.valueProposition || '',
+            goal: formData.goal || 'qualify',
+            icp: {
+                sector: formData.icpSector || '',
+                size: formData.icpSize || '',
+                decider: formData.icpDecider || '',
+                budget: formData.icpBudget || ''
+            },
+            quality_criteria: (formData.qualificationCriteria || []).map((c, i) => ({
+                id: i,
+                text: typeof c === 'string' ? c : c.text,
+                type: 'must_have'
+            })),
+            painPoints: formData.painPoints || [],
+            needs: formData.needs || [],
+            objections: formData.objections || [],
+            products: analysisData.products || [],
+            faqs: analysisData.faqs || [],
+            channels: formData.channels || { sms: true, whatsapp: false },
+            crm: formData.crm || null,
+            businessType: formData.businessType || '',
+            website: formData.website || '',
+            language: formData.language || 'Français',
+            country: formData.country || 'France',
+            agentPersona: formData.agentPersona || null,
+            selectedAgentId: formData.selectedAgentId || null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        const scoringCriteria = fullAgentConfig.quality_criteria
+            .map(c => `- ${c.text}`)
+            .join('\n');
+
+        const firstMessageTemplate = formData.agentPersona?.firstMessage ||
+            `Bonjour {{name}}, merci pour votre intérêt ! Je suis ${fullAgentConfig.name}, ${fullAgentConfig.role} chez ${fullAgentConfig.company}. Comment puis-je vous aider ?`;
+
+        try {
+            // Try backend API first
+            const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/agents/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    agentConfig: fullAgentConfig,
+                    onboardingData: {
+                        website: formData.website,
+                        businessType: formData.businessType,
+                        companyName: analysisData.companyName,
+                        valueProposition: analysisData.valueProposition,
+                        icpSector: formData.icpSector,
+                        icpSize: formData.icpSize,
+                        icpDecider: formData.icpDecider,
+                        icpBudget: formData.icpBudget,
+                        painPoints: formData.painPoints,
+                        needs: formData.needs,
+                        objections: formData.objections,
+                        qualificationCriteria: formData.qualificationCriteria,
+                        products: analysisData.products,
+                        faqs: analysisData.faqs,
+                        goal: formData.goal,
+                        selectedAgentId: formData.selectedAgentId,
+                        agentPersona: formData.agentPersona,
+                        channels: formData.channels,
+                        crm: formData.crm,
+                        language: formData.language,
+                        country: formData.country
+                    }
+                })
+            });
+
+            if (response.ok) {
+                console.log('Agent saved via API');
+                return true;
+            }
+            throw new Error('API failed');
+        } catch (apiError) {
+            console.warn('API failed, using Supabase fallback:', apiError);
+            
+            // Fallback to Supabase
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({
+                        agent_config: fullAgentConfig,
+                        first_message_template: firstMessageTemplate,
+                        scoring_criteria: scoringCriteria,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', user.id);
+
+                if (error) throw error;
+                console.log('Agent saved via Supabase');
+                return true;
+            } catch (supabaseError) {
+                console.error('Supabase error:', supabaseError);
+                return false;
+            }
+        }
+    };
+
     const startWithCsv = async () => {
         if (!csvFile || !user) return;
         setLoadingImport(true);
-        setLoadingText("Import des leads...");
+        setLoadingText("Sauvegarde de l'agent...");
 
         try {
+            // First, save the agent configuration
+            await saveAgentAndFinish();
+            
+            setLoadingText("Import des leads...");
+
             // Parse CSV file
             const text = await csvFile.text();
             const lines = text.split('\n').filter(line => line.trim());
@@ -288,21 +407,26 @@ const Onboarding = () => {
             }
 
             // Optionally trigger SMS campaign via backend
-            const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/import-leads', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    leads,
-                    agentId: user.id,
-                    sendInitialSms: true
-                })
-            });
+            try {
+                const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/import-leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        leads,
+                        agentId: user.id,
+                        sendInitialSms: true
+                    })
+                });
 
-            const result = await response.json();
-            console.log('Import result:', result);
+                const result = await response.json();
+                console.log('Import result:', result);
+            } catch (importError) {
+                console.warn('SMS trigger failed:', importError);
+                // Continue anyway - leads are saved
+            }
 
             setLoadingImport(false);
-            navigate('/campaigns/new');
+            navigate('/contacts');
         } catch (error) {
             console.error('Error importing CSV:', error);
             alert("Erreur lors de l'import: " + error.message);
@@ -2447,7 +2571,9 @@ const Onboarding = () => {
                                         </div>
 
                                         <div className="card-actions">
-                                            <button className="btn-primary full-width" onClick={() => {
+                                            <button className="btn-primary full-width" onClick={async () => {
+                                                setLoadingFinish(true);
+                                                await saveAgentAndFinish();
                                                 navigate('/');
                                             }} disabled={loadingFinish}>
                                                 {loadingFinish ? (
