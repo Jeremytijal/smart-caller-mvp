@@ -504,86 +504,145 @@ const Onboarding = () => {
         if (!user) return alert("Utilisateur non connecté.");
         setLoading(true);
         setLoadingText("Création de votre agent IA...");
+        
+        // Build complete agent configuration
+        const fullAgentConfig = {
+            // Agent Identity
+            name: formData.agentPersona?.name || `Agent ${formData.businessType}`,
+            role: formData.agentPersona?.role || 'Assistant Commercial',
+            company: analysisData.companyName || formData.businessType || 'Mon Entreprise',
+            
+            // Behavior
+            tone: 50,
+            politeness: 'vous',
+            
+            // Context & Goals
+            context: formData.agentPersona?.goal 
+                ? `Objectif: ${formData.agentPersona.goal}. Comportements: ${formData.agentPersona.behaviors?.join(', ') || ''}.`
+                : analysisData.valueProposition || '',
+            goal: formData.goal || 'qualify',
+            
+            // ICP Data
+            icp: {
+                sector: formData.icpSector || '',
+                size: formData.icpSize || '',
+                decider: formData.icpDecider || '',
+                budget: formData.icpBudget || ''
+            },
+            
+            // Qualification
+            quality_criteria: (formData.qualificationCriteria || []).map((c, i) => ({
+                id: i,
+                text: typeof c === 'string' ? c : c.text,
+                type: 'must_have'
+            })),
+            
+            // Pain Points & Needs
+            painPoints: formData.painPoints || [],
+            needs: formData.needs || [],
+            objections: formData.objections || [],
+            
+            // Products/Services
+            products: analysisData.products || [],
+            faqs: analysisData.faqs || [],
+            
+            // Channels & CRM
+            channels: formData.channels || { sms: true, whatsapp: false },
+            crm: formData.crm || null,
+            
+            // Metadata
+            businessType: formData.businessType || '',
+            website: formData.website || '',
+            language: formData.language || 'Français',
+            country: formData.country || 'France',
+            
+            // Agent Persona
+            agentPersona: formData.agentPersona || null,
+            selectedAgentId: formData.selectedAgentId || null,
+            
+            // Timestamps
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        // Generate scoring criteria and first message
+        const scoringCriteria = fullAgentConfig.quality_criteria
+            .map(c => `- ${c.text}`)
+            .join('\n');
+        
+        const firstMessageTemplate = formData.agentPersona?.firstMessage || 
+            `Bonjour {{name}}, merci pour votre intérêt ! Je suis ${fullAgentConfig.name}, ${fullAgentConfig.role} chez ${fullAgentConfig.company}. Comment puis-je vous aider ?`;
+
         try {
-            // Prepare complete onboarding data
-            const onboardingData = {
-                // Business Info
-                website: formData.website,
-                businessType: formData.businessType,
-                companyName: analysisData.companyName,
-                valueProposition: analysisData.valueProposition,
-                industry: analysisData.industry,
-                targetMarket: analysisData.targetMarket,
-                
-                // ICP
-                icpSector: formData.icpSector,
-                icpSize: formData.icpSize,
-                icpDecider: formData.icpDecider,
-                icpBudget: formData.icpBudget,
-                
-                // Pain Points & Needs
-                painPoints: formData.painPoints,
-                needs: formData.needs,
-                objections: formData.objections,
-                
-                // Qualification
-                qualificationCriteria: formData.qualificationCriteria,
-                commonQuestions: formData.commonQuestions,
-                
-                // Products & FAQs
-                products: analysisData.products,
-                faqs: analysisData.faqs,
-                
-                // Agent Configuration
-                goal: formData.goal,
-                selectedAgentId: formData.selectedAgentId,
-                agentPersona: formData.agentPersona,
-                
-                // Channels & CRM
-                channels: formData.channels,
-                crm: formData.crm,
-                crmApiKey: formData.crmApiKey,
-                
-                // Localization
-                language: formData.language,
-                country: formData.country
-            };
-
-            // Build agent config
-            const agentConfig = {
-                name: formData.agentPersona?.name || `Agent ${formData.businessType}`,
-                role: formData.agentPersona?.role || 'Assistant Commercial',
-                tone: 50,
-                politeness: 'vous',
-                context: formData.agentPersona?.goal 
-                    ? `Objectif: ${formData.agentPersona.goal}. Comportements: ${formData.agentPersona.behaviors?.join(', ') || ''}.`
-                    : analysisData.valueProposition
-            };
-
-            // Call backend API to create agent
+            // Try backend API first
             const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/agents/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userId: user.id,
-                    agentConfig,
-                    onboardingData
+                    agentConfig: fullAgentConfig,
+                    onboardingData: {
+                        website: formData.website,
+                        businessType: formData.businessType,
+                        companyName: analysisData.companyName,
+                        valueProposition: analysisData.valueProposition,
+                        icpSector: formData.icpSector,
+                        icpSize: formData.icpSize,
+                        icpDecider: formData.icpDecider,
+                        icpBudget: formData.icpBudget,
+                        painPoints: formData.painPoints,
+                        needs: formData.needs,
+                        objections: formData.objections,
+                        qualificationCriteria: formData.qualificationCriteria,
+                        products: analysisData.products,
+                        faqs: analysisData.faqs,
+                        goal: formData.goal,
+                        selectedAgentId: formData.selectedAgentId,
+                        agentPersona: formData.agentPersona,
+                        channels: formData.channels,
+                        crm: formData.crm,
+                        language: formData.language,
+                        country: formData.country
+                    }
                 })
             });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to create agent');
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Agent created via API:', result);
+                setStep(8);
+                return;
             }
-
-            console.log('Agent created successfully:', result);
             
-            // Move to the final "Get Started" step
-            setStep(8);
-        } catch (error) {
-            console.error('Error saving:', error);
-            alert("Erreur lors de la création de l'agent: " + error.message);
+            // If API fails, fallback to direct Supabase
+            console.warn('API failed, falling back to Supabase direct save');
+            throw new Error('API failed');
+            
+        } catch (apiError) {
+            console.warn('Backend API error, using Supabase fallback:', apiError);
+            
+            // Fallback: Save directly to Supabase
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({
+                        agent_config: fullAgentConfig,
+                        first_message_template: firstMessageTemplate,
+                        scoring_criteria: scoringCriteria,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', user.id);
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log('Agent saved via Supabase fallback');
+                setStep(8);
+            } catch (supabaseError) {
+                console.error('Supabase fallback error:', supabaseError);
+                alert("Erreur lors de la création de l'agent. Veuillez réessayer.");
+            }
         } finally {
             setLoading(false);
         }
