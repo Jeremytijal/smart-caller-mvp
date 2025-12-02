@@ -51,7 +51,15 @@ const Onboarding = () => {
         agentPersona: null, // { role, goal, firstMessage, behaviors, constraints, tone }
         channels: { sms: true, whatsapp: false, email: false, webchat: false }, // Default SMS/WhatsApp true
         crm: null, // 'hubspot', 'pipedrive', 'salesforce', 'none'
-        crmApiKey: ''
+        crmApiKey: '',
+        // Behavior & Scheduling
+        behaviorMode: 'human', // 'human' or 'assistant'
+        responseDelay: 2, // minutes (1-5)
+        schedule: {
+            startTime: '09:00',
+            endTime: '18:00',
+            days: ['L', 'M', 'Me', 'J', 'V'] // Lundi to Vendredi
+        }
     });
 
     // Analysis Results State
@@ -273,6 +281,14 @@ const Onboarding = () => {
             country: formData.country || 'France',
             agentPersona: formData.agentPersona || null,
             selectedAgentId: formData.selectedAgentId || null,
+            // Behavior & Scheduling
+            behaviorMode: formData.behaviorMode || 'human',
+            responseDelay: formData.responseDelay || 2,
+            schedule: formData.schedule || {
+                startTime: '09:00',
+                endTime: '18:00',
+                days: ['L', 'M', 'Me', 'J', 'V']
+            },
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
@@ -684,6 +700,15 @@ const Onboarding = () => {
             // Agent Persona
             agentPersona: formData.agentPersona || null,
             selectedAgentId: formData.selectedAgentId || null,
+
+            // Behavior & Scheduling
+            behaviorMode: formData.behaviorMode || 'human',
+            responseDelay: formData.responseDelay || 2,
+            schedule: formData.schedule || {
+                startTime: '09:00',
+                endTime: '18:00',
+                days: ['L', 'M', 'Me', 'J', 'V']
+            },
 
             // Timestamps
             createdAt: new Date().toISOString(),
@@ -1854,6 +1879,150 @@ const Onboarding = () => {
                                                 <div className="objective-item">
                                                     <div className="objective-check"><Check size={14} /></div>
                                                     <span>Collecter les coordonnées pour le suivi</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Behavior Mode Card */}
+                                    <div className="config-card">
+                                        <div className="config-card-header">
+                                            <div className="config-card-icon purple">
+                                                <Users size={18} />
+                                            </div>
+                                            <div>
+                                                <h3>Mode de comportement</h3>
+                                                <p>Choisissez comment votre agent se présente aux leads</p>
+                                            </div>
+                                        </div>
+                                        <div className="config-card-body">
+                                            <div className="behavior-options">
+                                                <div 
+                                                    className={`behavior-option ${formData.behaviorMode === 'human' ? 'selected' : ''}`}
+                                                    onClick={() => setFormData({ ...formData, behaviorMode: 'human' })}
+                                                >
+                                                    <div className="behavior-option-icon">
+                                                        <User size={24} />
+                                                    </div>
+                                                    <div className="behavior-option-content">
+                                                        <h4>Mode Humain</h4>
+                                                        <p>L'agent se comporte comme un humain avec des délais de réponse naturels. Idéal pour créer une relation de confiance.</p>
+                                                    </div>
+                                                    <div className="behavior-option-check">
+                                                        {formData.behaviorMode === 'human' && <Check size={18} />}
+                                                    </div>
+                                                </div>
+                                                <div 
+                                                    className={`behavior-option ${formData.behaviorMode === 'assistant' ? 'selected' : ''}`}
+                                                    onClick={() => setFormData({ ...formData, behaviorMode: 'assistant' })}
+                                                >
+                                                    <div className="behavior-option-icon">
+                                                        <Zap size={24} />
+                                                    </div>
+                                                    <div className="behavior-option-content">
+                                                        <h4>Mode Assistant IA</h4>
+                                                        <p>L'agent se présente clairement comme un assistant IA. Réponses instantanées et transparence totale.</p>
+                                                    </div>
+                                                    <div className="behavior-option-check">
+                                                        {formData.behaviorMode === 'assistant' && <Check size={18} />}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {formData.behaviorMode === 'human' && (
+                                                <div className="response-delay-section">
+                                                    <label>Délai de réponse (pour paraître humain)</label>
+                                                    <div className="delay-slider-container">
+                                                        <input
+                                                            type="range"
+                                                            min="1"
+                                                            max="5"
+                                                            value={formData.responseDelay}
+                                                            onChange={(e) => setFormData({ ...formData, responseDelay: parseInt(e.target.value) })}
+                                                            className="delay-slider"
+                                                        />
+                                                        <div className="delay-value">
+                                                            <Clock size={14} />
+                                                            <span>{formData.responseDelay} min</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="delay-labels">
+                                                        <span>1 min</span>
+                                                        <span>5 min</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Schedule Card */}
+                                    <div className="config-card">
+                                        <div className="config-card-header">
+                                            <div className="config-card-icon teal">
+                                                <Calendar size={18} />
+                                            </div>
+                                            <div>
+                                                <h3>Planning d'envoi</h3>
+                                                <p>Définissez quand votre agent peut envoyer des messages</p>
+                                            </div>
+                                        </div>
+                                        <div className="config-card-body">
+                                            <div className="schedule-section">
+                                                <div className="schedule-row">
+                                                    <div className="schedule-field">
+                                                        <label>Heure de début</label>
+                                                        <input
+                                                            type="time"
+                                                            value={formData.schedule.startTime}
+                                                            onChange={(e) => setFormData({
+                                                                ...formData,
+                                                                schedule: { ...formData.schedule, startTime: e.target.value }
+                                                            })}
+                                                            className="time-input"
+                                                        />
+                                                    </div>
+                                                    <span className="schedule-separator">à</span>
+                                                    <div className="schedule-field">
+                                                        <label>Heure de fin</label>
+                                                        <input
+                                                            type="time"
+                                                            value={formData.schedule.endTime}
+                                                            onChange={(e) => setFormData({
+                                                                ...formData,
+                                                                schedule: { ...formData.schedule, endTime: e.target.value }
+                                                            })}
+                                                            className="time-input"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="days-section">
+                                                    <label>Jours d'envoi</label>
+                                                    <div className="days-selector">
+                                                        {['L', 'M', 'Me', 'J', 'V', 'S', 'D'].map((day) => (
+                                                            <button
+                                                                key={day}
+                                                                type="button"
+                                                                className={`day-btn ${formData.schedule.days.includes(day) ? 'selected' : ''}`}
+                                                                onClick={() => {
+                                                                    const newDays = formData.schedule.days.includes(day)
+                                                                        ? formData.schedule.days.filter(d => d !== day)
+                                                                        : [...formData.schedule.days, day];
+                                                                    setFormData({
+                                                                        ...formData,
+                                                                        schedule: { ...formData.schedule, days: newDays }
+                                                                    });
+                                                                }}
+                                                            >
+                                                                {day}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="schedule-info">
+                                                    <Info size={14} />
+                                                    <span>En dehors de ces horaires, les messages seront mis en file d'attente.</span>
                                                 </div>
                                             </div>
                                         </div>

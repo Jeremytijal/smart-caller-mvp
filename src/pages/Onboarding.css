@@ -4152,6 +4152,265 @@ textarea:focus {
     box-shadow: 0 8px 24px rgba(255, 71, 15, 0.25);
 }
 
+/* ==========================================================================
+   BEHAVIOR MODE & SCHEDULE - Step 4 Additions
+   ========================================================================== */
+
+/* Config Card Icon Colors */
+.config-card-icon.purple {
+    background: rgba(147, 51, 234, 0.1);
+    color: #9333EA;
+}
+
+.config-card-icon.teal {
+    background: rgba(20, 184, 166, 0.1);
+    color: #14B8A6;
+}
+
+/* Behavior Options */
+.behavior-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.behavior-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    background: var(--bg-hover);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.behavior-option:hover {
+    background: var(--bg-card);
+    border-color: var(--border-strong);
+}
+
+.behavior-option.selected {
+    background: rgba(255, 71, 15, 0.04);
+    border-color: #FF470F;
+}
+
+.behavior-option-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.behavior-option.selected .behavior-option-icon {
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    color: white;
+}
+
+.behavior-option-content {
+    flex: 1;
+}
+
+.behavior-option-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.behavior-option-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.behavior-option-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.behavior-option.selected .behavior-option-check {
+    background: #FF470F;
+    color: white;
+}
+
+/* Response Delay Section */
+.response-delay-section {
+    background: var(--bg-hover);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 8px;
+}
+
+.response-delay-section label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.delay-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.delay-slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #10B981, #F59E0B, #FF470F);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.delay-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #FF470F;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.delay-value {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    font-weight: 600;
+    color: #FF470F;
+    font-size: 0.9rem;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.delay-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+/* Schedule Section */
+.schedule-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.schedule-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.schedule-field {
+    flex: 1;
+}
+
+.schedule-field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.time-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-family: inherit;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #FF470F;
+    box-shadow: 0 0 0 3px rgba(255, 71, 15, 0.1);
+}
+
+.schedule-separator {
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    padding-bottom: 14px;
+}
+
+.days-section label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.days-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.day-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 2px solid var(--border-subtle);
+    background: var(--bg-card);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.day-btn:hover {
+    border-color: var(--border-strong);
+}
+
+.day-btn.selected {
+    background: #FF470F;
+    border-color: #FF470F;
+    color: white;
+}
+
+.schedule-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(59, 130, 246, 0.08);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #3B82F6;
+}
+
+.schedule-info svg {
+    flex-shrink: 0;
+}
+
 /* Responsive */
 @media (max-width: 1100px) {
     .config-page-layout {
@@ -4243,14 +4502,17 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: linear-gradient(135deg, var(--accent) 0%, #FF8A00 100%);
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%) !important;
+    color: white !important;
     border: none;
-    box-shadow: 0 4px 14px rgba(254, 109, 16, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(255, 71, 15, 0.3);
+    cursor: pointer;
 }
 
 .btn-activate:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(254, 109, 16, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 71, 15, 0.4);
 }
 
 /* Layout */
@@ -4648,14 +4910,17 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: linear-gradient(135deg, var(--accent) 0%, #FF8A00 100%);
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%) !important;
+    color: white !important;
     border: none;
-    box-shadow: 0 4px 14px rgba(254, 109, 16, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(255, 71, 15, 0.3);
+    cursor: pointer;
 }
 
 .btn-activate-large:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(254, 109, 16, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 71, 15, 0.4);
 }
 
 /* Responsive */
