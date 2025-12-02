@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, Rocket } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
@@ -29,91 +29,156 @@ const SignUp = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-background">
-                <div className="glow-orb orb-1"></div>
-                <div className="glow-orb orb-2"></div>
+        <div className="auth-split-container">
+            {/* Left Side - Form */}
+            <div className="auth-form-side">
+                <motion.div
+                    className="auth-form-content"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <div className="auth-logo-section">
+                        <div className="auth-logo-icon">
+                            <Rocket size={24} />
+                        </div>
+                        <span className="auth-logo-text">Smart Caller</span>
+                    </div>
+
+                    <div className="auth-header-section">
+                        <h1>Créer un compte</h1>
+                        <p>Commencez à qualifier vos leads automatiquement</p>
+                    </div>
+
+                    {error && (
+                        <div className="auth-error">
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="auth-form">
+                        <div className="form-group">
+                            <label>Nom complet</label>
+                            <div className="input-wrapper">
+                                <User size={18} className="input-icon" />
+                                <input
+                                    type="text"
+                                    placeholder="John Doe"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                    className="input-field"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email professionnel</label>
+                            <div className="input-wrapper">
+                                <Mail size={18} className="input-icon" />
+                                <input
+                                    type="email"
+                                    placeholder="nom@entreprise.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    className="input-field"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Mot de passe</label>
+                            <div className="input-wrapper">
+                                <Lock size={18} className="input-icon" />
+                                <input
+                                    type="password"
+                                    placeholder="Minimum 8 caractères"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="input-field"
+                                />
+                            </div>
+                        </div>
+
+                        <p className="terms-text">
+                            En vous inscrivant, vous acceptez nos <a href="/terms">Conditions d'utilisation</a> et notre <a href="/privacy">Politique de confidentialité</a>.
+                        </p>
+
+                        <button type="submit" className="btn-signup" disabled={isLoading}>
+                            {isLoading ? (
+                                <Loader2 size={20} className="animate-spin" />
+                            ) : (
+                                <>Créer mon compte <ArrowRight size={18} /></>
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer-section">
+                        <p>Vous avez déjà un compte ? <Link to="/login" className="link-accent">Se connecter</Link></p>
+                    </div>
+                </motion.div>
             </div>
 
-            <motion.div
-                className="auth-card glass-panel"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className="auth-header">
-                    <div className="logo-container">
-                        <img src="/smart-caller-logo.png" alt="Smart Caller" className="auth-logo" />
+            {/* Right Side - Testimonial */}
+            <div className="auth-testimonial-side">
+                <motion.div
+                    className="testimonial-content"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                    <div className="testimonial-header">
+                        <h2>La vitesse de réponse fait <span className="highlight">toute la différence</span></h2>
                     </div>
-                    <h1>Créer un compte</h1>
-                    <p className="text-muted">Commencez à qualifier vos leads automatiquement</p>
-                </div>
 
-                {error && (
-                    <div className="auth-error">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label>Nom complet</label>
-                        <div className="input-wrapper">
-                            <User size={20} className="input-icon" />
-                            <input
-                                type="text"
-                                placeholder="John Doe"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                required
-                                className="input-field"
+                    <div className="testimonial-card">
+                        <div className="testimonial-photo">
+                            <img 
+                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
+                                alt="Alex Hormozi"
                             />
+                            <div className="photo-accent"></div>
+                        </div>
+                        
+                        <div className="testimonial-quote">
+                            <div className="quote-mark">"</div>
+                            <p className="quote-highlight">
+                                Si vous mettez plus de 5 minutes à répondre à un lead, votre taux de closing chute de 80%.
+                            </p>
+                            <p className="quote-text">
+                                Je connais des entrepreneurs qui payent plus de 60 000 $ par an quelqu'un dont le seul job est de répondre aux leads en moins de 5 minutes…
+                            </p>
+                            <p className="quote-text">
+                                Parce que rien ne fait augmenter le revenu plus vite que la vitesse.
+                            </p>
+                            
+                            <div className="quote-author">
+                                <div className="author-info">
+                                    <span className="author-name">Alex Hormozi</span>
+                                    <span className="author-title">Entrepreneur & Auteur de $100M Offers</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Adresse Email</label>
-                        <div className="input-wrapper">
-                            <Mail size={20} className="input-icon" />
-                            <input
-                                type="email"
-                                placeholder="nom@entreprise.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="input-field"
-                            />
+                    <div className="testimonial-stats">
+                        <div className="stat-item">
+                            <span className="stat-value">-80%</span>
+                            <span className="stat-label">Taux de closing après 5 min</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-value">&lt;30s</span>
+                            <span className="stat-label">Temps de réponse Smart Caller</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-value">24/7</span>
+                            <span className="stat-label">Disponibilité de l'agent</span>
                         </div>
                     </div>
-
-                    <div className="form-group">
-                        <label>Mot de passe</label>
-                        <div className="input-wrapper">
-                            <Lock size={20} className="input-icon" />
-                            <input
-                                type="password"
-                                placeholder="Créez un mot de passe sécurisé"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="input-field"
-                            />
-                        </div>
-                    </div>
-
-                    <button type="submit" className="btn-primary btn-block mt-6" disabled={isLoading}>
-                        {isLoading ? (
-                            <Loader2 size={20} className="animate-spin" />
-                        ) : (
-                            <>Commencer <ArrowRight size={20} /></>
-                        )}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    <p>Vous avez déjà un compte ? <Link to="/login" className="link-highlight">Se connecter</Link></p>
-                </div>
-            </motion.div>
+                </motion.div>
+            </div>
         </div>
     );
 };
