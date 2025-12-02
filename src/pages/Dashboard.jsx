@@ -129,20 +129,20 @@ const Dashboard = () => {
             <div className="charts-grid">
                 {/* Funnel Chart */}
                 <div className="glass-panel chart-card">
-                    <h3>Entonnoir de Conversion</h3>
+                    <h3>Entonnoir de conversion</h3>
                     <div className="chart-container">
                         <ResponsiveContainer width="100%" height={300}>
                             <FunnelChart>
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: 'var(--glass-border)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-primary)' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                    itemStyle={{ color: '#1a1a1a' }}
                                 />
                                 <Funnel
                                     dataKey="value"
                                     data={funnelData}
                                     isAnimationActive
                                 >
-                                    <LabelList position="right" fill="#fff" stroke="none" dataKey="name" />
+                                    <LabelList position="right" fill="#1a1a1a" stroke="none" dataKey="name" />
                                 </Funnel>
                             </FunnelChart>
                         </ResponsiveContainer>
@@ -151,19 +151,19 @@ const Dashboard = () => {
 
                 {/* Weekly Activity Chart */}
                 <div className="glass-panel chart-card">
-                    <h3>Nouveaux Leads par Jour</h3>
+                    <h3>Nouveaux leads par jour</h3>
                     <div className="chart-container">
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={activityData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
-                                <XAxis dataKey="name" stroke="var(--text-muted)" axisLine={false} tickLine={false} />
-                                <YAxis stroke="var(--text-muted)" axisLine={false} tickLine={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" vertical={false} />
+                                <XAxis dataKey="name" stroke="#6b7280" axisLine={false} tickLine={false} />
+                                <YAxis stroke="#6b7280" axisLine={false} tickLine={false} />
                                 <Tooltip
-                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                    contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: 'var(--glass-border)', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'var(--text-primary)' }}
+                                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                    itemStyle={{ color: '#1a1a1a' }}
                                 />
-                                <Bar dataKey="leads" fill="var(--accent-primary)" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="leads" fill="#FF470F" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
