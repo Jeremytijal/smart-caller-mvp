@@ -1453,11 +1453,13 @@ const Onboarding = () => {
                                 {/* Left Panel: Complete Agent Profile */}
                                 <div className="agent-profile-panel">
                                     <div className="profile-header">
-                                        <h2>Complete Agent Profile</h2>
-                                        <p className="subtitle">Review and customize each section to fine-tune how your agent interacts with customers</p>
+                                        <div className="profile-header-content">
+                                            <h2>Profil complet de l'agent</h2>
+                                            <p className="subtitle">Personnalisez chaque section pour optimiser les interactions de votre agent avec vos prospects</p>
+                                        </div>
                                         <button className="btn-regenerate" onClick={() => generateAgentProfile({ id: formData.selectedAgentId })}>
                                             <RefreshCw size={14} />
-                                            Regenerate Profile
+                                            Régénérer
                                         </button>
                                     </div>
 
@@ -1465,46 +1467,69 @@ const Onboarding = () => {
                                         <div className="profile-content">
                                             {/* Objective and Persona Section */}
                                             <div className="profile-section">
-                                                <h3 className="section-title">Objective and Persona</h3>
-                                                <div className="section-content">
+                                                <div className="section-title-row">
+                                                    <div className="section-icon"><Target size={18} /></div>
+                                                    <h3 className="section-title">Objectif et personnalité</h3>
+                                                </div>
+                                                <div className="section-content editable-section">
                                                     <p className="profile-text">
-                                                        You are <strong>{formData.agentPersona.role}</strong> at {formData.businessType}, helping customers get the best service.
-                                                        With extensive experience in the industry, you've assisted thousands of prospects, specializing in understanding their needs and providing tailored solutions.
+                                                        Vous êtes <strong>{formData.agentPersona.role}</strong> chez {formData.businessType}, aidant les clients à obtenir le meilleur service.
+                                                        Fort d'une vaste expérience dans le secteur, vous avez accompagné des milliers de prospects, en comprenant leurs besoins et en proposant des solutions sur mesure.
                                                     </p>
                                                     <p className="profile-text mt-3">
-                                                        Your mission is to guide prospects through a consultative discovery process, uncovering their unique challenges to position {formData.businessType}'s solutions as the ideal fit.
+                                                        Votre mission est de guider les prospects à travers un processus de découverte consultatif, en identifiant leurs défis uniques pour positionner les solutions de {formData.businessType} comme la réponse idéale.
                                                     </p>
                                                 </div>
                                             </div>
 
                                             {/* Primary Goal Section */}
                                             <div className="profile-section">
-                                                <h3 className="section-title">Primary Goal</h3>
+                                                <div className="section-title-row">
+                                                    <div className="section-icon"><Sparkles size={18} /></div>
+                                                    <h3 className="section-title">Objectif principal</h3>
+                                                </div>
                                                 <div className="section-content">
-                                                    <div className="goal-item">
-                                                        <strong>Primary Objective:</strong> {formData.agentPersona.goal || "Qualify leads by gathering comprehensive information and assessing fit based on needs, budget, and timeline."}
+                                                    <div className="goals-grid">
+                                                        <div className="goal-card">
+                                                            <div className="goal-card-header">
+                                                                <CheckCircle2 size={16} className="goal-icon" />
+                                                                <strong>Objectif principal</strong>
                                                     </div>
-                                                    <div className="goal-item mt-3">
-                                                        <strong>Information Gathering:</strong> Collect contact details, understand pain points, assess budget alignment, and determine urgency to qualify leads effectively.
+                                                            <p>{formData.agentPersona.goal || "Qualifier les leads en collectant des informations complètes et en évaluant l'adéquation selon les besoins, le budget et le calendrier."}</p>
                                                     </div>
-                                                    <div className="goal-item mt-3">
-                                                        <strong>Qualification Approach:</strong> Assess fit based on specific pain points, budget alignment, and timeline. High-quality leads show clear pain, budget fit, and urgency.
+                                                        <div className="goal-card">
+                                                            <div className="goal-card-header">
+                                                                <Info size={16} className="goal-icon" />
+                                                                <strong>Collecte d'informations</strong>
+                                                    </div>
+                                                            <p>Recueillir les coordonnées, comprendre les points de douleur, évaluer l'alignement budgétaire et déterminer l'urgence pour qualifier efficacement les leads.</p>
+                                                        </div>
+                                                        <div className="goal-card">
+                                                            <div className="goal-card-header">
+                                                                <Star size={16} className="goal-icon" />
+                                                                <strong>Approche de qualification</strong>
+                                                            </div>
+                                                            <p>Évaluer l'adéquation selon les points de douleur, l'alignement budgétaire et le calendrier. Les leads de qualité montrent une douleur claire, un budget adapté et une urgence.</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* Conversation Flow Section */}
                                             <div className="profile-section">
-                                                <h3 className="section-title">Conversation Flow</h3>
+                                                <div className="section-title-row">
+                                                    <div className="section-icon"><MessageSquare size={18} /></div>
+                                                    <h3 className="section-title">Flux de conversation</h3>
+                                                </div>
                                                 <div className="section-content">
                                                     <div className="flow-step">
                                                         <div className="step-number">1</div>
                                                         <div className="step-content">
-                                                            <strong>GREETING & RAPPORT BUILDING:</strong> Introduce yourself warmly, share credibility, and ask an engaging question.
+                                                            <strong>ACCUEIL & CRÉATION DE LIEN :</strong> Se présenter chaleureusement, partager sa crédibilité et poser une question engageante.
                                                             <div className="example-box mt-2">
-                                                                <em>Example:</em><br />
-                                                                [Prospect]: Hi, interested in your services.<br />
-                                                                [{formData.agentPersona.role}]: {formData.agentPersona.firstMessage || "Hello! How can I assist you today?"}
+                                                                <em>Exemple :</em><br />
+                                                                [Prospect] : Bonjour, je suis intéressé par vos services.<br />
+                                                                [{formData.agentPersona.role}] : {formData.agentPersona.firstMessage || "Bonjour ! Comment puis-je vous aider aujourd'hui ?"}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1512,11 +1537,11 @@ const Onboarding = () => {
                                                     <div className="flow-step">
                                                         <div className="step-number">2</div>
                                                         <div className="step-content">
-                                                            <strong>DISCOVERY & NEEDS ASSESSMENT:</strong> Use open-ended questions to uncover current situation and show empathy.
+                                                            <strong>DÉCOUVERTE & ÉVALUATION DES BESOINS :</strong> Utiliser des questions ouvertes pour découvrir la situation actuelle et montrer de l'empathie.
                                                             <div className="example-box mt-2">
-                                                                <em>Example:</em><br />
-                                                                [Prospect]: Having issues with current provider.<br />
-                                                                [{formData.agentPersona.role}]: I understand how frustrating that can be. Tell me more about the specific challenges you're facing?
+                                                                <em>Exemple :</em><br />
+                                                                [Prospect] : J'ai des problèmes avec mon fournisseur actuel.<br />
+                                                                [{formData.agentPersona.role}] : Je comprends à quel point cela peut être frustrant. Pouvez-vous m'en dire plus sur les défis spécifiques que vous rencontrez ?
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1524,11 +1549,11 @@ const Onboarding = () => {
                                                     <div className="flow-step">
                                                         <div className="step-number">3</div>
                                                         <div className="step-content">
-                                                            <strong>PAIN POINT EXPLORATION:</strong> Dig deeper to understand impact and urgency.
+                                                            <strong>EXPLORATION DES POINTS DE DOULEUR :</strong> Approfondir pour comprendre l'impact et l'urgence.
                                                             <div className="example-box mt-2">
-                                                                <em>Example:</em><br />
-                                                                [Prospect]: Service is unreliable and expensive.<br />
-                                                                [{formData.agentPersona.role}]: That sounds challenging. How much is this affecting your daily operations, and what's your budget for a better solution?
+                                                                <em>Exemple :</em><br />
+                                                                [Prospect] : Le service est peu fiable et coûteux.<br />
+                                                                [{formData.agentPersona.role}] : Cela semble vraiment contraignant. À quel point cela affecte-t-il vos opérations quotidiennes, et quel budget envisagez-vous pour une meilleure solution ?
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1536,10 +1561,10 @@ const Onboarding = () => {
                                                     <div className="flow-step">
                                                         <div className="step-number">4</div>
                                                         <div className="step-content">
-                                                            <strong>VALUE BUILDING & SOLUTION ALIGNMENT:</strong> Connect their pains to your offering with proof points.
+                                                            <strong>CRÉATION DE VALEUR & ALIGNEMENT :</strong> Relier leurs problèmes à votre offre avec des preuves concrètes.
                                                             <div className="example-box mt-2">
-                                                                <em>Example:</em><br />
-                                                                [{formData.agentPersona.role}]: Many customers in similar situations have found our solution helps reduce costs while improving reliability. Would you like to learn more about how we can help?
+                                                                <em>Exemple :</em><br />
+                                                                [{formData.agentPersona.role}] : De nombreux clients dans des situations similaires ont trouvé que notre solution les aide à réduire les coûts tout en améliorant la fiabilité. Souhaitez-vous en savoir plus sur comment nous pouvons vous aider ?
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1547,17 +1572,17 @@ const Onboarding = () => {
                                                     <div className="flow-step">
                                                         <div className="step-number">5</div>
                                                         <div className="step-content">
-                                                            <strong>QUALIFICATION ASSESSMENT:</strong> Evaluate lead quality based on pain, budget, and timeline.
+                                                            <strong>ÉVALUATION DE LA QUALIFICATION :</strong> Évaluer la qualité du lead selon la douleur, le budget et le calendrier.
                                                         </div>
                                                     </div>
 
                                                     <div className="flow-step">
                                                         <div className="step-number">6</div>
                                                         <div className="step-content">
-                                                            <strong>CLOSING & NEXT STEPS:</strong> For qualified leads, gather contact info and schedule follow-up.
+                                                            <strong>CONCLUSION & PROCHAINES ÉTAPES :</strong> Pour les leads qualifiés, recueillir les coordonnées et planifier un suivi.
                                                             <div className="example-box mt-2">
-                                                                <em>Example:</em><br />
-                                                                [{formData.agentPersona.role}]: Based on what you've shared, I'd love to connect you with our team. Could you provide your email and phone number so we can send you a personalized quote?
+                                                                <em>Exemple :</em><br />
+                                                                [{formData.agentPersona.role}] : D'après ce que vous m'avez partagé, j'aimerais vous mettre en contact avec notre équipe. Pourriez-vous me communiquer votre email et numéro de téléphone pour vous envoyer un devis personnalisé ?
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1575,13 +1600,13 @@ const Onboarding = () => {
                                                 <Zap size={20} />
                                             </div>
                                             <div>
-                                                <h4>{formData.agentPersona?.role || "AI Assistant"}</h4>
-                                                <span className="agent-role-subtitle">Inbound Lead Qualification Agent</span>
+                                                <h4>{formData.agentPersona?.role || "Assistant IA"}</h4>
+                                                <span className="agent-role-subtitle">Agent de qualification de leads</span>
                                             </div>
                                         </div>
                                         <button className="btn-clear" onClick={() => setSimulation([])}>
                                             <X size={16} />
-                                            Clear
+                                            Effacer
                                         </button>
                                     </div>
 
@@ -1589,8 +1614,8 @@ const Onboarding = () => {
                                         {simulation.length === 0 ? (
                                             <div className="preview-empty-state">
                                                 <MessageCircle size={48} className="empty-icon" />
-                                                <h4>Start a conversation with your agent</h4>
-                                                <p>Type a message below to begin testing</p>
+                                                <h4>Testez votre agent</h4>
+                                                <p>Tapez un message ci-dessous pour commencer une conversation</p>
                                             </div>
                                         ) : (
                                             <div className="preview-messages">
@@ -1611,7 +1636,7 @@ const Onboarding = () => {
                                     <div className="preview-input">
                                         <input
                                             type="text"
-                                            placeholder="Type your test message..."
+                                            placeholder="Tapez votre message de test..."
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                             onKeyDown={(e) => {
@@ -1622,7 +1647,7 @@ const Onboarding = () => {
                                                     setTimeout(() => {
                                                         setSimulation(prev => [...prev, {
                                                             sender: 'agent',
-                                                            text: formData.agentPersona?.firstMessage || "Thank you for your message. How can I assist you today?"
+                                                            text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider aujourd'hui ?"
                                                         }]);
                                                     }, 1000);
                                                 }
@@ -1637,18 +1662,18 @@ const Onboarding = () => {
                                                     setTimeout(() => {
                                                         setSimulation(prev => [...prev, {
                                                             sender: 'agent',
-                                                            text: formData.agentPersona?.firstMessage || "Thank you for your message. How can I assist you today?"
+                                                            text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider aujourd'hui ?"
                                                         }]);
                                                     }, 1000);
                                                 }
                                             }}
                                         >
-                                            Send
+                                            Envoyer
                                         </button>
                                     </div>
 
                                     <button className="btn-primary full-width mt-4" onClick={() => setStep(5)}>
-                                        Continue to Channels
+                                        Continuer vers les canaux
                                         <ArrowRight size={16} />
                                     </button>
                                 </div>
