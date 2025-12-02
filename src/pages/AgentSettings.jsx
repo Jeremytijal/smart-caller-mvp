@@ -73,8 +73,8 @@ const AgentSettings = () => {
                 let loadedCriteria = agentConfig.quality_criteria || [];
                 if (loadedCriteria.length === 0) {
                     loadedCriteria = [
-                        { id: 1, type: 'must_have', text: 'Budget > $1000' },
-                        { id: 2, type: 'must_have', text: 'Decision Maker' },
+                        { id: 1, type: 'must_have', text: 'Budget > 1000€' },
+                        { id: 2, type: 'must_have', text: 'Décideur' },
                     ];
                 }
 
@@ -144,9 +144,9 @@ const AgentSettings = () => {
 
     // --- Helpers for Identity ---
     const getToneLabel = (value) => {
-        if (value < 30) return "Empathique & Conseiller";
-        if (value < 70) return "Professionnel & Équilibré";
-        return "Offensif & Persuasif";
+        if (value < 30) return "Empathique & conseiller";
+        if (value < 70) return "Professionnel & équilibré";
+        return "Offensif & persuasif";
     };
 
     // --- Helpers for Messages ---
@@ -185,16 +185,16 @@ const AgentSettings = () => {
         const niceToHave = criteriaList.filter(c => c.type === 'nice_to_have').map(c => `- ${c.text}`).join('\n');
 
         return `
-GOAL: Qualify leads based on the following criteria:
+OBJECTIF : Qualifier les leads selon les critères suivants :
 
-MUST HAVE:
-${mustHave || '(None)'}
+INDISPENSABLES :
+${mustHave || '(Aucun)'}
 
-DEAL BREAKERS (STOP IMMEDIATELY):
-${dealBreakers || '(None)'}
+DISQUALIFIANTS (ARRÊTER IMMÉDIATEMENT) :
+${dealBreakers || '(Aucun)'}
 
-NICE TO HAVE:
-${niceToHave || '(None)'}
+SOUHAITABLES :
+${niceToHave || '(Aucun)'}
         `.trim();
     };
 
@@ -394,7 +394,7 @@ ${niceToHave || '(None)'}
                             <section className="settings-card full-width">
                                 <div className="card-header">
                                     <MessageSquare className="text-primary" size={24} />
-                                    <h2>Premier Message</h2>
+                                    <h2>Premier message</h2>
                                 </div>
 
                                 <div className="form-group">
@@ -415,7 +415,7 @@ ${niceToHave || '(None)'}
                                             checked={config.enable_template_webhook}
                                             onChange={(e) => setConfig({ ...config, enable_template_webhook: e.target.checked })}
                                         />
-                                        Activer pour Webhook
+                                        Activer pour les webhooks
                                     </label>
                                     <label className="toggle-label">
                                         <input
@@ -423,13 +423,13 @@ ${niceToHave || '(None)'}
                                             checked={config.enable_template_csv}
                                             onChange={(e) => setConfig({ ...config, enable_template_csv: e.target.checked })}
                                         />
-                                        Activer pour Import CSV
+                                        Activer pour l'import CSV
                                     </label>
                                 </div>
 
                                 <div className="divider"></div>
 
-                                <h3>Messages par Source</h3>
+                                <h3>Messages par source</h3>
                                 <div className="source-list">
                                     {Object.entries(config.source_templates).map(([source, template]) => (
                                         <div key={source} className="source-item">
@@ -454,7 +454,7 @@ ${niceToHave || '(None)'}
                                         type="text"
                                         value={newSource}
                                         onChange={(e) => setNewSource(e.target.value)}
-                                        placeholder="Nouvelle source (ex: linkedin, ebook)"
+                                        placeholder="Nouvelle source (ex: LinkedIn, e-book)"
                                     />
                                     <button onClick={addSourceTemplate} className="btn-secondary">
                                         <Plus size={18} /> Ajouter
@@ -468,35 +468,35 @@ ${niceToHave || '(None)'}
                     {activeTab === 'quality' && (
                         <div className="quality-layout">
                             <div className="criteria-column full-width">
-                                {/* Must Have Section */}
+                                {/* Critères indispensables */}
                                 <section className="glass-panel criteria-section">
                                     <div className="section-header">
                                         <div className="indicator must-have"></div>
-                                        <h2>Critères Indispensables (Must Have)</h2>
+                                        <h2>Critères indispensables</h2>
                                     </div>
                                     {renderCriteriaList('must_have', 'Ex: Budget > 500€', 'Aucun critère indispensable défini.')}
                                 </section>
 
-                                {/* Deal Breakers Section */}
+                                {/* Disqualifiants */}
                                 <section className="glass-panel criteria-section deal-breaker-section">
                                     <div className="section-header">
                                         <AlertTriangle className="text-danger" size={20} />
-                                        <h2 className="text-danger">Disqualifiants (Deal Breakers)</h2>
+                                        <h2 className="text-danger">Disqualifiants</h2>
                                     </div>
                                     {renderCriteriaList('deal_breaker', 'Ex: Pas de budget', 'Aucun disqualifiant défini.')}
                                 </section>
 
-                                {/* Nice to Have Section */}
+                                {/* Souhaitables */}
                                 <section className="glass-panel criteria-section">
                                     <div className="section-header">
                                         <div className="indicator nice-to-have"></div>
-                                        <h2>Souhaitables (Nice to Have)</h2>
+                                        <h2>Souhaitables</h2>
                                     </div>
                                     {renderCriteriaList('nice_to_have', 'Ex: Prêt à démarrer', 'Aucun critère souhaitable défini.')}
                                 </section>
 
                                 <div className="glass-panel preview-panel mt-4">
-                                    <h3>Aperçu des Instructions générées pour l'IA</h3>
+                                    <h3>Aperçu des instructions générées pour l'IA</h3>
                                     <pre className="text-xs text-muted bg-darker p-4 rounded mt-2 whitespace-pre-wrap">
                                         {config.scoring_criteria || '(Aucune instruction générée)'}
                                     </pre>

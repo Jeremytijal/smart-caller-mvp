@@ -1712,22 +1712,22 @@ const Onboarding = () => {
                             <div className="channel-selection-container">
                                 <div className="text-center mb-12">
                                     <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-3">
-                                        Channel Selection
+                                        Sélection des canaux
                                     </div>
-                                    <h2>Choose where to deploy your AI agent</h2>
+                                    <h2>Choisissez où déployer votre agent IA</h2>
                                     <p className="subtitle max-w-xl mx-auto">
-                                        Select one or more channels to connect with your customers.
+                                        Sélectionnez un ou plusieurs canaux pour communiquer avec vos clients.
                                     </p>
                                 </div>
 
                                 <div className="channels-grid">
                                     {[
-                                        { id: 'whatsapp', label: 'WhatsApp', desc: 'Engage leads via WhatsApp Business conversations.', icon: MessageCircle, available: true },
-                                        { id: 'sms', label: 'SMS', desc: 'Send and receive SMS messages.', icon: Smartphone, available: true },
-                                        { id: 'instagram', label: 'Instagram', desc: 'Connect with customers through Instagram Direct Messages.', icon: Instagram, available: false },
-                                        { id: 'messenger', label: 'Meta', desc: 'Integrate with Messenger to provide instant support.', icon: Facebook, available: false },
-                                        { id: 'email', label: 'Email', desc: 'Automate replies and follow-ups for customer emails.', icon: Mail, available: false },
-                                        { id: 'webchat', label: 'Web Chat', desc: 'Add a live chat widget directly to your website.', icon: MessageSquare, available: false },
+                                        { id: 'whatsapp', label: 'WhatsApp', desc: 'Engagez vos leads via WhatsApp Business.', icon: MessageCircle, available: true },
+                                        { id: 'sms', label: 'SMS', desc: 'Envoyez et recevez des SMS.', icon: Smartphone, available: true },
+                                        { id: 'instagram', label: 'Instagram', desc: 'Communiquez avec vos clients via les messages Instagram.', icon: Instagram, available: false },
+                                        { id: 'messenger', label: 'Meta', desc: 'Intégrez Messenger pour un support instantané.', icon: Facebook, available: false },
+                                        { id: 'email', label: 'Email', desc: 'Automatisez les réponses et relances par email.', icon: Mail, available: false },
+                                        { id: 'webchat', label: 'Chat Web', desc: 'Ajoutez un widget de chat en direct sur votre site.', icon: MessageSquare, available: false },
                                     ].map(channel => (
                                         <div key={channel.id} className={`channel-card ${!channel.available ? 'disabled' : ''}`}>
                                             <div className="flex justify-between items-start mb-4">
@@ -1755,15 +1755,15 @@ const Onboarding = () => {
                                 <div className="channel-footer">
                                     <div className="footer-notes">
                                         <div className="note-item">
-                                            <Check size={14} className="text-accent" /> We'll set up the integrations automatically.
+                                            <Check size={14} className="text-accent" /> Nous configurons les intégrations automatiquement.
                                         </div>
                                         <div className="note-item">
-                                            <Check size={14} className="text-accent" /> Your agent will be ready to handle conversations.
+                                            <Check size={14} className="text-accent" /> Votre agent sera prêt à gérer les conversations.
                                         </div>
                                     </div>
                                     <div className="footer-actions">
-                                        <button className="btn-secondary" onClick={() => setStep(4)}>Back</button>
-                                        <button className="btn-primary" onClick={() => setStep(6)}>Continue to Integrations <ArrowRight size={16} /></button>
+                                        <button className="btn-secondary" onClick={() => setStep(4)}>Retour</button>
+                                        <button className="btn-primary" onClick={() => setStep(6)}>Continuer vers les intégrations <ArrowRight size={16} /></button>
                                     </div>
                                 </div>
                             </div>
@@ -1780,16 +1780,16 @@ const Onboarding = () => {
                                 <div className="integration-header">
                                     <div className="integration-header-left">
                                         <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-2">
-                                        Connect CRM
+                                        Connexion CRM
                                     </div>
-                                        <h2 className="integration-title">Connect your agent to your CRM</h2>
+                                        <h2 className="integration-title">Connectez votre agent à votre CRM</h2>
                                         <p className="integration-subtitle">
-                                        Link your CRM to automatically sync leads, conversations, and qualification data.
+                                        Liez votre CRM pour synchroniser automatiquement les leads, conversations et données de qualification.
                                     </p>
                                     </div>
                                     <div className="integration-header-right">
                                         <button className="btn-primary btn-launch" onClick={() => setStep(7)}>
-                                            Launch your Agent <ArrowRight size={16} />
+                                            Lancer votre agent <ArrowRight size={16} />
                                         </button>
                                     </div>
                                 </div>
@@ -1805,11 +1805,11 @@ const Onboarding = () => {
                                                 <h3>Smart Caller</h3>
                                             </div>
                                             <div className="status-badge connected">
-                                                Connected <Check size={14} />
+                                                Connecté <Check size={14} />
                                             </div>
                                         </div>
                                         <p className="card-desc">
-                                            You already can manage your leads inside Smart Caller. All data is synced automatically.
+                                            Vous pouvez déjà gérer vos leads dans Smart Caller. Toutes les données sont synchronisées automatiquement.
                                         </p>
                                     </div>
 
@@ -1822,15 +1822,15 @@ const Onboarding = () => {
                                                 </div>
                                                 <h3>Webhook</h3>
                                             </div>
-                                            <button className="btn-outline-sm">Connect</button>
+                                            <button className="btn-outline-sm">Connecter</button>
                                         </div>
                                         <p className="card-desc">
-                                            Send leads to any external service via webhook.
+                                            Envoyez les leads vers n'importe quel service externe via webhook.
                                         </p>
                                         <div className="webhook-input-wrapper">
                                             <input
                                                 type="text"
-                                                placeholder="https://your-webhook-url.com/..."
+                                                placeholder="https://votre-webhook-url.com/..."
                                                 className="webhook-input"
                                                 value={formData.webhookUrl || ''}
                                                 onChange={(e) => setFormData({ ...formData, webhookUrl: e.target.value })}
@@ -1855,10 +1855,10 @@ const Onboarding = () => {
                                                     </div>
                                                     <h3 className="text-muted">{crm.name}</h3>
                                                 </div>
-                                                <button className="btn-outline-sm disabled" disabled>Connect</button>
+                                                <button className="btn-outline-sm disabled" disabled>Connecter</button>
                                             </div>
                                             <p className="card-desc text-muted">
-                                                Integration coming soon.
+                                                Intégration bientôt disponible.
                                             </p>
                                         </div>
                                     ))}
@@ -1866,10 +1866,10 @@ const Onboarding = () => {
 
                                 <div className="integration-footer">
                                     <button className="btn-secondary" onClick={() => setStep(5)}>
-                                        <ArrowLeft size={16} /> Back
+                                        <ArrowLeft size={16} /> Retour
                                     </button>
                                         <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
-                                            Lost? Talk to Sales <HelpCircle size={16} />
+                                            Besoin d'aide ? <HelpCircle size={16} />
                                         </button>
                                 </div>
                             </div>

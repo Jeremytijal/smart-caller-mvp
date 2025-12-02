@@ -56,7 +56,7 @@ const Dashboard = () => {
 
             // 3. Funnel Data
             setFunnelData([
-                { value: total, name: 'Total Leads', fill: 'var(--accent-primary)' },
+                { value: total, name: 'Total des leads', fill: 'var(--accent-primary)' },
                 { value: scoredContacts.length, name: 'Scorés', fill: 'var(--accent-secondary)' },
                 { value: qualified, name: 'Qualifiés', fill: 'var(--success)' },
             ]);
@@ -92,11 +92,11 @@ const Dashboard = () => {
     };
 
     const stats = [
-        { label: 'Total Leads', value: metrics.total, icon: Users, color: 'var(--accent-primary)' },
+        { label: 'Total des leads', value: metrics.total, icon: Users, color: 'var(--accent-primary)' },
         { label: 'Qualifiés', value: metrics.qualified, icon: CheckCircle, color: 'var(--success)' },
         { label: 'Disqualifiés', value: metrics.disqualified, icon: XCircle, color: 'var(--danger)' },
-        { label: 'Score Moyen', value: `${metrics.avgScore}/100`, icon: MessageSquare, color: 'var(--warning)' },
-        { label: 'Taux de Qualif.', value: `${metrics.qualificationRate}%`, icon: Clock, color: '#8b5cf6' },
+        { label: 'Score moyen', value: `${metrics.avgScore}/100`, icon: MessageSquare, color: 'var(--warning)' },
+        { label: 'Taux de qualif.', value: `${metrics.qualificationRate}%`, icon: Clock, color: '#8b5cf6' },
     ];
 
     if (loading) return <div className="p-8 text-center">Chargement du tableau de bord...</div>;

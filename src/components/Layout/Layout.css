@@ -1,15 +1,17 @@
 .app-layout {
     display: flex;
     min-height: 100vh;
+    background: #F5F3EF;
 }
 
 .main-content {
     flex: 1;
-    margin-left: 300px;
-    /* Sidebar width + gap */
-    padding: 2rem;
+    margin-left: 280px;
+    /* Sidebar width */
+    padding: 0;
     min-height: 100vh;
     position: relative;
+    background: #F5F3EF;
 }
 
 @media (max-width: 768px) {
