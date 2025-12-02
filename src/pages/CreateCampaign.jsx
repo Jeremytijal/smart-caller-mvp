@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
     Rocket, Target, Calendar, UserCheck, RefreshCw, ShoppingCart, 
-    MessageSquare, Users, Bot, Clock, Send, ChevronRight, Check,
-    Upload, FileText, Sparkles, AlertCircle, Info, Zap, Phone,
-    Mail, MessageCircle, Settings, Eye, Play, Pause, ArrowLeft
+    MessageSquare, Bot, Clock, ChevronRight, Check,
+    Sparkles, AlertCircle, Info, Zap, Phone,
+    Mail, MessageCircle, Eye, ArrowLeft, Building2, User
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -15,13 +15,13 @@ const CreateCampaign = () => {
     const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [loadingAgent, setLoadingAgent] = useState(true);
     const [agentConfig, setAgentConfig] = useState(null);
 
     // Campaign State
     const [campaign, setCampaign] = useState({
         name: '',
         objectives: [],
-        agentId: null,
         channel: 'sms',
         firstMessage: '',
         schedule: {
@@ -31,15 +31,10 @@ const CreateCampaign = () => {
             days: ['lun', 'mar', 'mer', 'jeu', 'ven'],
             timezone: 'Europe/Paris'
         },
-        targeting: {
-            source: 'all', // 'all', 'csv', 'segment'
-            filters: []
-        },
         settings: {
             maxMessagesPerDay: 100,
-            delayBetweenMessages: 30, // seconds
-            stopOnReply: true,
-            trackOpens: true
+            delayBetweenMessages: 30,
+            stopOnReply: true
         }
     });
 
@@ -100,11 +95,20 @@ const CreateCampaign = () => {
     const daysOptions = [
         { id: 'lun', label: 'L' },
         { id: 'mar', label: 'M' },
-        { id: 'mer', label: 'M' },
+        { id: 'mer', label: 'Me' },
         { id: 'jeu', label: 'J' },
         { id: 'ven', label: 'V' },
         { id: 'sam', label: 'S' },
         { id: 'dim', label: 'D' }
+    ];
+
+    // Steps configuration
+    const steps = [
+        { num: 1, label: 'Objectifs' },
+        { num: 2, label: 'Canal' },
+        { num: 3, label: 'Message' },
+        { num: 4, label: 'Planning' },
+        { num: 5, label: 'Récap' }
     ];
 
     // Fetch agent config on mount
@@ -115,6 +119,7 @@ const CreateCampaign = () => {
     }, [user]);
 
     const fetchAgentConfig = async () => {
+        setLoadingAgent(true);
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -122,19 +127,29 @@ const CreateCampaign = () => {
                 .eq('id', user.id)
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+            
+            console.log('Agent config loaded:', data);
             
             if (data?.agent_config) {
                 setAgentConfig(data.agent_config);
                 // Pre-fill first message from agent config
+                const defaultMessage = data.first_message_template || 
+                    data.agent_config?.agentPersona?.firstMessage || 
+                    `Bonjour {{name}}, je suis ${data.agent_config?.name || 'votre assistant'} de ${data.agent_config?.company || 'notre équipe'}. Comment puis-je vous aider ?`;
+                
                 setCampaign(prev => ({
                     ...prev,
-                    agentId: user.id,
-                    firstMessage: data.first_message_template || data.agent_config.agentPersona?.firstMessage || ''
+                    firstMessage: defaultMessage
                 }));
             }
         } catch (error) {
             console.error('Error fetching agent config:', error);
+        } finally {
+            setLoadingAgent(false);
         }
     };
 
@@ -160,29 +175,35 @@ const CreateCampaign = () => {
     };
 
     const generateFirstMessage = async () => {
-        if (!agentConfig || campaign.objectives.length === 0) return;
+        if (campaign.objectives.length === 0) {
+            alert('Sélectionnez au moins un objectif pour générer un message');
+            return;
+        }
         
         setLoading(true);
         try {
-            // Generate message based on objectives
             const objectiveNames = campaign.objectives.map(id => 
                 objectives.find(o => o.id === id)?.title
-            ).join(', ');
+            ).join(' et ');
 
+            const businessType = agentConfig?.businessType || 'Service professionnel';
+            
             const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/generate-persona', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    businessType: `${agentConfig.businessType} - Campagne ${objectiveNames}`
+                    businessType: `${businessType} - Campagne de ${objectiveNames}`
                 })
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setCampaign(prev => ({
-                    ...prev,
-                    firstMessage: data.firstMessage || prev.firstMessage
-                }));
+                if (data.firstMessage) {
+                    setCampaign(prev => ({
+                        ...prev,
+                        firstMessage: data.firstMessage
+                    }));
+                }
             }
         } catch (error) {
             console.error('Error generating message:', error);
@@ -199,13 +220,9 @@ const CreateCampaign = () => {
 
         setLoading(true);
         try {
-            // Save campaign to database (you'd need to create a campaigns table)
-            // For now, just show success
             console.log('Campaign to launch:', campaign);
-            
-            // Navigate to campaigns list or show success
             alert('Campagne créée avec succès ! Elle sera lancée selon le planning défini.');
-            navigate('/campaigns');
+            navigate('/');
         } catch (error) {
             console.error('Error launching campaign:', error);
             alert('Erreur lors de la création de la campagne');
@@ -217,7 +234,7 @@ const CreateCampaign = () => {
     const canProceed = () => {
         switch (currentStep) {
             case 1: return campaign.name && campaign.objectives.length > 0;
-            case 2: return campaign.agentId && campaign.channel;
+            case 2: return campaign.channel;
             case 3: return campaign.firstMessage.length > 10;
             case 4: return campaign.schedule.startDate && campaign.schedule.days.length > 0;
             default: return true;
@@ -244,7 +261,7 @@ const CreateCampaign = () => {
                     <button 
                         className="btn-primary"
                         onClick={handleLaunchCampaign}
-                        disabled={loading || !canProceed()}
+                        disabled={loading || currentStep !== 5}
                     >
                         <Rocket size={18} />
                         {loading ? 'Création...' : 'Lancer la campagne'}
@@ -252,26 +269,21 @@ const CreateCampaign = () => {
                 </div>
             </header>
 
-            {/* Progress Steps */}
+            {/* Progress Steps - Fixed */}
             <div className="campaign-progress">
-                {[
-                    { num: 1, label: 'Objectifs' },
-                    { num: 2, label: 'Agent & Canal' },
-                    { num: 3, label: 'Message' },
-                    { num: 4, label: 'Planning' },
-                    { num: 5, label: 'Récapitulatif' }
-                ].map((step, idx) => (
-                    <div 
-                        key={step.num} 
-                        className={`progress-step ${currentStep === step.num ? 'active' : ''} ${currentStep > step.num ? 'completed' : ''}`}
-                        onClick={() => currentStep > step.num && setCurrentStep(step.num)}
-                    >
-                        <div className="step-number">
-                            {currentStep > step.num ? <Check size={14} /> : step.num}
+                {steps.map((step, idx) => (
+                    <React.Fragment key={step.num}>
+                        <div 
+                            className={`progress-step ${currentStep === step.num ? 'active' : ''} ${currentStep > step.num ? 'completed' : ''}`}
+                            onClick={() => currentStep > step.num && setCurrentStep(step.num)}
+                        >
+                            <div className="step-circle">
+                                {currentStep > step.num ? <Check size={14} /> : step.num}
+                            </div>
+                            <span className="step-text">{step.label}</span>
                         </div>
-                        <span className="step-label">{step.label}</span>
-                        {idx < 4 && <ChevronRight size={16} className="step-arrow" />}
-                    </div>
+                        {idx < steps.length - 1 && <div className="step-connector" />}
+                    </React.Fragment>
                 ))}
             </div>
 
@@ -339,44 +351,63 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 2: Agent & Channel */}
+                {/* Step 2: Channel (Agent is automatically the user's agent) */}
                 {currentStep === 2 && (
                     <div className="step-content">
                         <div className="step-header">
-                            <h2>Agent & Canal de communication</h2>
-                            <p>Choisissez l'agent et le canal pour cette campagne</p>
+                            <h2>Canal de communication</h2>
+                            <p>Votre agent sera utilisé pour cette campagne</p>
                         </div>
 
+                        {/* Agent Info Box */}
                         <div className="form-section">
-                            <label className="form-label">Agent IA</label>
+                            <label className="form-label">Votre Agent IA</label>
                             
-                            {agentConfig ? (
-                                <div className="agent-card selected">
+                            {loadingAgent ? (
+                                <div className="agent-card loading">
+                                    <div className="loading-spinner"></div>
+                                    <p>Chargement de l'agent...</p>
+                                </div>
+                            ) : agentConfig ? (
+                                <div className="agent-card active">
                                     <div className="agent-avatar">
                                         <Bot size={28} />
                                     </div>
                                     <div className="agent-info">
                                         <h4>{agentConfig.name || 'Agent IA'}</h4>
                                         <p>{agentConfig.role || 'Assistant Commercial'}</p>
-                                        <div className="agent-meta">
-                                            <span className="meta-tag">
+                                        <div className="agent-details">
+                                            {agentConfig.company && (
+                                                <span className="detail-tag">
+                                                    <Building2 size={12} />
+                                                    {agentConfig.company}
+                                                </span>
+                                            )}
+                                            <span className="detail-tag">
+                                                <User size={12} />
+                                                {agentConfig.politeness === 'tu' ? 'Tutoiement' : 'Vouvoiement'}
+                                            </span>
+                                            <span className="detail-tag">
                                                 <Target size={12} />
                                                 {agentConfig.goal === 'book' ? 'Prise de RDV' : 'Qualification'}
                                             </span>
-                                            <span className="meta-tag">
-                                                <MessageSquare size={12} />
-                                                {agentConfig.politeness === 'tu' ? 'Tutoiement' : 'Vouvoiement'}
-                                            </span>
                                         </div>
                                     </div>
-                                    <div className="agent-check">
-                                        <Check size={20} />
+                                    <div className="agent-status">
+                                        <Check size={18} />
+                                        <span>Actif</span>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="agent-card empty">
-                                    <AlertCircle size={24} />
-                                    <p>Aucun agent configuré. <a href="/onboarding">Créez votre agent</a></p>
+                                    <AlertCircle size={32} />
+                                    <div>
+                                        <h4>Aucun agent configuré</h4>
+                                        <p>Vous devez d'abord créer votre agent IA</p>
+                                        <button className="btn-primary small" onClick={() => navigate('/onboarding')}>
+                                            Créer mon agent
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -395,7 +426,7 @@ const CreateCampaign = () => {
                                             <Icon size={24} />
                                             <span>{ch.label}</span>
                                             {!ch.available && <span className="coming-soon">Bientôt</span>}
-                                            {campaign.channel === ch.id && <Check size={16} className="channel-check" />}
+                                            {campaign.channel === ch.id && ch.available && <Check size={16} className="channel-check" />}
                                         </div>
                                     );
                                 })}
@@ -426,7 +457,7 @@ const CreateCampaign = () => {
                                 <button 
                                     className="btn-generate"
                                     onClick={generateFirstMessage}
-                                    disabled={loading || campaign.objectives.length === 0}
+                                    disabled={loading}
                                 >
                                     <Sparkles size={16} />
                                     {loading ? 'Génération...' : 'Générer avec l\'IA'}
@@ -466,17 +497,20 @@ const CreateCampaign = () => {
                                 <span>Aperçu</span>
                             </div>
                             <div className="phone-mockup">
-                                <div className="phone-header">
-                                    <span>Smart Caller</span>
-                                    <span className="time">10:30</span>
-                                </div>
-                                <div className="phone-content">
-                                    <div className="message-bubble agent">
-                                        {campaign.firstMessage
-                                            .replace('{{name}}', 'Jean')
-                                            .replace('{{company}}', agentConfig?.company || 'Votre Entreprise')
-                                            .replace('{{agent_name}}', agentConfig?.name || 'Agent')
-                                            || 'Votre message apparaîtra ici...'}
+                                <div className="phone-notch"></div>
+                                <div className="phone-screen">
+                                    <div className="phone-status">
+                                        <span>{agentConfig?.name || 'Smart Caller'}</span>
+                                        <span className="time">10:30</span>
+                                    </div>
+                                    <div className="phone-messages">
+                                        <div className="message-bubble agent">
+                                            {campaign.firstMessage
+                                                .replace(/\{\{name\}\}/g, 'Jean')
+                                                .replace(/\{\{company\}\}/g, agentConfig?.company || 'Votre Entreprise')
+                                                .replace(/\{\{agent_name\}\}/g, agentConfig?.name || 'Agent')
+                                                || 'Votre message apparaîtra ici...'}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -539,6 +573,7 @@ const CreateCampaign = () => {
                                 {daysOptions.map(day => (
                                     <button
                                         key={day.id}
+                                        type="button"
                                         className={`day-btn ${campaign.schedule.days.includes(day.id) ? 'selected' : ''}`}
                                         onClick={() => toggleDay(day.id)}
                                     >
@@ -562,7 +597,7 @@ const CreateCampaign = () => {
                                         value={campaign.settings.maxMessagesPerDay}
                                         onChange={(e) => setCampaign({
                                             ...campaign,
-                                            settings: { ...campaign.settings, maxMessagesPerDay: parseInt(e.target.value) }
+                                            settings: { ...campaign.settings, maxMessagesPerDay: parseInt(e.target.value) || 100 }
                                         })}
                                         min={1}
                                         max={1000}
@@ -580,7 +615,7 @@ const CreateCampaign = () => {
                                         value={campaign.settings.delayBetweenMessages}
                                         onChange={(e) => setCampaign({
                                             ...campaign,
-                                            settings: { ...campaign.settings, delayBetweenMessages: parseInt(e.target.value) }
+                                            settings: { ...campaign.settings, delayBetweenMessages: parseInt(e.target.value) || 30 }
                                         })}
                                         min={5}
                                         max={300}
@@ -654,7 +689,7 @@ const CreateCampaign = () => {
                             <div className="summary-section">
                                 <h4><MessageSquare size={18} /> Message</h4>
                                 <div className="summary-message">
-                                    "{campaign.firstMessage.substring(0, 100)}{campaign.firstMessage.length > 100 ? '...' : ''}"
+                                    "{campaign.firstMessage.substring(0, 150)}{campaign.firstMessage.length > 150 ? '...' : ''}"
                                 </div>
                             </div>
 
@@ -670,7 +705,7 @@ const CreateCampaign = () => {
                                 </div>
                                 <div className="summary-row">
                                     <span>Jours</span>
-                                    <strong>{campaign.schedule.days.join(', ').toUpperCase()}</strong>
+                                    <strong>{campaign.schedule.days.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')}</strong>
                                 </div>
                                 <div className="summary-row">
                                     <span>Max / jour</span>
@@ -688,7 +723,7 @@ const CreateCampaign = () => {
                         </div>
                     </div>
                 )}
-            </div>
+                </div>
 
             {/* Navigation */}
             <div className="campaign-navigation">
