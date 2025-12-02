@@ -205,7 +205,9 @@ const Onboarding = () => {
     const [webhookCopied, setWebhookCopied] = useState(false);
 
     // Generate unique webhook URL for user
-    const webhookUrl = user ? `https://api.smartcaller.ai/webhook/${user.id}` : 'https://api.smartcaller.ai/webhook/your-id';
+    const webhookUrl = user 
+        ? `https://app-smart-caller-backend-production.up.railway.app/webhooks/${user.id}/leads` 
+        : 'https://app-smart-caller-backend-production.up.railway.app/webhooks/your-id/leads';
 
     const copyWebhook = () => {
         navigator.clipboard.writeText(webhookUrl);
@@ -231,14 +233,79 @@ const Onboarding = () => {
     };
 
     const startWithCsv = async () => {
-        if (!csvFile) return;
+        if (!csvFile || !user) return;
         setLoading(true);
         setLoadingText("Import des leads...");
-        // Simulate upload - in real app, this would upload to backend
-        setTimeout(() => {
+        
+        try {
+            // Parse CSV file
+            const text = await csvFile.text();
+            const lines = text.split('\n').filter(line => line.trim());
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            // Find column indices
+            const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('nom'));
+            const phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('tel') || h.includes('mobile'));
+            const emailIdx = headers.findIndex(h => h.includes('email') || h.includes('mail'));
+            const companyIdx = headers.findIndex(h => h.includes('company') || h.includes('entreprise') || h.includes('societe'));
+            
+            if (phoneIdx === -1) {
+                alert("Le fichier CSV doit contenir une colonne 'phone' ou 'tel'");
+                setLoading(false);
+                return;
+            }
+
+            // Parse leads
+            const leads = [];
+            for (let i = 1; i < lines.length && i <= 100; i++) { // Limit to 100 leads
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values[phoneIdx]) {
+                    leads.push({
+                        name: nameIdx >= 0 ? values[nameIdx] : 'Inconnu',
+                        phone: values[phoneIdx],
+                        email: emailIdx >= 0 ? values[emailIdx] : null,
+                        company_name: companyIdx >= 0 ? values[companyIdx] : null,
+                        source: 'CSV Import'
+                    });
+                }
+            }
+
+            // Insert leads into Supabase
+            const { error: insertError } = await supabase
+                .from('contacts')
+                .insert(leads.map(lead => ({
+                    ...lead,
+                    user_id: user.id,
+                    status: 'new',
+                    created_at: new Date().toISOString()
+                })));
+
+            if (insertError) {
+                console.error('Error inserting leads:', insertError);
+                // Continue anyway - some leads might have been inserted
+            }
+
+            // Optionally trigger SMS campaign via backend
+            const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/import-leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    leads,
+                    agentId: user.id,
+                    sendInitialSms: true
+                })
+            });
+
+            const result = await response.json();
+            console.log('Import result:', result);
+
             setLoading(false);
-            navigate('/');
-        }, 2000);
+            navigate('/contacts');
+        } catch (error) {
+            console.error('Error importing CSV:', error);
+            alert("Erreur lors de l'import: " + error.message);
+            setLoading(false);
+        }
     };
 
     // --- Helper: Generate Agent Options ---
@@ -307,18 +374,35 @@ const Onboarding = () => {
                 body: JSON.stringify({ url: formData.website })
             });
             const data = await response.json();
+            
+            // Update formData with all analysis results
             setFormData(prev => ({
                 ...prev,
                 businessType: data.businessType,
-                icp: `Clients idéaux pour ${data.businessType} :
-- Secteur : PME et ETI
-- Besoin : Amélioration de la gestion des appels
-- Pain points : Perte de leads, standard saturé`, // Mock AI proposition
-                commonQuestions: data.commonQuestions,
-                qualificationCriteria: data.qualificationCriteria
+                icpSector: data.icpSector || prev.icpSector,
+                icpSize: data.icpSize || prev.icpSize,
+                icpDecider: data.icpDecider || prev.icpDecider,
+                icpBudget: data.icpBudget || prev.icpBudget,
+                painPoints: data.painPoints || prev.painPoints,
+                needs: data.needs || prev.needs,
+                objections: data.objections || prev.objections,
+                commonQuestions: data.commonQuestions || prev.commonQuestions,
+                qualificationCriteria: data.qualificationCriteria || prev.qualificationCriteria
             }));
 
-            // Generate options based on the result
+            // Update analysisData with company profile
+            setAnalysisData(prev => ({
+                ...prev,
+                companyName: data.companyName || prev.companyName,
+                industry: data.industry || prev.industry,
+                valueProposition: data.valueProposition || prev.valueProposition,
+                targetMarket: data.targetMarket || prev.targetMarket,
+                products: data.products || prev.products,
+                faqs: data.faqs || prev.faqs,
+                tone: data.tone || prev.tone
+            }));
+
+            // Generate agent options based on the result
             setAgentOptions(generateAgentOptions(data.businessType));
 
             setStep(1);
@@ -419,35 +503,87 @@ const Onboarding = () => {
     const finishOnboarding = async () => {
         if (!user) return alert("Utilisateur non connecté.");
         setLoading(true);
+        setLoadingText("Création de votre agent IA...");
         try {
-            // Construct final config
-            const configToSave = {
-                name: "Agent " + formData.businessType,
-                role: formData.agentPersona.role,
-                company: formData.businessType,
-                tone: 50, // Default mapping
-                politeness: 'vous',
-                context: `Goal: ${formData.agentPersona.goal}. Behaviors: ${formData.agentPersona.behaviors.join(', ')}.`,
-                first_message: formData.agentPersona.firstMessage,
-                quality_criteria: formData.qualificationCriteria.map((c, i) => ({ id: i, text: c, type: 'must_have' })),
-                scoring_criteria: formData.qualificationCriteria.map(c => `- ${c}`).join('\n'),
+            // Prepare complete onboarding data
+            const onboardingData = {
+                // Business Info
+                website: formData.website,
+                businessType: formData.businessType,
+                companyName: analysisData.companyName,
+                valueProposition: analysisData.valueProposition,
+                industry: analysisData.industry,
+                targetMarket: analysisData.targetMarket,
+                
+                // ICP
+                icpSector: formData.icpSector,
+                icpSize: formData.icpSize,
+                icpDecider: formData.icpDecider,
+                icpBudget: formData.icpBudget,
+                
+                // Pain Points & Needs
+                painPoints: formData.painPoints,
+                needs: formData.needs,
+                objections: formData.objections,
+                
+                // Qualification
+                qualificationCriteria: formData.qualificationCriteria,
+                commonQuestions: formData.commonQuestions,
+                
+                // Products & FAQs
+                products: analysisData.products,
+                faqs: analysisData.faqs,
+                
+                // Agent Configuration
+                goal: formData.goal,
+                selectedAgentId: formData.selectedAgentId,
+                agentPersona: formData.agentPersona,
+                
+                // Channels & CRM
                 channels: formData.channels,
-                crm: formData.crm
+                crm: formData.crm,
+                crmApiKey: formData.crmApiKey,
+                
+                // Localization
+                language: formData.language,
+                country: formData.country
             };
 
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    agent_config: configToSave,
-                    updated_at: new Date(),
-                })
-                .eq('id', user.id);
+            // Build agent config
+            const agentConfig = {
+                name: formData.agentPersona?.name || `Agent ${formData.businessType}`,
+                role: formData.agentPersona?.role || 'Assistant Commercial',
+                tone: 50,
+                politeness: 'vous',
+                context: formData.agentPersona?.goal 
+                    ? `Objectif: ${formData.agentPersona.goal}. Comportements: ${formData.agentPersona.behaviors?.join(', ') || ''}.`
+                    : analysisData.valueProposition
+            };
 
-            if (error) throw error;
-            navigate('/');
+            // Call backend API to create agent
+            const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/agents/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    agentConfig,
+                    onboardingData
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to create agent');
+            }
+
+            console.log('Agent created successfully:', result);
+            
+            // Move to the final "Get Started" step
+            setStep(8);
         } catch (error) {
             console.error('Error saving:', error);
-            alert("Erreur lors de la sauvegarde.");
+            alert("Erreur lors de la création de l'agent: " + error.message);
         } finally {
             setLoading(false);
         }
