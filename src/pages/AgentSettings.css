@@ -1,293 +1,515 @@
 /* ==========================================================================
-   AGENT SETTINGS PAGE - Paragon AI Style (Light Theme)
+   AGENT SETTINGS PAGE - Style Activation Onboarding
    ========================================================================== */
 
-.settings-page {
-    max-width: 900px;
+.agent-config-page {
+    max-width: 1200px;
     margin: 0 auto;
     padding: 32px;
     background: #F5F3EF;
     min-height: 100vh;
 }
 
-/* Page Header */
-.settings-page .page-header {
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.config-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 32px;
     padding-bottom: 24px;
     border-bottom: 1px solid #e5e5e5;
 }
 
-.settings-page .page-header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 8px;
-}
-
-.settings-page .page-header .text-muted {
-    color: #6b7280;
-    font-size: 0.95rem;
-}
-
-/* Primary Button */
-.settings-page .btn-primary {
+.config-header-left {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+    gap: 16px;
 }
 
-.settings-page .btn-primary:hover {
-    transform: translateY(-1px);
+.config-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
     box-shadow: 0 4px 12px rgba(255, 71, 15, 0.25);
 }
 
-.settings-page .btn-primary:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Tabs - Paragon Style */
-.tabs-container {
-    margin-top: 0;
-}
-
-.tabs-header {
-    display: flex;
-    gap: 0;
-    background: #fff;
-    padding: 0;
-    border-radius: 12px;
-    border: 1px solid #e5e5e5;
-    margin-bottom: 32px;
-    width: fit-content;
-    overflow: hidden;
-}
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    color: #6b7280;
-    padding: 14px 24px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-    border-right: 1px solid #e5e5e5;
-}
-
-.tab-btn:last-child {
-    border-right: none;
-}
-
-.tab-btn:hover {
+.config-title {
+    font-size: 1.75rem;
+    font-weight: 700;
     color: #1a1a1a;
-    background: #f9fafb;
+    margin: 0 0 4px 0;
 }
 
-.tab-btn.active {
-    color: #FF470F;
-    background: rgba(255, 71, 15, 0.06);
-}
-
-.tab-btn.active svg {
-    color: #FF470F;
-}
-
-/* Settings Grid */
-.settings-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-}
-
-/* Setup Layout */
-.setup-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.setup-form.full-width {
-    width: 100%;
-}
-
-/* Settings Card / Glass Panel - Paragon Style */
-.settings-page .settings-card,
-.settings-page .glass-panel,
-.settings-page .setup-card {
-    background: #ffffff !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-    margin-bottom: -1px;
-}
-
-.settings-page .settings-card:first-child,
-.settings-page .glass-panel:first-child,
-.settings-page .setup-card:first-child {
-    border-radius: 12px 12px 0 0 !important;
-}
-
-.settings-page .settings-card:last-child,
-.settings-page .glass-panel:last-child,
-.settings-page .setup-card:last-child {
-    border-radius: 0 0 12px 12px !important;
-    margin-bottom: 0;
-}
-
-.settings-page .settings-card:only-child,
-.settings-page .glass-panel:only-child,
-.settings-page .setup-card:only-child {
-    border-radius: 12px !important;
-}
-
-/* Card Header - Paragon Style */
-.settings-page .card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e5e5;
-    background: #fafafa;
+.config-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
     margin: 0;
 }
 
-.settings-page .card-header h2 {
-    font-size: 0.95rem;
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.config-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+    align-items: start;
+}
+
+.config-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.config-sidebar {
+    position: sticky;
+    top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ==========================================================================
+   SUMMARY CARDS - Style Activation
+   ========================================================================== */
+
+.summary-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.summary-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.summary-card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.summary-card-title svg {
+    color: #FF470F;
+}
+
+.summary-card-title h3 {
+    font-size: 1rem;
     font-weight: 600;
     color: #1a1a1a;
     margin: 0;
 }
 
-.settings-page .card-icon {
-    color: #FF470F;
-}
-
-/* Form Content */
-.settings-page .form-grid,
-.settings-page .form-group,
-.settings-page .tone-control,
-.settings-page .politeness-control {
-    padding: 24px;
-}
-
-.settings-page .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    padding: 24px;
-}
-
-.settings-page .form-grid .form-group {
-    padding: 0;
-}
-
-@media (max-width: 768px) {
-    .settings-page .form-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Form Groups */
-.settings-page .form-group {
-    margin-bottom: 0;
-}
-
-.settings-page .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 0.85rem;
-    color: #6b7280;
-}
-
-/* Inputs - Paragon Style */
-.settings-page textarea,
-.settings-page input[type="text"],
-.settings-page input[type="email"],
-.settings-page input[type="password"],
-.settings-page select {
-    width: 100%;
+/* Edit Button */
+.btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
     background: #ffffff;
     border: 1px solid #e5e5e5;
     border-radius: 8px;
-    padding: 12px 16px;
-    color: #1a1a1a;
-    font-family: inherit;
-    font-size: 0.95rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
     transition: all 0.2s;
 }
 
-.settings-page textarea:hover,
-.settings-page input[type="text"]:hover {
+.btn-edit:hover {
+    background: #f9fafb;
     border-color: #d1d5db;
+    color: #1a1a1a;
 }
 
-.settings-page textarea:focus,
-.settings-page input[type="text"]:focus {
+/* ==========================================================================
+   AGENT IDENTITY PREVIEW
+   ========================================================================== */
+
+.agent-identity-preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+}
+
+.agent-avatar-large {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.agent-identity-info {
+    flex: 1;
+}
+
+.agent-identity-info h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 6px 0;
+}
+
+.agent-goal {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0 0 12px 0;
+    line-height: 1.5;
+}
+
+.agent-tone-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* First Message Preview */
+.first-message-preview {
+    padding: 0 24px 24px;
+    border-top: 1px solid #f0f0f0;
+    margin-top: 0;
+}
+
+.first-message-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    margin: 16px 0 8px;
+}
+
+.first-message-preview p {
+    color: #1a1a1a;
+    font-style: italic;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   SUMMARY GRID
+   ========================================================================== */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    padding: 0;
+}
+
+.summary-item {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+}
+
+.summary-item:nth-child(2n) {
+    border-right: none;
+}
+
+.summary-item:nth-last-child(-n+2) {
+    border-bottom: none;
+}
+
+.summary-item.full-width {
+    grid-column: 1 / -1;
+    border-right: none;
+    border-bottom: none;
+}
+
+.summary-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #9ca3af;
+    margin-bottom: 6px;
+}
+
+.summary-value {
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   PAIN POINTS & TAGS
+   ========================================================================== */
+
+.pain-points-summary {
+    padding: 20px 24px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.pain-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.pain-tag {
+    padding: 6px 12px;
+    background: rgba(255, 71, 15, 0.08);
+    color: #FF470F;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.pain-tag.more {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   CHANNELS & INTEGRATIONS
+   ========================================================================== */
+
+.summary-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.summary-card.half {
+    min-height: auto;
+}
+
+.channels-summary,
+.integrations-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px 24px;
+}
+
+.channel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.channel-badge.active {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #059669;
+}
+
+.channel-badge.active svg {
+    color: #10B981;
+}
+
+.integration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.integration-badge.connected {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #059669;
+}
+
+.integration-badge .check-icon {
+    color: #10B981;
+}
+
+/* ==========================================================================
+   QUALITY SUMMARY
+   ========================================================================== */
+
+.quality-summary {
+    padding: 20px 24px;
+}
+
+.criteria-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.criteria-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.criteria-tag.must-have {
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+}
+
+.criteria-tag.deal-breaker {
+    background: rgba(239, 68, 68, 0.08);
+    color: #DC2626;
+}
+
+.criteria-tag.more {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   EDIT SECTIONS
+   ========================================================================== */
+
+.edit-section {
+    padding: 24px;
+    background: #fafafa;
+    border-top: 1px solid #f0f0f0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
     outline: none;
     border-color: #FF470F;
     box-shadow: 0 0 0 3px rgba(255, 71, 15, 0.1);
 }
 
-.settings-page textarea::placeholder,
-.settings-page input::placeholder {
+.form-group input::placeholder,
+.form-group textarea::placeholder {
     color: #9ca3af;
 }
 
-/* Tone Control */
-.settings-page .tone-control {
-    padding: 24px;
-    border-bottom: 1px solid #e5e5e5;
+.form-group small {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-top: 6px;
 }
 
-.settings-page .tone-header {
+/* Tone Control */
+.tone-control {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+}
+
+.tone-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
 }
 
-.settings-page .tone-header label {
-    font-weight: 500;
+.tone-header label {
     font-size: 0.85rem;
+    font-weight: 600;
     color: #6b7280;
-    margin: 0;
 }
 
-.settings-page .tone-value {
+.tone-value {
     color: #FF470F;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
-.settings-page .range-slider {
+.range-slider {
     width: 100%;
     height: 6px;
     border-radius: 3px;
-    background: #e5e7eb;
+    background: linear-gradient(to right, #10B981, #F59E0B, #EF4444);
     -webkit-appearance: none;
     appearance: none;
 }
 
-.settings-page .range-slider::-webkit-slider-thumb {
+.range-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 20px;
     height: 20px;
@@ -295,43 +517,43 @@
     background: #FF470F;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(255, 71, 15, 0.3);
+    border: 3px solid white;
 }
 
-.settings-page .tone-labels {
+.tone-labels {
     display: flex;
     justify-content: space-between;
     margin-top: 8px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #9ca3af;
 }
 
 /* Politeness Control */
-.settings-page .politeness-control {
+.politeness-control {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 24px;
+    margin-bottom: 20px;
 }
 
-.settings-page .politeness-control label {
-    font-weight: 500;
+.politeness-control > label {
     font-size: 0.85rem;
+    font-weight: 600;
     color: #6b7280;
-    margin: 0;
 }
 
-.settings-page .toggle-group {
+.toggle-group {
     display: flex;
     background: #f3f4f6;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 4px;
 }
 
-.settings-page .toggle-btn {
-    padding: 8px 16px;
+.toggle-btn {
+    padding: 10px 20px;
     border: none;
     background: transparent;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 500;
@@ -339,214 +561,87 @@
     transition: all 0.2s;
 }
 
-.settings-page .toggle-btn.active {
-    background: #fff;
+.toggle-btn.active {
+    background: #ffffff;
     color: #1a1a1a;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Toggles */
-.settings-page .toggles {
-    display: flex;
-    gap: 24px;
-    padding: 0 24px 24px;
+/* ==========================================================================
+   CRITERIA EDIT
+   ========================================================================== */
+
+.criteria-section {
+    margin-bottom: 20px;
 }
 
-.settings-page .toggle-label {
+.criteria-section:last-child {
+    margin-bottom: 0;
+}
+
+.criteria-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #6b7280;
-}
-
-.settings-page .toggle-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #FF470F;
-}
-
-/* Divider */
-.settings-page .divider {
-    height: 1px;
-    background: #e5e5e5;
-    margin: 0 24px;
-}
-
-/* Source List */
-.settings-page .source-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 0 24px 24px;
-}
-
-.settings-page .source-item {
-    background: #f9fafb;
-    padding: 16px;
-    border-radius: 8px;
-    border: 1px solid #e5e5e5;
-}
-
-.settings-page .source-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 12px;
 }
 
-.settings-page .source-item .badge {
-    background: rgba(59, 130, 246, 0.1);
-    color: #3B82F6;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.settings-page .btn-icon-danger {
-    background: none;
-    border: none;
-    color: #EF4444;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.settings-page .btn-icon-danger:hover {
-    background: rgba(239, 68, 68, 0.1);
-}
-
-/* Add Source */
-.settings-page .add-source {
-    display: flex;
-    gap: 12px;
-    padding: 0 24px 24px;
-}
-
-.settings-page .add-source input {
-    flex: 1;
-}
-
-.settings-page .btn-secondary {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    color: #1a1a1a;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
+.criteria-header h4 {
     font-size: 0.9rem;
-    transition: all 0.2s;
-}
-
-.settings-page .btn-secondary:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-}
-
-/* H3 in cards */
-.settings-page h3 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    padding: 24px 24px 16px;
-    margin: 0;
-}
-
-/* Quality Layout */
-.settings-page .quality-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.settings-page .criteria-column.full-width {
-    width: 100%;
-}
-
-/* Criteria Section */
-.settings-page .criteria-section {
-    margin-bottom: -1px;
-}
-
-.settings-page .criteria-section .section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e5e5;
-    background: #fafafa;
-}
-
-.settings-page .criteria-section .section-header h2 {
-    font-size: 0.95rem;
     font-weight: 600;
     color: #1a1a1a;
     margin: 0;
 }
 
-.settings-page .indicator {
-    width: 12px;
-    height: 12px;
+.indicator {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
 }
 
-.settings-page .indicator.must-have {
+.indicator.must-have {
     background: #10B981;
 }
 
-.settings-page .indicator.nice-to-have {
+.indicator.nice-to-have {
     background: #3B82F6;
 }
 
-.settings-page .deal-breaker-section .section-header h2 {
-    color: #EF4444;
-}
-
-/* Criteria List */
-.settings-page .criteria-list {
+.criteria-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 24px;
+    gap: 10px;
 }
 
-.settings-page .criteria-item {
+.criteria-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #f9fafb;
+    gap: 10px;
     padding: 12px 16px;
-    border-radius: 8px;
+    background: #ffffff;
     border: 1px solid #e5e5e5;
+    border-radius: 10px;
 }
 
-.settings-page .criteria-item.deal-breaker {
-    background: rgba(239, 68, 68, 0.05);
+.criteria-item.deal-breaker {
+    background: rgba(239, 68, 68, 0.04);
     border-color: rgba(239, 68, 68, 0.2);
 }
 
-.settings-page .criteria-item input {
+.criteria-item input {
     flex: 1;
-    background: transparent;
     border: none;
-    padding: 0;
+    background: transparent;
     font-size: 0.9rem;
+    padding: 0;
 }
 
-.settings-page .criteria-item input:focus {
+.criteria-item input:focus {
     outline: none;
     box-shadow: none;
 }
 
-.settings-page .btn-icon {
+.btn-icon {
     background: none;
     border: none;
     padding: 6px;
@@ -556,17 +651,12 @@
     transition: all 0.2s;
 }
 
-.settings-page .btn-icon:hover {
-    background: #f3f4f6;
-    color: #1a1a1a;
-}
-
-.settings-page .btn-icon.delete:hover {
+.btn-icon.delete:hover {
     background: rgba(239, 68, 68, 0.1);
     color: #EF4444;
 }
 
-.settings-page .btn-dashed {
+.btn-dashed {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -575,71 +665,253 @@
     padding: 12px;
     background: transparent;
     border: 2px dashed #e5e5e5;
-    border-radius: 8px;
+    border-radius: 10px;
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.settings-page .btn-dashed:hover {
+.btn-dashed:hover {
     border-color: #FF470F;
     color: #FF470F;
     background: rgba(255, 71, 15, 0.02);
 }
 
-.settings-page .btn-dashed.danger:hover {
+.btn-dashed.danger:hover {
     border-color: #EF4444;
     color: #EF4444;
     background: rgba(239, 68, 68, 0.02);
 }
 
-.settings-page .empty-state {
-    text-align: center;
-    padding: 24px;
-    color: #9ca3af;
-    font-style: italic;
-    border: 2px dashed #e5e5e5;
-    border-radius: 8px;
-    margin-bottom: 12px;
+/* ==========================================================================
+   CHANNELS EDIT
+   ========================================================================== */
+
+.channels-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.settings-page .empty-text {
+.channel-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    cursor: pointer;
     font-size: 0.9rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    transition: all 0.2s;
 }
 
-/* Preview Panel */
-.settings-page .preview-panel {
-    background: #ffffff !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 12px !important;
-    padding: 0 !important;
-    margin-top: 24px !important;
+.channel-toggle:hover {
+    border-color: #d1d5db;
 }
 
-.settings-page .preview-panel h3 {
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e5e5;
-    background: #fafafa;
-    border-radius: 12px 12px 0 0;
-    margin: 0;
+.channel-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #FF470F;
 }
 
-.settings-page .preview-panel pre {
-    background: #f9fafb;
-    border: none;
-    border-radius: 0 0 12px 12px;
-    padding: 24px !important;
-    font-family: 'SF Mono', Monaco, monospace;
-    font-size: 0.8rem;
+.channel-toggle svg {
     color: #6b7280;
-    overflow-x: auto;
-    white-space: pre-wrap;
+}
+
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+
+.config-checklist {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.config-checklist h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 16px 0;
+}
+
+.checklist-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #9ca3af;
+}
+
+.checklist-item svg {
+    color: #d1d5db;
+}
+
+.checklist-item.checked {
+    color: #1a1a1a;
+}
+
+.checklist-item.checked svg {
+    color: #10B981;
+}
+
+/* Info Cards */
+.config-info-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.config-info-card .info-card-icon {
+    width: 44px;
+    height: 44px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: #6b7280;
+}
+
+.config-info-card h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.config-info-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.5;
     margin: 0;
 }
 
-/* Toast Notification */
+.config-info-card.highlight {
+    background: linear-gradient(135deg, rgba(255, 71, 15, 0.04) 0%, rgba(255, 107, 53, 0.08) 100%);
+    border-color: rgba(255, 71, 15, 0.15);
+}
+
+.config-info-card.highlight .info-card-icon {
+    background: rgba(255, 71, 15, 0.1);
+    color: #FF470F;
+}
+
+/* Action Card */
+.config-action-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.config-action-card h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.config-action-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+}
+
+/* Help */
+.config-help {
+    text-align: center;
+}
+
+.btn-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-text:hover {
+    color: #FF470F;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 71, 15, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #FF470F;
+    color: #FF470F;
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATION
+   ========================================================================== */
+
 .toast-notification {
     position: fixed;
     bottom: 24px;
@@ -667,59 +939,77 @@
     color: #10B981;
 }
 
-/* Utilities */
-.settings-page .mt-4 {
-    margin-top: 16px;
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+.text-muted {
+    color: #9ca3af;
+    font-size: 0.9rem;
 }
 
-.settings-page .text-danger {
+.text-danger {
     color: #EF4444;
 }
 
-.settings-page .text-xs {
-    font-size: 0.75rem;
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .config-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .config-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .config-checklist {
+        grid-column: 1 / -1;
+    }
+    
+    .config-help {
+        grid-column: 1 / -1;
+    }
 }
 
-.settings-page .text-muted {
-    color: #6b7280;
-}
-
-.settings-page .text-primary {
-    color: #FF470F;
-}
-
-.settings-page code {
-    background: #f3f4f6;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    color: #1a1a1a;
-}
-
-.settings-page small {
-    display: block;
-    margin-top: 8px;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
-    .settings-page {
+    .agent-config-page {
         padding: 20px;
     }
     
-    .settings-page .page-header {
+    .config-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 16px;
     }
     
-    .tabs-header {
+    .btn-save {
         width: 100%;
-        overflow-x: auto;
+        justify-content: center;
     }
     
-    .settings-page .politeness-control {
-        flex-direction: column;
-        align-items: flex-start;
+    .summary-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-item {
+        border-right: none;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .config-sidebar {
+        grid-template-columns: 1fr;
     }
 }
