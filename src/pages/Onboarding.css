@@ -2342,18 +2342,21 @@ textarea:focus {
 .icp-field-card {
     background: var(--bg-input);
     border: 1px solid var(--border-subtle);
-    border-radius: 10px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .icp-field-card:hover {
     border-color: var(--border-strong);
+    background: var(--bg-card);
 }
 
 .icp-field-card:focus-within {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-dim);
+    background: var(--bg-card);
 }
 
 .field-header {
@@ -2386,21 +2389,52 @@ textarea:focus {
 
 .icp-field-card input {
     width: 100%;
-    background: transparent;
-    border: none;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
     color: var(--text-primary);
     font-size: 0.95rem;
-    font-weight: 500;
-    padding: 0;
+    font-weight: 600;
+    padding: 12px 14px;
+    transition: all 0.2s ease;
+    cursor: text;
+}
+
+.icp-field-card input:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-input);
 }
 
 .icp-field-card input:focus {
     outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+    background: var(--bg-card);
 }
 
 .icp-field-card input::placeholder {
     color: var(--text-tertiary);
     font-weight: 400;
+}
+
+/* Edit indicator on hover */
+.icp-field-card::after {
+    content: '✏️';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.icp-field-card:hover::after {
+    opacity: 0.5;
+}
+
+.icp-field-card:focus-within::after {
+    opacity: 0;
 }
 
 /* === ICP Sections === */
