@@ -396,9 +396,8 @@ const Onboarding = () => {
                 .from('contacts')
                 .insert(leads.map(lead => ({
                     ...lead,
-                    user_id: user.id,
-                    status: 'new',
-                    created_at: new Date().toISOString()
+                    agent_id: user.id,
+                    status: 'pending'
                 })));
 
             if (insertError) {

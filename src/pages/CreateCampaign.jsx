@@ -167,7 +167,7 @@ const CreateCampaign = () => {
             const { data, error } = await supabase
                 .from('contacts')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('agent_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -236,9 +236,8 @@ const CreateCampaign = () => {
                         email: emailIdx >= 0 ? values[emailIdx] : null,
                         company_name: companyIdx >= 0 ? values[companyIdx] : null,
                         source: 'CSV Import - Campagne',
-                        user_id: user.id,
-                        status: 'new',
-                        created_at: new Date().toISOString()
+                        agent_id: user.id,
+                        status: 'pending'
                     });
                 }
             }
@@ -1087,7 +1086,7 @@ const CreateCampaign = () => {
                         </div>
                     </div>
                 )}
-            </div>
+                </div>
 
             {/* Navigation */}
             <div className="campaign-navigation">
