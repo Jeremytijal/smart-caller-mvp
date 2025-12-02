@@ -136,7 +136,7 @@ const SignUp = () => {
                     <div className="testimonial-card">
                         <div className="testimonial-photo">
                             <img 
-                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfh8TOQr1l9FrjfGmO8KKvCHOqPkGb3rNd4A&s" 
                                 alt="Alex Hormozi"
                             />
                             <div className="photo-accent"></div>
