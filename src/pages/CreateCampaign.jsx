@@ -4,7 +4,9 @@ import {
     Rocket, Target, Calendar, UserCheck, RefreshCw, ShoppingCart, 
     MessageSquare, Bot, Clock, ChevronRight, Check,
     Sparkles, AlertCircle, Info, Zap, Phone,
-    Mail, MessageCircle, Eye, ArrowLeft, Building2, User
+    Mail, MessageCircle, Eye, ArrowLeft, Building2, User,
+    Users, Upload, FileText, X, Database, Filter, CheckSquare,
+    Square, Search
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +18,17 @@ const CreateCampaign = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [loadingAgent, setLoadingAgent] = useState(true);
+    const [loadingContacts, setLoadingContacts] = useState(true);
     const [agentConfig, setAgentConfig] = useState(null);
+
+    // Contacts State
+    const [contacts, setContacts] = useState([]);
+    const [selectedContacts, setSelectedContacts] = useState([]);
+    const [contactSource, setContactSource] = useState('existing'); // 'existing', 'import', 'all'
+    const [csvFile, setCsvFile] = useState(null);
+    const [csvPreview, setCsvPreview] = useState(null);
+    const [contactFilter, setContactFilter] = useState('all'); // 'all', 'new', 'qualified', 'unqualified'
+    const [searchContacts, setSearchContacts] = useState('');
 
     // Campaign State
     const [campaign, setCampaign] = useState({
@@ -102,19 +114,21 @@ const CreateCampaign = () => {
         { id: 'dim', label: 'D' }
     ];
 
-    // Steps configuration
+    // Steps configuration - Added "Leads" step
     const steps = [
         { num: 1, label: 'Objectifs' },
-        { num: 2, label: 'Canal' },
-        { num: 3, label: 'Message' },
-        { num: 4, label: 'Planning' },
-        { num: 5, label: 'Récap' }
+        { num: 2, label: 'Leads' },
+        { num: 3, label: 'Canal' },
+        { num: 4, label: 'Message' },
+        { num: 5, label: 'Planning' },
+        { num: 6, label: 'Récap' }
     ];
 
-    // Fetch agent config on mount
+    // Fetch agent config and contacts on mount
     useEffect(() => {
         if (user) {
             fetchAgentConfig();
+            fetchContacts();
         }
     }, [user]);
 
@@ -127,16 +141,10 @@ const CreateCampaign = () => {
                 .eq('id', user.id)
                 .single();
 
-            if (error) {
-                console.error('Supabase error:', error);
-                throw error;
-            }
-            
-            console.log('Agent config loaded:', data);
+            if (error) throw error;
             
             if (data?.agent_config) {
                 setAgentConfig(data.agent_config);
-                // Pre-fill first message from agent config
                 const defaultMessage = data.first_message_template || 
                     data.agent_config?.agentPersona?.firstMessage || 
                     `Bonjour {{name}}, je suis ${data.agent_config?.name || 'votre assistant'} de ${data.agent_config?.company || 'notre équipe'}. Comment puis-je vous aider ?`;
@@ -152,6 +160,146 @@ const CreateCampaign = () => {
             setLoadingAgent(false);
         }
     };
+
+    const fetchContacts = async () => {
+        setLoadingContacts(true);
+        try {
+            const { data, error } = await supabase
+                .from('contacts')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setContacts(data || []);
+            
+            // Auto-select all if there are contacts
+            if (data && data.length > 0) {
+                setSelectedContacts(data.map(c => c.id));
+                setContactSource('existing');
+            }
+        } catch (error) {
+            console.error('Error fetching contacts:', error);
+            setContacts([]);
+        } finally {
+            setLoadingContacts(false);
+        }
+    };
+
+    const handleCsvUpload = (e) => {
+        const file = e.target.files[0];
+        if (file && (file.type === 'text/csv' || file.name.endsWith('.csv'))) {
+            setCsvFile(file);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const text = event.target.result;
+                const lines = text.split('\n').filter(l => l.trim());
+                const headers = lines[0].split(',').map(h => h.trim());
+                const rows = lines.slice(1, 6).map(line => line.split(',').map(c => c.trim()));
+                setCsvPreview({ 
+                    headers, 
+                    rows, 
+                    totalRows: lines.length - 1 
+                });
+            };
+            reader.readAsText(file);
+        }
+    };
+
+    const importCsvContacts = async () => {
+        if (!csvFile) return;
+        
+        setLoading(true);
+        try {
+            const text = await csvFile.text();
+            const lines = text.split('\n').filter(line => line.trim());
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+            const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('nom'));
+            const phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('tel') || h.includes('mobile'));
+            const emailIdx = headers.findIndex(h => h.includes('email') || h.includes('mail'));
+            const companyIdx = headers.findIndex(h => h.includes('company') || h.includes('entreprise'));
+
+            if (phoneIdx === -1) {
+                alert("Le fichier CSV doit contenir une colonne 'phone' ou 'tel'");
+                setLoading(false);
+                return;
+            }
+
+            const newContacts = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values[phoneIdx]) {
+                    newContacts.push({
+                        name: nameIdx >= 0 ? values[nameIdx] : 'Inconnu',
+                        phone: values[phoneIdx],
+                        email: emailIdx >= 0 ? values[emailIdx] : null,
+                        company_name: companyIdx >= 0 ? values[companyIdx] : null,
+                        source: 'CSV Import - Campagne',
+                        user_id: user.id,
+                        status: 'new',
+                        created_at: new Date().toISOString()
+                    });
+                }
+            }
+
+            // Insert into Supabase
+            const { data, error } = await supabase
+                .from('contacts')
+                .insert(newContacts)
+                .select();
+
+            if (error) throw error;
+
+            // Add to contacts list and select them
+            setContacts(prev => [...data, ...prev]);
+            setSelectedContacts(prev => [...prev, ...data.map(c => c.id)]);
+            
+            // Clear CSV
+            setCsvFile(null);
+            setCsvPreview(null);
+            
+            alert(`${data.length} contacts importés avec succès !`);
+        } catch (error) {
+            console.error('Error importing CSV:', error);
+            alert('Erreur lors de l\'import: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const toggleContactSelection = (contactId) => {
+        setSelectedContacts(prev => 
+            prev.includes(contactId)
+                ? prev.filter(id => id !== contactId)
+                : [...prev, contactId]
+        );
+    };
+
+    const selectAllContacts = () => {
+        const filteredIds = filteredContacts.map(c => c.id);
+        const allSelected = filteredIds.every(id => selectedContacts.includes(id));
+        
+        if (allSelected) {
+            setSelectedContacts(prev => prev.filter(id => !filteredIds.includes(id)));
+        } else {
+            setSelectedContacts(prev => [...new Set([...prev, ...filteredIds])]);
+        }
+    };
+
+    const filteredContacts = contacts.filter(contact => {
+        const matchesFilter = contactFilter === 'all' || 
+            (contactFilter === 'new' && contact.status === 'new') ||
+            (contactFilter === 'qualified' && contact.score >= 70) ||
+            (contactFilter === 'unqualified' && (!contact.score || contact.score < 70));
+        
+        const matchesSearch = !searchContacts || 
+            contact.name?.toLowerCase().includes(searchContacts.toLowerCase()) ||
+            contact.phone?.includes(searchContacts) ||
+            contact.email?.toLowerCase().includes(searchContacts.toLowerCase());
+        
+        return matchesFilter && matchesSearch;
+    });
 
     const toggleObjective = (objectiveId) => {
         setCampaign(prev => ({
@@ -213,16 +361,21 @@ const CreateCampaign = () => {
     };
 
     const handleLaunchCampaign = async () => {
-        if (!campaign.name || campaign.objectives.length === 0 || !campaign.firstMessage) {
-            alert('Veuillez remplir tous les champs obligatoires');
+        if (!campaign.name || campaign.objectives.length === 0 || !campaign.firstMessage || selectedContacts.length === 0) {
+            alert('Veuillez remplir tous les champs obligatoires et sélectionner des contacts');
             return;
         }
 
         setLoading(true);
         try {
-            console.log('Campaign to launch:', campaign);
-            alert('Campagne créée avec succès ! Elle sera lancée selon le planning défini.');
-            navigate('/');
+            console.log('Campaign to launch:', {
+                ...campaign,
+                contacts: selectedContacts,
+                totalContacts: selectedContacts.length
+            });
+            
+            alert(`Campagne créée avec succès ! ${selectedContacts.length} contacts seront contactés selon le planning défini.`);
+            navigate('/campaigns');
         } catch (error) {
             console.error('Error launching campaign:', error);
             alert('Erreur lors de la création de la campagne');
@@ -234,9 +387,10 @@ const CreateCampaign = () => {
     const canProceed = () => {
         switch (currentStep) {
             case 1: return campaign.name && campaign.objectives.length > 0;
-            case 2: return campaign.channel;
-            case 3: return campaign.firstMessage.length > 10;
-            case 4: return campaign.schedule.startDate && campaign.schedule.days.length > 0;
+            case 2: return selectedContacts.length > 0;
+            case 3: return campaign.channel;
+            case 4: return campaign.firstMessage.length > 10;
+            case 5: return campaign.schedule.startDate && campaign.schedule.days.length > 0;
             default: return true;
         }
     };
@@ -261,7 +415,7 @@ const CreateCampaign = () => {
                     <button 
                         className="btn-primary"
                         onClick={handleLaunchCampaign}
-                        disabled={loading || currentStep !== 5}
+                        disabled={loading || currentStep !== 6}
                     >
                         <Rocket size={18} />
                         {loading ? 'Création...' : 'Lancer la campagne'}
@@ -269,7 +423,7 @@ const CreateCampaign = () => {
                 </div>
             </header>
 
-            {/* Progress Steps - Fixed */}
+            {/* Progress Steps */}
             <div className="campaign-progress">
                 {steps.map((step, idx) => (
                     <React.Fragment key={step.num}>
@@ -351,15 +505,222 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 2: Channel (Agent is automatically the user's agent) */}
+                {/* Step 2: Leads Selection */}
                 {currentStep === 2 && (
+                    <div className="step-content">
+                        <div className="step-header">
+                            <h2>Sélectionnez vos leads</h2>
+                            <p>Choisissez les contacts à inclure dans cette campagne</p>
+                        </div>
+
+                        {/* Source Selection */}
+                        <div className="leads-source-selector">
+                            <button 
+                                className={`source-btn ${contactSource === 'existing' ? 'active' : ''}`}
+                                onClick={() => setContactSource('existing')}
+                            >
+                                <Database size={20} />
+                                <div>
+                                    <span>Contacts existants</span>
+                                    <small>{contacts.length} contacts disponibles</small>
+                                </div>
+                            </button>
+                            <button 
+                                className={`source-btn ${contactSource === 'import' ? 'active' : ''}`}
+                                onClick={() => setContactSource('import')}
+                            >
+                                <Upload size={20} />
+                                <div>
+                                    <span>Importer un CSV</span>
+                                    <small>Ajouter de nouveaux leads</small>
+                                </div>
+                            </button>
+                        </div>
+
+                        {/* CSV Import Section */}
+                        {contactSource === 'import' && (
+                            <div className="csv-import-section">
+                                {!csvFile ? (
+                                    <label className="csv-dropzone-large">
+                                        <input
+                                            type="file"
+                                            accept=".csv"
+                                            onChange={handleCsvUpload}
+                                            hidden
+                                        />
+                                        <Upload size={40} />
+                                        <h4>Glissez votre fichier CSV ici</h4>
+                                        <p>ou cliquez pour parcourir</p>
+                                        <span className="format-hint">Colonnes requises : nom, téléphone (email optionnel)</span>
+                                    </label>
+                                ) : (
+                                    <div className="csv-preview-card">
+                                        <div className="csv-file-header">
+                                            <div className="file-info">
+                                                <FileText size={24} />
+                                                <div>
+                                                    <strong>{csvFile.name}</strong>
+                                                    <span>{csvPreview?.totalRows || 0} contacts détectés</span>
+                                                </div>
+                                            </div>
+                                            <button className="btn-remove" onClick={() => { setCsvFile(null); setCsvPreview(null); }}>
+                                                <X size={18} />
+                                            </button>
+                                        </div>
+                                        
+                                        {csvPreview && (
+                                            <div className="csv-table-wrapper">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            {csvPreview.headers.slice(0, 4).map((h, i) => (
+                                                                <th key={i}>{h}</th>
+                                                            ))}
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {csvPreview.rows.slice(0, 3).map((row, i) => (
+                                                            <tr key={i}>
+                                                                {row.slice(0, 4).map((cell, j) => (
+                                                                    <td key={j}>{cell?.slice(0, 25)}{cell?.length > 25 ? '...' : ''}</td>
+                                                                ))}
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
+
+                                        <button 
+                                            className="btn-primary full-width"
+                                            onClick={importCsvContacts}
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Import en cours...' : `Importer ${csvPreview?.totalRows || 0} contacts`}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Existing Contacts Selection */}
+                        {contactSource === 'existing' && (
+                            <div className="contacts-selection">
+                                {loadingContacts ? (
+                                    <div className="loading-contacts">
+                                        <div className="loading-spinner"></div>
+                                        <p>Chargement des contacts...</p>
+                                    </div>
+                                ) : contacts.length === 0 ? (
+                                    <div className="no-contacts">
+                                        <Users size={48} />
+                                        <h4>Aucun contact disponible</h4>
+                                        <p>Importez des contacts via CSV pour lancer votre campagne</p>
+                                        <button className="btn-secondary" onClick={() => setContactSource('import')}>
+                                            <Upload size={18} />
+                                            Importer un CSV
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Filters */}
+                                        <div className="contacts-filters">
+                                            <div className="search-contacts">
+                                                <Search size={18} />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Rechercher un contact..."
+                                                    value={searchContacts}
+                                                    onChange={(e) => setSearchContacts(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="filter-buttons">
+                                                {[
+                                                    { key: 'all', label: 'Tous' },
+                                                    { key: 'new', label: 'Nouveaux' },
+                                                    { key: 'qualified', label: 'Qualifiés' }
+                                                ].map(f => (
+                                                    <button
+                                                        key={f.key}
+                                                        className={`filter-btn ${contactFilter === f.key ? 'active' : ''}`}
+                                                        onClick={() => setContactFilter(f.key)}
+                                                    >
+                                                        {f.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Selection Header */}
+                                        <div className="selection-header">
+                                            <button className="select-all-btn" onClick={selectAllContacts}>
+                                                {filteredContacts.every(c => selectedContacts.includes(c.id)) 
+                                                    ? <CheckSquare size={18} /> 
+                                                    : <Square size={18} />
+                                                }
+                                                Tout sélectionner
+                                            </button>
+                                            <span className="selection-count">
+                                                {selectedContacts.length} contact{selectedContacts.length > 1 ? 's' : ''} sélectionné{selectedContacts.length > 1 ? 's' : ''}
+                                            </span>
+                                        </div>
+
+                                        {/* Contacts List */}
+                                        <div className="contacts-list">
+                                            {filteredContacts.map(contact => (
+                                                <div 
+                                                    key={contact.id}
+                                                    className={`contact-row ${selectedContacts.includes(contact.id) ? 'selected' : ''}`}
+                                                    onClick={() => toggleContactSelection(contact.id)}
+                                                >
+                                                    <div className="contact-checkbox">
+                                                        {selectedContacts.includes(contact.id) 
+                                                            ? <CheckSquare size={18} /> 
+                                                            : <Square size={18} />
+                                                        }
+                                                    </div>
+                                                    <div className="contact-avatar">
+                                                        {contact.name?.charAt(0)?.toUpperCase() || '?'}
+                                                    </div>
+                                                    <div className="contact-info">
+                                                        <span className="contact-name">{contact.name || 'Sans nom'}</span>
+                                                        <span className="contact-phone">{contact.phone}</span>
+                                                    </div>
+                                                    {contact.company_name && (
+                                                        <span className="contact-company">{contact.company_name}</span>
+                                                    )}
+                                                    <span className={`contact-status ${contact.status || 'new'}`}>
+                                                        {contact.status === 'qualified' ? 'Qualifié' : 
+                                                         contact.status === 'contacted' ? 'Contacté' : 'Nouveau'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Selection Summary */}
+                        {selectedContacts.length > 0 && (
+                            <div className="selected-summary success">
+                                <Users size={16} />
+                                <span>
+                                    {selectedContacts.length} contact{selectedContacts.length > 1 ? 's' : ''} sélectionné{selectedContacts.length > 1 ? 's' : ''} pour cette campagne
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Step 3: Channel */}
+                {currentStep === 3 && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Canal de communication</h2>
                             <p>Votre agent sera utilisé pour cette campagne</p>
                         </div>
 
-                        {/* Agent Info Box */}
                         <div className="form-section">
                             <label className="form-label">Votre Agent IA</label>
                             
@@ -386,10 +747,6 @@ const CreateCampaign = () => {
                                             <span className="detail-tag">
                                                 <User size={12} />
                                                 {agentConfig.politeness === 'tu' ? 'Tutoiement' : 'Vouvoiement'}
-                                            </span>
-                                            <span className="detail-tag">
-                                                <Target size={12} />
-                                                {agentConfig.goal === 'book' ? 'Prise de RDV' : 'Qualification'}
                                             </span>
                                         </div>
                                     </div>
@@ -443,8 +800,8 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 3: First Message */}
-                {currentStep === 3 && (
+                {/* Step 4: First Message */}
+                {currentStep === 4 && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Premier message</h2>
@@ -490,7 +847,6 @@ const CreateCampaign = () => {
                             </div>
                         </div>
 
-                        {/* Preview */}
                         <div className="message-preview">
                             <div className="preview-header">
                                 <Eye size={16} />
@@ -518,8 +874,8 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 4: Schedule */}
-                {currentStep === 4 && (
+                {/* Step 5: Schedule */}
+                {currentStep === 5 && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Planning d'envoi</h2>
@@ -644,8 +1000,8 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 5: Summary */}
-                {currentStep === 5 && (
+                {/* Step 6: Summary */}
+                {currentStep === 6 && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Récapitulatif</h2>
@@ -671,6 +1027,14 @@ const CreateCampaign = () => {
                                             );
                                         })}
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="summary-section">
+                                <h4><Users size={18} /> Audience</h4>
+                                <div className="summary-row">
+                                    <span>Contacts sélectionnés</span>
+                                    <strong>{selectedContacts.length} contacts</strong>
                                 </div>
                             </div>
 
@@ -718,12 +1082,12 @@ const CreateCampaign = () => {
                             <Rocket size={20} />
                             <div>
                                 <strong>Prêt à lancer ?</strong>
-                                <p>Votre campagne sera envoyée automatiquement selon le planning défini. Vous pourrez la mettre en pause à tout moment.</p>
+                                <p>Votre campagne enverra des messages à {selectedContacts.length} contacts selon le planning défini. Vous pourrez la mettre en pause à tout moment.</p>
                             </div>
                         </div>
                     </div>
                 )}
-                </div>
+            </div>
 
             {/* Navigation */}
             <div className="campaign-navigation">
@@ -736,7 +1100,7 @@ const CreateCampaign = () => {
                     Précédent
                 </button>
 
-                {currentStep < 5 ? (
+                {currentStep < 6 ? (
                     <button 
                         className="btn-primary"
                         onClick={() => setCurrentStep(prev => prev + 1)}
