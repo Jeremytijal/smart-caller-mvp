@@ -10,7 +10,9 @@ const Onboarding = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [step, setStep] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false); // Deprecated: use specific loading states
+    const [loadingFinish, setLoadingFinish] = useState(false);
+    const [loadingImport, setLoadingImport] = useState(false);
     const [loadingText, setLoadingText] = useState('');
 
     // State Management
@@ -205,8 +207,8 @@ const Onboarding = () => {
     const [webhookCopied, setWebhookCopied] = useState(false);
 
     // Generate unique webhook URL for user
-    const webhookUrl = user 
-        ? `https://app-smart-caller-backend-production.up.railway.app/webhooks/${user.id}/leads` 
+    const webhookUrl = user
+        ? `https://app-smart-caller-backend-production.up.railway.app/webhooks/${user.id}/leads`
         : 'https://app-smart-caller-backend-production.up.railway.app/webhooks/your-id/leads';
 
     const copyWebhook = () => {
@@ -234,24 +236,24 @@ const Onboarding = () => {
 
     const startWithCsv = async () => {
         if (!csvFile || !user) return;
-        setLoading(true);
+        setLoadingImport(true);
         setLoadingText("Import des leads...");
-        
+
         try {
             // Parse CSV file
             const text = await csvFile.text();
             const lines = text.split('\n').filter(line => line.trim());
             const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            
+
             // Find column indices
             const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('nom'));
             const phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('tel') || h.includes('mobile'));
             const emailIdx = headers.findIndex(h => h.includes('email') || h.includes('mail'));
             const companyIdx = headers.findIndex(h => h.includes('company') || h.includes('entreprise') || h.includes('societe'));
-            
+
             if (phoneIdx === -1) {
                 alert("Le fichier CSV doit contenir une colonne 'phone' ou 'tel'");
-                setLoading(false);
+                setLoadingImport(false);
                 return;
             }
 
@@ -299,12 +301,12 @@ const Onboarding = () => {
             const result = await response.json();
             console.log('Import result:', result);
 
-            setLoading(false);
+            setLoadingImport(false);
             navigate('/contacts');
         } catch (error) {
             console.error('Error importing CSV:', error);
             alert("Erreur lors de l'import: " + error.message);
-            setLoading(false);
+            setLoadingImport(false);
         }
     };
 
@@ -374,7 +376,7 @@ const Onboarding = () => {
                 body: JSON.stringify({ url: formData.website })
             });
             const data = await response.json();
-            
+
             // Update formData with all analysis results
             setFormData(prev => ({
                 ...prev,
@@ -502,26 +504,26 @@ const Onboarding = () => {
 
     const finishOnboarding = async () => {
         if (!user) return alert("Utilisateur non connecté.");
-        setLoading(true);
+        setLoadingFinish(true);
         setLoadingText("Création de votre agent IA...");
-        
+
         // Build complete agent configuration
         const fullAgentConfig = {
             // Agent Identity
             name: formData.agentPersona?.name || `Agent ${formData.businessType}`,
             role: formData.agentPersona?.role || 'Assistant Commercial',
             company: analysisData.companyName || formData.businessType || 'Mon Entreprise',
-            
+
             // Behavior
             tone: 50,
             politeness: 'vous',
-            
+
             // Context & Goals
-            context: formData.agentPersona?.goal 
+            context: formData.agentPersona?.goal
                 ? `Objectif: ${formData.agentPersona.goal}. Comportements: ${formData.agentPersona.behaviors?.join(', ') || ''}.`
                 : analysisData.valueProposition || '',
             goal: formData.goal || 'qualify',
-            
+
             // ICP Data
             icp: {
                 sector: formData.icpSector || '',
@@ -529,37 +531,37 @@ const Onboarding = () => {
                 decider: formData.icpDecider || '',
                 budget: formData.icpBudget || ''
             },
-            
+
             // Qualification
             quality_criteria: (formData.qualificationCriteria || []).map((c, i) => ({
                 id: i,
                 text: typeof c === 'string' ? c : c.text,
                 type: 'must_have'
             })),
-            
+
             // Pain Points & Needs
             painPoints: formData.painPoints || [],
             needs: formData.needs || [],
             objections: formData.objections || [],
-            
+
             // Products/Services
             products: analysisData.products || [],
             faqs: analysisData.faqs || [],
-            
+
             // Channels & CRM
             channels: formData.channels || { sms: true, whatsapp: false },
             crm: formData.crm || null,
-            
+
             // Metadata
             businessType: formData.businessType || '',
             website: formData.website || '',
             language: formData.language || 'Français',
             country: formData.country || 'France',
-            
+
             // Agent Persona
             agentPersona: formData.agentPersona || null,
             selectedAgentId: formData.selectedAgentId || null,
-            
+
             // Timestamps
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -569,8 +571,8 @@ const Onboarding = () => {
         const scoringCriteria = fullAgentConfig.quality_criteria
             .map(c => `- ${c.text}`)
             .join('\n');
-        
-        const firstMessageTemplate = formData.agentPersona?.firstMessage || 
+
+        const firstMessageTemplate = formData.agentPersona?.firstMessage ||
             `Bonjour {{name}}, merci pour votre intérêt ! Je suis ${fullAgentConfig.name}, ${fullAgentConfig.role} chez ${fullAgentConfig.company}. Comment puis-je vous aider ?`;
 
         try {
@@ -613,14 +615,14 @@ const Onboarding = () => {
                 setStep(8);
                 return;
             }
-            
+
             // If API fails, fallback to direct Supabase
             console.warn('API failed, falling back to Supabase direct save');
             throw new Error('API failed');
-            
+
         } catch (apiError) {
             console.warn('Backend API error, using Supabase fallback:', apiError);
-            
+
             // Fallback: Save directly to Supabase
             try {
                 const { error } = await supabase
@@ -644,7 +646,7 @@ const Onboarding = () => {
                 alert("Erreur lors de la création de l'agent. Veuillez réessayer.");
             }
         } finally {
-            setLoading(false);
+            setLoadingFinish(false);
         }
     };
 
@@ -1664,87 +1666,87 @@ const Onboarding = () => {
                                         <div className="config-card-header">
                                             <div className="config-card-icon blue">
                                                 <User size={18} />
-                                                </div>
+                                            </div>
                                             <div>
                                                 <h3>Identité de l'agent</h3>
                                                 <p>Définissez qui est votre agent et comment il se présente</p>
                                             </div>
-                                                    </div>
+                                        </div>
                                         <div className="config-card-body">
                                             <div className="config-field">
                                                 <label>Nom de l'agent</label>
-                                                <input 
-                                                    type="text" 
-                                                    value={formData.agentPersona?.role || "Assistant IA"} 
-                                                    onChange={(e) => setFormData({...formData, agentPersona: {...formData.agentPersona, role: e.target.value}})}
+                                                <input
+                                                    type="text"
+                                                    value={formData.agentPersona?.role || "Assistant IA"}
+                                                    onChange={(e) => setFormData({ ...formData, agentPersona: { ...formData.agentPersona, role: e.target.value } })}
                                                     placeholder="Ex: Sophie, Conseiller Commercial..."
                                                 />
-                                                    </div>
+                                            </div>
                                             <div className="config-field">
                                                 <label>Entreprise représentée</label>
-                                                <input 
-                                                    type="text" 
-                                                    value={formData.businessType || ""} 
-                                                    onChange={(e) => setFormData({...formData, businessType: e.target.value})}
+                                                <input
+                                                    type="text"
+                                                    value={formData.businessType || ""}
+                                                    onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
                                                     placeholder="Nom de votre entreprise"
                                                 />
                                             </div>
                                             <div className="config-field full-width">
                                                 <label>Message d'accueil</label>
-                                                <textarea 
-                                                    value={formData.agentPersona?.firstMessage || "Bonjour ! Comment puis-je vous aider aujourd'hui ?"} 
-                                                    onChange={(e) => setFormData({...formData, agentPersona: {...formData.agentPersona, firstMessage: e.target.value}})}
+                                                <textarea
+                                                    value={formData.agentPersona?.firstMessage || "Bonjour ! Comment puis-je vous aider aujourd'hui ?"}
+                                                    onChange={(e) => setFormData({ ...formData, agentPersona: { ...formData.agentPersona, firstMessage: e.target.value } })}
                                                     placeholder="Le premier message envoyé par l'agent"
                                                     rows={2}
                                                 />
-                                                    </div>
-                                                </div>
                                             </div>
+                                        </div>
+                                    </div>
 
                                     {/* Objectives Card */}
                                     <div className="config-card">
                                         <div className="config-card-header">
                                             <div className="config-card-icon orange">
                                                 <Target size={18} />
-                                                            </div>
+                                            </div>
                                             <div>
                                                 <h3>Objectifs de l'agent</h3>
                                                 <p>Définissez ce que votre agent doit accomplir</p>
-                                                        </div>
-                                                    </div>
+                                            </div>
+                                        </div>
                                         <div className="config-card-body">
                                             <div className="objectives-list">
                                                 <div className="objective-item">
                                                     <div className="objective-check"><Check size={14} /></div>
                                                     <span>Qualifier les leads en collectant des informations clés</span>
-                                                            </div>
+                                                </div>
                                                 <div className="objective-item">
                                                     <div className="objective-check"><Check size={14} /></div>
                                                     <span>Identifier les besoins et points de douleur</span>
-                                                        </div>
+                                                </div>
                                                 <div className="objective-item">
                                                     <div className="objective-check"><Check size={14} /></div>
                                                     <span>Évaluer le budget et le calendrier</span>
-                                                    </div>
+                                                </div>
                                                 <div className="objective-item">
                                                     <div className="objective-check"><Check size={14} /></div>
                                                     <span>Collecter les coordonnées pour le suivi</span>
                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     {/* Conversation Flow Card */}
                                     <div className="config-card">
                                         <div className="config-card-header">
                                             <div className="config-card-icon green">
                                                 <MessageSquare size={18} />
-                                                            </div>
+                                            </div>
                                             <div>
                                                 <h3>Flux de conversation</h3>
                                                 <p>Les étapes que l'agent suit pour qualifier un lead</p>
-                                                        </div>
-                                                    </div>
+                                            </div>
+                                        </div>
                                         <div className="config-card-body">
                                             <div className="flow-timeline">
                                                 <div className="flow-timeline-item">
@@ -1752,15 +1754,15 @@ const Onboarding = () => {
                                                     <div className="flow-timeline-content">
                                                         <h4>Accueil</h4>
                                                         <p>Se présenter et créer un lien de confiance</p>
-                                                        </div>
                                                     </div>
+                                                </div>
                                                 <div className="flow-timeline-item">
                                                     <div className="flow-timeline-number">2</div>
                                                     <div className="flow-timeline-content">
                                                         <h4>Découverte</h4>
                                                         <p>Comprendre la situation et les besoins du prospect</p>
-                                                            </div>
-                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div className="flow-timeline-item">
                                                     <div className="flow-timeline-number">3</div>
                                                     <div className="flow-timeline-content">
@@ -1773,8 +1775,8 @@ const Onboarding = () => {
                                                     <div className="flow-timeline-content">
                                                         <h4>Proposition de valeur</h4>
                                                         <p>Présenter la solution adaptée aux besoins</p>
-                                            </div>
-                                        </div>
+                                                    </div>
+                                                </div>
                                                 <div className="flow-timeline-item">
                                                     <div className="flow-timeline-number">5</div>
                                                     <div className="flow-timeline-content">
@@ -1804,25 +1806,25 @@ const Onboarding = () => {
                                                 </div>
                                                 <span className="preview-device-title">Aperçu en direct</span>
                                             </div>
-                                            
+
                                             <div className="preview-chat-container">
                                                 <div className="preview-chat-header">
                                                     <div className="preview-agent-info">
                                                         <div className="preview-agent-avatar">
                                                             <Zap size={16} />
-                                            </div>
-                                            <div>
+                                                        </div>
+                                                        <div>
                                                             <h4>{formData.agentPersona?.role || "Assistant IA"}</h4>
                                                             <span>En ligne</span>
-                                            </div>
-                                        </div>
+                                                        </div>
+                                                    </div>
                                                     <button className="btn-icon-sm" onClick={() => setSimulation([])}>
                                                         <RefreshCw size={14} />
-                                        </button>
-                                    </div>
+                                                    </button>
+                                                </div>
 
                                                 <div className="preview-chat-body">
-                                        {simulation.length === 0 ? (
+                                                    {simulation.length === 0 ? (
                                                         <div className="preview-chat-empty">
                                                             <div className="preview-chat-welcome">
                                                                 <div className="welcome-avatar">
@@ -1830,69 +1832,69 @@ const Onboarding = () => {
                                                                 </div>
                                                                 <p>Testez votre agent en envoyant un message</p>
                                                             </div>
-                                            </div>
-                                        ) : (
+                                                        </div>
+                                                    ) : (
                                                         <div className="preview-chat-messages">
-                                                {simulation.map((msg, i) => (
+                                                            {simulation.map((msg, i) => (
                                                                 <div key={i} className={`chat-message ${msg.sender}`}>
                                                                     {msg.sender === 'agent' && (
                                                                         <div className="chat-message-avatar">
                                                                             <Zap size={12} />
-                                                        </div>
+                                                                        </div>
                                                                     )}
                                                                     <div className="chat-message-bubble">
-                                                            {msg.text}
+                                                                        {msg.text}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                                    )}
+                                                </div>
 
                                                 <div className="preview-chat-input">
-                                        <input
-                                            type="text"
+                                                    <input
+                                                        type="text"
                                                         placeholder="Écrivez un message..."
-                                            value={newMessage}
-                                            onChange={(e) => setNewMessage(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && newMessage.trim()) {
-                                                    setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
-                                                    setNewMessage('');
-                                                    setTimeout(() => {
-                                                        setSimulation(prev => [...prev, {
-                                                            sender: 'agent',
+                                                        value={newMessage}
+                                                        onChange={(e) => setNewMessage(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && newMessage.trim()) {
+                                                                setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
+                                                                setNewMessage('');
+                                                                setTimeout(() => {
+                                                                    setSimulation(prev => [...prev, {
+                                                                        sender: 'agent',
                                                                         text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?"
-                                                        }]);
-                                                    }, 1000);
-                                                }
-                                            }}
-                                        />
-                                        <button
+                                                                    }]);
+                                                                }, 1000);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
                                                         className="btn-send-chat"
-                                            onClick={() => {
-                                                if (newMessage.trim()) {
-                                                    setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
-                                                    setNewMessage('');
-                                                    setTimeout(() => {
-                                                        setSimulation(prev => [...prev, {
-                                                            sender: 'agent',
+                                                        onClick={() => {
+                                                            if (newMessage.trim()) {
+                                                                setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
+                                                                setNewMessage('');
+                                                                setTimeout(() => {
+                                                                    setSimulation(prev => [...prev, {
+                                                                        sender: 'agent',
                                                                         text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?"
-                                                        }]);
-                                                    }, 1000);
-                                                }
-                                            }}
-                                        >
+                                                                    }]);
+                                                                }, 1000);
+                                                            }
+                                                        }}
+                                                    >
                                                         <Send size={16} />
-                                        </button>
+                                                    </button>
                                                 </div>
                                             </div>
-                                    </div>
+                                        </div>
 
                                         <button className="btn-primary-lg" onClick={() => setStep(5)}>
                                             Continuer vers les canaux
                                             <ArrowRight size={18} />
-                                    </button>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1975,12 +1977,12 @@ const Onboarding = () => {
                                 <div className="integration-header">
                                     <div className="integration-header-left">
                                         <div className="inline-block bg-accent-subtle px-3 py-1 rounded-full text-xs font-medium text-accent mb-2">
-                                        Connexion CRM
-                                    </div>
+                                            Connexion CRM
+                                        </div>
                                         <h2 className="integration-title">Connectez votre agent à votre CRM</h2>
                                         <p className="integration-subtitle">
-                                        Liez votre CRM pour synchroniser automatiquement les leads, conversations et données de qualification.
-                                    </p>
+                                            Liez votre CRM pour synchroniser automatiquement les leads, conversations et données de qualification.
+                                        </p>
                                     </div>
                                     <div className="integration-header-right">
                                         <button className="btn-primary btn-launch" onClick={() => setStep(7)}>
@@ -2063,9 +2065,9 @@ const Onboarding = () => {
                                     <button className="btn-secondary" onClick={() => setStep(5)}>
                                         <ArrowLeft size={16} /> Retour
                                     </button>
-                                        <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
-                                            Besoin d'aide ? <HelpCircle size={16} />
-                                        </button>
+                                    <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                                        Besoin d'aide ? <HelpCircle size={16} />
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
@@ -2088,12 +2090,12 @@ const Onboarding = () => {
                                             <p className="activation-subtitle">
                                                 Vérifiez les informations de votre agent avant de l'activer.
                                             </p>
-                                                </div>
-                                            </div>
+                                        </div>
+                                    </div>
                                     <button className="btn-primary btn-activate" onClick={() => setStep(8)} disabled={loading}>
                                         {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer l'agent</>}
                                     </button>
-                                            </div>
+                                </div>
 
                                 <div className="activation-layout">
                                     {/* Main Content */}
@@ -2104,11 +2106,11 @@ const Onboarding = () => {
                                                 <div className="summary-card-title">
                                                     <UserCircle size={20} />
                                                     <h3>Identité de l'agent</h3>
-                                        </div>
+                                                </div>
                                                 <button className="btn-edit" onClick={() => setStep(4)}>
                                                     <Edit2 size={14} /> Modifier
-                                            </button>
-                                        </div>
+                                                </button>
+                                            </div>
                                             <div className="agent-identity-preview">
                                                 <div className="agent-avatar-large">
                                                     <Zap size={24} />
@@ -2415,7 +2417,7 @@ const Onboarding = () => {
                                         <div className="card-badge recommended">Recommandé</div>
                                         <h3>Connecter vos formulaires</h3>
                                         <p className="card-description">
-                                            Intégrez Smart Caller à vos formulaires existants via webhook. 
+                                            Intégrez Smart Caller à vos formulaires existants via webhook.
                                             Chaque nouveau lead sera automatiquement contacté.
                                         </p>
 
@@ -2447,8 +2449,12 @@ const Onboarding = () => {
                                         <div className="card-actions">
                                             <button className="btn-primary full-width" onClick={() => {
                                                 finishOnboarding();
-                                            }}>
-                                                <Check size={18} /> C'est configuré, allons-y !
+                                            }} disabled={loadingFinish}>
+                                                {loadingFinish ? (
+                                                    <><Loader2 className="animate-spin" size={18} /> Configuration...</>
+                                                ) : (
+                                                    <><Check size={18} /> C'est configuré, allons-y !</>
+                                                )}
                                             </button>
                                             <a href="https://docs.smartcaller.ai/webhook" target="_blank" rel="noopener noreferrer" className="btn-text-link">
                                                 <ExternalLink size={14} /> Voir la documentation
@@ -2464,18 +2470,18 @@ const Onboarding = () => {
                                         <div className="card-badge free">100 leads gratuits</div>
                                         <h3>Tester avec vos leads</h3>
                                         <p className="card-description">
-                                            Importez un fichier CSV avec vos leads existants. 
+                                            Importez un fichier CSV avec vos leads existants.
                                             Testez gratuitement sur 100 contacts pour voir la magie opérer.
                                         </p>
 
                                         <div className="csv-upload-section">
                                             {!csvFile ? (
                                                 <label className="csv-dropzone">
-                                                    <input 
-                                                        type="file" 
-                                                        accept=".csv" 
+                                                    <input
+                                                        type="file"
+                                                        accept=".csv"
                                                         onChange={handleCsvUpload}
-                                                        hidden 
+                                                        hidden
                                                     />
                                                     <div className="dropzone-content">
                                                         <FileText size={32} />
@@ -2529,12 +2535,12 @@ const Onboarding = () => {
                                         </div>
 
                                         <div className="card-actions">
-                                            <button 
-                                                className={`btn-primary full-width ${!csvFile ? 'disabled' : ''}`} 
+                                            <button
+                                                className={`btn-primary full-width ${!csvFile ? 'disabled' : ''}`}
                                                 onClick={startWithCsv}
-                                                disabled={!csvFile || loading}
+                                                disabled={!csvFile || loadingImport}
                                             >
-                                                {loading ? (
+                                                {loadingImport ? (
                                                     <><Loader2 className="animate-spin" size={18} /> Import en cours...</>
                                                 ) : (
                                                     <><Upload size={18} /> Importer et démarrer</>
