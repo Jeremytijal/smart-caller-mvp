@@ -508,9 +508,15 @@
     margin-bottom: 1.5rem;
 }
 
+.form-options {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
 .forgot-link {
-    font-size: 0.875rem;
-    color: #888888;
+    font-size: 0.85rem;
+    color: #666666;
     text-decoration: none;
     transition: color 0.2s;
 }

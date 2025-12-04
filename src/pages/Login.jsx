@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Loader2, Play } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, Rocket, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { enableDemoMode } from '../data/demoData';
 import './Auth.css';
@@ -18,12 +18,12 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
         try {
             await login(email, password);
             navigate('/');
         } catch (error) {
             console.error('Login failed', error);
-            // Translate common Supabase errors
             if (error.message.includes('Email not confirmed')) {
                 setError('Veuillez confirmer votre email avant de vous connecter.');
             } else if (error.message.includes('Invalid login credentials')) {
@@ -40,7 +40,6 @@ const Login = () => {
         setIsDemoLoading(true);
         setError('');
         try {
-            // Use demo credentials
             await login('demo@smartcaller.ai', 'emo123456');
             enableDemoMode();
             navigate('/');
@@ -53,100 +52,161 @@ const Login = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-background">
-                <div className="glow-orb orb-1"></div>
-                <div className="glow-orb orb-2"></div>
-            </div>
-
-            <motion.div
-                className="auth-card glass-panel"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className="auth-header">
-                    <div className="logo-container">
-                        <img src="/smart-caller-logo.png" alt="Smart Caller" className="auth-logo" />
-                    </div>
-                    <h1>Bon retour</h1>
-                    <p className="text-muted">Connectez-vous à votre agent Smart Caller</p>
-                </div>
-
-                {error && (
-                    <div className="auth-error">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label>Adresse Email</label>
-                        <div className="input-wrapper">
-                            <Mail size={20} className="input-icon" />
-                            <input
-                                type="email"
-                                placeholder="nom@entreprise.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="input-field"
-                            />
+        <div className="auth-split-container">
+            {/* Left Side - Form */}
+            <div className="auth-form-side">
+                <motion.div
+                    className="auth-form-content"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <div className="auth-logo-section">
+                        <div className="auth-logo-icon">
+                            <Rocket size={24} />
                         </div>
+                        <span className="auth-logo-text">Smart Caller</span>
                     </div>
 
-                    <div className="form-group">
-                        <label>Mot de passe</label>
-                        <div className="input-wrapper">
-                            <Lock size={20} className="input-icon" />
-                            <input
-                                type="password"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="input-field"
-                            />
+                    <div className="auth-header-section">
+                        <h1>Bon retour !</h1>
+                        <p>Connectez-vous à votre agent Smart Caller</p>
+                    </div>
+
+                    {error && (
+                        <div className="auth-error">
+                            {error}
                         </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="auth-form">
+                        <div className="form-group">
+                            <label>Email</label>
+                            <div className="input-wrapper">
+                                <Mail size={18} className="input-icon" />
+                                <input
+                                    type="email"
+                                    placeholder="nom@entreprise.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    className="input-field"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Mot de passe</label>
+                            <div className="input-wrapper">
+                                <Lock size={18} className="input-icon" />
+                                <input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="input-field"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-options">
+                            <Link to="/forgot-password" className="forgot-link">Mot de passe oublié ?</Link>
+                        </div>
+
+                        <button type="submit" className="btn-signup" disabled={isLoading}>
+                            {isLoading ? (
+                                <Loader2 size={20} className="animate-spin" />
+                            ) : (
+                                <>Se connecter <ArrowRight size={18} /></>
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="auth-divider">
+                        <span>ou</span>
                     </div>
 
-                    <div className="form-footer">
-                        <Link to="/forgot-password" class="forgot-link">Mot de passe oublié ?</Link>
-                    </div>
-
-                    <button type="submit" className="btn-primary btn-block" disabled={isLoading}>
-                        {isLoading ? (
+                    <button 
+                        type="button" 
+                        className="btn-demo" 
+                        onClick={handleDemoLogin}
+                        disabled={isDemoLoading}
+                    >
+                        {isDemoLoading ? (
                             <Loader2 size={20} className="animate-spin" />
                         ) : (
-                            <>Se connecter <ArrowRight size={20} /></>
+                            <>
+                                <Play size={18} />
+                                Voir la démo
+                            </>
                         )}
                     </button>
-                </form>
 
-                <div className="auth-divider">
-                    <span>ou</span>
-                </div>
+                    <div className="auth-footer-section">
+                        <p>Pas encore de compte ? <Link to="/signup" className="link-accent">S'inscrire</Link></p>
+                    </div>
+                </motion.div>
+            </div>
 
-                <button 
-                    type="button" 
-                    className="btn-demo btn-block" 
-                    onClick={handleDemoLogin}
-                    disabled={isDemoLoading}
+            {/* Right Side - Testimonial */}
+            <div className="auth-testimonial-side">
+                <motion.div
+                    className="testimonial-content"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                    {isDemoLoading ? (
-                        <Loader2 size={20} className="animate-spin" />
-                    ) : (
-                        <>
-                            <Play size={18} />
-                            Voir la démo
-                        </>
-                    )}
-                </button>
+                    <div className="testimonial-header">
+                        <h2>La vitesse de réponse fait <span className="highlight">toute la différence</span></h2>
+                    </div>
 
-                <div className="auth-footer">
-                    <p>Pas encore de compte ? <Link to="/signup" className="link-highlight">S'inscrire</Link></p>
-                </div>
-            </motion.div>
+                    <div className="testimonial-card">
+                        <div className="testimonial-photo">
+                            <img 
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfh8TOQr1l9FrjfGmO8KKvCHOqPkGb3rNd4A&s" 
+                                alt="Alex Hormozi"
+                            />
+                            <div className="photo-accent"></div>
+                        </div>
+                        
+                        <div className="testimonial-quote">
+                            <div className="quote-mark">"</div>
+                            <p className="quote-highlight">
+                                Si vous mettez plus de 5 minutes à répondre à un lead, votre taux de closing chute de 80%.
+                            </p>
+                            <p className="quote-text">
+                                Je connais des entrepreneurs qui payent plus de 60 000 $ par an quelqu'un dont le seul job est de répondre aux leads en moins de 5 minutes…
+                            </p>
+                            <p className="quote-text">
+                                Parce que rien ne fait augmenter le revenu plus vite que la vitesse.
+                            </p>
+                            
+                            <div className="quote-author">
+                                <div className="author-info">
+                                    <span className="author-name">Alex Hormozi</span>
+                                    <span className="author-title">Entrepreneur & Auteur de $100M Offers</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="testimonial-stats">
+                        <div className="stat-item">
+                            <span className="stat-value">-80%</span>
+                            <span className="stat-label">Taux de closing après 5 min</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-value">&lt;30s</span>
+                            <span className="stat-label">Temps de réponse Smart Caller</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-value">24/7</span>
+                            <span className="stat-label">Disponibilité de l'agent</span>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
         </div>
     );
 };
