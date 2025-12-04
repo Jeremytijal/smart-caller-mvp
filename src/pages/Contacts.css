@@ -245,3 +245,16 @@
     text-align: center;
     width: 140px;
 }
+
+/* Demo Badge */
+.contacts-page .demo-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border-radius: 100px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(255, 71, 15, 0.3);
+}
