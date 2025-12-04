@@ -142,13 +142,13 @@ const Contacts = () => {
                     <h1>Contacts</h1>
                     <p className="text-muted">Gérez votre base de prospects</p>
                 </div>
-                <div className="flex gap-3 items-center">
+                <div className="header-actions">
                     {isDemo && (
                         <div className="demo-badge">
                             <span>🎯 Mode Démo</span>
                         </div>
                     )}
-                    <Link to="/integrations" className="btn-secondary flex items-center gap-2">
+                    <Link to="/integrations" className="btn-secondary">
                         <Webhook size={18} /> Connecter un Webhook
                     </Link>
                     <button className="btn-primary" onClick={() => setShowImportModal(true)}>

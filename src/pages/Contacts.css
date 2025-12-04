@@ -12,9 +12,8 @@
 .contacts-page .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 32px;
-    flex-wrap: wrap;
     gap: 16px;
 }
 
@@ -30,17 +29,12 @@
     font-size: 0.95rem;
 }
 
-/* Header buttons container */
-.contacts-page .page-header .flex {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-}
 
 /* Header Actions */
-.header-actions {
+.contacts-page .header-actions {
     display: flex;
+    flex-direction: row;
+    align-items: center;
     gap: 12px;
 }
 
