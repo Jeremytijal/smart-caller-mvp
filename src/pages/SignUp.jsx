@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, ArrowRight, Loader2, Rocket } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, Rocket, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { enableDemoMode } from '../data/demoData';
 import './Auth.css';
 
 const SignUp = () => {
@@ -10,13 +11,15 @@ const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isDemoLoading, setIsDemoLoading] = useState(false);
     const [error, setError] = useState('');
-    const { signup } = useAuth();
+    const { signup, login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
         try {
             await signup(name, email, password);
             navigate('/onboarding');
@@ -25,6 +28,21 @@ const SignUp = () => {
             setError('Erreur lors de l\'inscription. Veuillez réessayer.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDemoLogin = async () => {
+        setIsDemoLoading(true);
+        setError('');
+        try {
+            await login('demo@smartcaller.ai', 'emo123456');
+            enableDemoMode();
+            navigate('/');
+        } catch (error) {
+            console.error('Demo login failed', error);
+            setError('Impossible de charger le compte démo. Veuillez réessayer.');
+        } finally {
+            setIsDemoLoading(false);
         }
     };
 
@@ -114,6 +132,26 @@ const SignUp = () => {
                             )}
                         </button>
                     </form>
+
+                    <div className="auth-divider">
+                        <span>ou</span>
+                    </div>
+
+                    <button 
+                        type="button" 
+                        className="btn-demo" 
+                        onClick={handleDemoLogin}
+                        disabled={isDemoLoading}
+                    >
+                        {isDemoLoading ? (
+                            <Loader2 size={20} className="animate-spin" />
+                        ) : (
+                            <>
+                                <Play size={18} />
+                                Voir la démo
+                            </>
+                        )}
+                    </button>
 
                     <div className="auth-footer-section">
                         <p>Vous avez déjà un compte ? <Link to="/login" className="link-accent">Se connecter</Link></p>

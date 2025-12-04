@@ -16,7 +16,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/signup" />;
 };
 
 console.log('App.jsx: Rendering App component...');
