@@ -41,7 +41,7 @@ const Login = () => {
         setError('');
         try {
             // Use demo credentials
-            await login('demo@smartcaller.ai', 'demo123456');
+            await login('demo@smartcaller.ai', 'emo123456');
             enableDemoMode();
             navigate('/');
         } catch (error) {
