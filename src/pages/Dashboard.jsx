@@ -1,27 +1,88 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CheckCircle, XCircle, MessageSquare, Clock, ArrowRight } from 'lucide-react';
+import { Users, CheckCircle, XCircle, MessageSquare, Clock, ArrowRight, Calendar, TrendingUp, Zap } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, FunnelChart, Funnel, LabelList } from 'recharts';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { isDemoMode, demoStats, demoContacts } from '../data/demoData';
 import './Dashboard.css';
 
 const Dashboard = () => {
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
+    const [isDemo, setIsDemo] = useState(false);
     const [metrics, setMetrics] = useState({
         total: 0,
         qualified: 0,
         disqualified: 0,
         avgScore: 0,
-        qualificationRate: 0
+        qualificationRate: 0,
+        meetings: 0,
+        responseTime: '—'
     });
     const [recentActivity, setRecentActivity] = useState([]);
     const [funnelData, setFunnelData] = useState([]);
     const [activityData, setActivityData] = useState([]);
+    const [sourceData, setSourceData] = useState([]);
 
     useEffect(() => {
-        if (user) fetchData();
+        if (user) {
+            const demoMode = isDemoMode(user.id);
+            setIsDemo(demoMode);
+            
+            if (demoMode) {
+                loadDemoData();
+            } else {
+                fetchData();
+            }
+        }
     }, [user]);
+
+    const loadDemoData = () => {
+        // Load demo metrics
+        setMetrics({
+            total: demoStats.totalLeads,
+            qualified: demoStats.qualifiedLeads,
+            disqualified: 28,
+            avgScore: demoStats.averageScore,
+            qualificationRate: demoStats.qualificationRate,
+            meetings: demoStats.meetingsBooked,
+            responseTime: demoStats.responseTime
+        });
+
+        // Load demo activity
+        setRecentActivity(demoStats.recentActivity.map((item, index) => ({
+            id: index,
+            user: item.contact,
+            action: item.type === 'qualified' ? 'Qualifié' : 
+                    item.type === 'meeting' ? 'RDV Réservé' : 
+                    item.type === 'new' ? 'Nouveau Lead' : 'Réponse',
+            time: item.time,
+            status: item.type === 'qualified' ? 'qualified' : 
+                    item.type === 'meeting' ? 'meeting' : 
+                    item.type === 'new' ? 'pending' : 'reply',
+            details: item.score ? `Score: ${item.score}` : item.details || item.source || item.message?.substring(0, 30) + '...'
+        })));
+
+        // Load demo funnel
+        setFunnelData([
+            { value: demoStats.totalLeads, name: 'Total des leads', fill: '#FF470F' },
+            { value: 234, name: 'Contactés', fill: '#FF6B35' },
+            { value: demoStats.qualifiedLeads, name: 'Qualifiés', fill: '#10B981' },
+            { value: demoStats.meetingsBooked, name: 'RDV', fill: '#3B82F6' },
+        ]);
+
+        // Load demo weekly data
+        setActivityData(demoStats.weeklyData.map(d => ({
+            name: d.day,
+            leads: d.leads,
+            qualified: d.qualified
+        })));
+
+        // Load source data
+        setSourceData(demoStats.sourceData);
+
+        setLoading(false);
+    };
 
     const fetchData = async () => {
         if (!user) return;
@@ -46,7 +107,15 @@ const Dashboard = () => {
                 : 0;
             const qualificationRate = total > 0 ? Math.round((qualified / total) * 100) : 0;
 
-            setMetrics({ total, qualified, disqualified, avgScore, qualificationRate });
+            setMetrics({ 
+                total, 
+                qualified, 
+                disqualified, 
+                avgScore, 
+                qualificationRate,
+                meetings: 0,
+                responseTime: '—'
+            });
 
             // 2. Recent Activity (Last 5 contacts)
             setRecentActivity(contacts.slice(0, 5).map(c => ({
@@ -60,15 +129,12 @@ const Dashboard = () => {
 
             // 3. Funnel Data
             setFunnelData([
-                { value: total, name: 'Total des leads', fill: 'var(--accent-primary)' },
-                { value: scoredContacts.length, name: 'Scorés', fill: 'var(--accent-secondary)' },
-                { value: qualified, name: 'Qualifiés', fill: 'var(--success)' },
+                { value: total, name: 'Total des leads', fill: '#FF470F' },
+                { value: scoredContacts.length, name: 'Scorés', fill: '#FF6B35' },
+                { value: qualified, name: 'Qualifiés', fill: '#10B981' },
             ]);
 
-            // 4. Weekly Activity (Mocking distribution for now based on real counts if dates match, 
-            // but for simplicity let's just show a static distribution scaled to real total or just keep mock if no dates)
-            // Let's try to group by day if possible, otherwise fallback.
-            // Simple grouping by day of week:
+            // 4. Weekly Activity
             const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
             const activityMap = { 'Dim': 0, 'Lun': 0, 'Mar': 0, 'Mer': 0, 'Jeu': 0, 'Ven': 0, 'Sam': 0 };
 
@@ -81,7 +147,6 @@ const Dashboard = () => {
                 name: day,
                 leads: activityMap[day]
             }));
-            // Reorder to start from Monday
             const orderedChartData = [
                 ...chartData.slice(1),
                 chartData[0]
@@ -96,11 +161,12 @@ const Dashboard = () => {
     };
 
     const stats = [
-        { label: 'Total des leads', value: metrics.total, icon: Users, color: 'var(--accent-primary)' },
-        { label: 'Qualifiés', value: metrics.qualified, icon: CheckCircle, color: 'var(--success)' },
-        { label: 'Disqualifiés', value: metrics.disqualified, icon: XCircle, color: 'var(--danger)' },
-        { label: 'Score moyen', value: `${metrics.avgScore}/100`, icon: MessageSquare, color: 'var(--warning)' },
-        { label: 'Taux de qualif.', value: `${metrics.qualificationRate}%`, icon: Clock, color: '#8b5cf6' },
+        { label: 'Total des leads', value: metrics.total, icon: Users, color: '#FF470F' },
+        { label: 'Qualifiés', value: metrics.qualified, icon: CheckCircle, color: '#10B981' },
+        { label: 'Score moyen', value: `${metrics.avgScore}/100`, icon: TrendingUp, color: '#F59E0B' },
+        { label: 'Taux de qualif.', value: `${metrics.qualificationRate}%`, icon: Zap, color: '#8B5CF6' },
+        { label: 'RDV réservés', value: metrics.meetings, icon: Calendar, color: '#3B82F6' },
+        { label: 'Temps réponse', value: metrics.responseTime, icon: Clock, color: '#EC4899' },
     ];
 
     if (loading) return <div className="p-8 text-center">Chargement du tableau de bord...</div>;
@@ -112,14 +178,18 @@ const Dashboard = () => {
                     <h1>Tableau de bord</h1>
                     <p className="text-muted">Aperçu des performances de votre agent IA</p>
                 </div>
-                {/* <button className="btn-primary">Exporter le rapport</button> */}
+                {isDemo && (
+                    <div className="demo-badge">
+                        <span>🎯 Mode Démo</span>
+                    </div>
+                )}
             </header>
 
             {/* Stats Grid */}
             <div className="stats-grid">
                 {stats.map((stat, index) => (
                     <div key={index} className="glass-panel stat-card">
-                        <div className="stat-icon" style={{ backgroundColor: `${stat.color}20`, color: stat.color }}>
+                        <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
                             <stat.icon size={24} />
                         </div>
                         <div className="stat-info">
@@ -155,7 +225,7 @@ const Dashboard = () => {
 
                 {/* Weekly Activity Chart */}
                 <div className="glass-panel chart-card">
-                    <h3>Nouveaux leads par jour</h3>
+                    <h3>Leads par jour</h3>
                     <div className="chart-container">
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={activityData}>
@@ -167,18 +237,51 @@ const Dashboard = () => {
                                     contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                                     itemStyle={{ color: '#1a1a1a' }}
                                 />
-                                <Bar dataKey="leads" fill="#FF470F" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="leads" fill="#FF470F" radius={[4, 4, 0, 0]} name="Leads" />
+                                {isDemo && <Bar dataKey="qualified" fill="#10B981" radius={[4, 4, 0, 0]} name="Qualifiés" />}
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
             </div>
 
+            {/* Source Performance (Demo only) */}
+            {isDemo && sourceData.length > 0 && (
+                <div className="glass-panel source-card">
+                    <h3>Performance par source</h3>
+                    <div className="source-grid">
+                        {sourceData.map((source, index) => (
+                            <div key={index} className="source-item">
+                                <div className="source-header">
+                                    <span className="source-name">{source.source}</span>
+                                    <span className="source-rate">{source.rate}%</span>
+                                </div>
+                                <div className="source-bar-track">
+                                    <div 
+                                        className="source-bar-fill" 
+                                        style={{ 
+                                            width: `${source.rate}%`,
+                                            background: index === 0 ? '#FF470F' : 
+                                                       index === 1 ? '#3B82F6' :
+                                                       index === 2 ? '#8B5CF6' :
+                                                       index === 3 ? '#10B981' : '#F59E0B'
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="source-stats">
+                                    <span>{source.leads} leads</span>
+                                    <span>{source.qualified} qualifiés</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Recent Activity */}
             <div className="glass-panel recent-activity">
                 <div className="activity-header">
-                    <h3>Derniers Contacts</h3>
-                    {/* <button className="btn-secondary text-sm">Voir tout</button> */}
+                    <h3>Activité récente</h3>
                 </div>
                 <div className="activity-list">
                     {recentActivity.length === 0 ? (
@@ -192,7 +295,12 @@ const Dashboard = () => {
                                     <span className="activity-action text-xs text-muted">{item.details}</span>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                    <span className={`badge ${item.status === 'qualified' ? 'bg-success-dim text-success' : item.status === 'disqualified' ? 'bg-danger-dim text-danger' : 'bg-primary-dim text-primary'}`}>
+                                    <span className={`badge ${
+                                        item.status === 'qualified' ? 'bg-success-dim text-success' : 
+                                        item.status === 'meeting' ? 'bg-blue-dim text-blue' :
+                                        item.status === 'disqualified' ? 'bg-danger-dim text-danger' : 
+                                        'bg-primary-dim text-primary'
+                                    }`}>
                                         {item.action}
                                     </span>
                                     <span className="activity-time mt-1">{item.time}</span>

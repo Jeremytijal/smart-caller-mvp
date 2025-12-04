@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { enableDemoMode } from '../data/demoData';
 import './Auth.css';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isDemoLoading, setIsDemoLoading] = useState(false);
     const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -31,6 +33,22 @@ const Login = () => {
             }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDemoLogin = async () => {
+        setIsDemoLoading(true);
+        setError('');
+        try {
+            // Use demo credentials
+            await login('demo@smartcaller.ai', 'demo123456');
+            enableDemoMode();
+            navigate('/');
+        } catch (error) {
+            console.error('Demo login failed', error);
+            setError('Impossible de charger le compte démo. Veuillez réessayer.');
+        } finally {
+            setIsDemoLoading(false);
         }
     };
 
@@ -104,6 +122,26 @@ const Login = () => {
                         )}
                     </button>
                 </form>
+
+                <div className="auth-divider">
+                    <span>ou</span>
+                </div>
+
+                <button 
+                    type="button" 
+                    className="btn-demo btn-block" 
+                    onClick={handleDemoLogin}
+                    disabled={isDemoLoading}
+                >
+                    {isDemoLoading ? (
+                        <Loader2 size={20} className="animate-spin" />
+                    ) : (
+                        <>
+                            <Play size={18} />
+                            Voir la démo
+                        </>
+                    )}
+                </button>
 
                 <div className="auth-footer">
                     <p>Pas encore de compte ? <Link to="/signup" className="link-highlight">S'inscrire</Link></p>

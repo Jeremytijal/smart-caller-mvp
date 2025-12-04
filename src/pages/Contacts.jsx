@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook, MessageSquare } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { isDemoMode, demoContacts } from '../data/demoData';
 import './Contacts.css';
 
 const Contacts = () => {
@@ -15,12 +16,31 @@ const Contacts = () => {
     const [preview, setPreview] = useState([]);
     const [sendInitialSms, setSendInitialSms] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
+    const [isDemo, setIsDemo] = useState(false);
 
     useEffect(() => {
         if (user) {
-            fetchContacts();
+            const demoMode = isDemoMode(user.id);
+            setIsDemo(demoMode);
+            
+            if (demoMode) {
+                loadDemoContacts();
+            } else {
+                fetchContacts();
+            }
         }
     }, [user]);
+
+    const loadDemoContacts = () => {
+        // Transform demo contacts to match expected format
+        const transformedContacts = demoContacts.map(c => ({
+            ...c,
+            company_name: c.company,
+            job_title: c.tags?.includes('decision-maker') ? 'Décideur' : null,
+        }));
+        setContacts(transformedContacts);
+        setLoading(false);
+    };
 
     const fetchContacts = async () => {
         if (!user) return;
@@ -122,7 +142,12 @@ const Contacts = () => {
                     <h1>Contacts</h1>
                     <p className="text-muted">Gérez votre base de prospects</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
+                    {isDemo && (
+                        <div className="demo-badge">
+                            <span>🎯 Mode Démo</span>
+                        </div>
+                    )}
                     <Link to="/integrations" className="btn-secondary flex items-center gap-2">
                         <Webhook size={18} /> Connecter un Webhook
                     </Link>

@@ -467,6 +467,68 @@
     margin-bottom: 8px;
 }
 
+/* Demo Banner */
+.demo-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Avatar Initials */
+.avatar-initials {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+}
+
+.avatar.qualified {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.avatar.pending {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.avatar.contacted {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+}
+
+.avatar.disqualified {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+/* Company Name in conversation item */
+.company-name {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* Unread Badge */
+.unread-badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: #FF470F;
+    border-radius: 10px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .chat-sidebar {
@@ -480,5 +542,9 @@
     
     .chat-area {
         border-radius: 20px;
+    }
+    
+    .demo-banner {
+        margin: 0 16px 16px;
     }
 }

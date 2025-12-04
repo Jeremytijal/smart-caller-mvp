@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { isDemoMode, demoConversations } from '../data/demoData';
 import './Conversations.css';
 
 const Conversations = () => {
@@ -15,6 +16,7 @@ const Conversations = () => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAutoPilot, setIsAutoPilot] = useState(true);
+    const [isDemo, setIsDemo] = useState(false);
 
     // Set phone from URL parameter when it changes
     useEffect(() => {
@@ -26,27 +28,63 @@ const Conversations = () => {
     // Fetch messages filtered by user's agent_id
     useEffect(() => {
         if (user) {
-            fetchConversations();
+            const demoMode = isDemoMode(user.id);
+            setIsDemo(demoMode);
+            
+            if (demoMode) {
+                loadDemoConversations();
+            } else {
+                fetchConversations();
+                
+                // Real-time subscription filtered by agent_id
+                const channel = supabase
+                    .channel('public:messages')
+                    .on('postgres_changes', { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'messages',
+                        filter: `agent_id=eq.${user?.id}` 
+                    }, (payload) => {
+                        console.log('New message received:', payload.new);
+                        fetchConversations();
+                    })
+                    .subscribe();
+
+                return () => {
+                    supabase.removeChannel(channel);
+                };
+            }
         }
-
-        // Real-time subscription filtered by agent_id
-        const channel = supabase
-            .channel('public:messages')
-            .on('postgres_changes', { 
-                event: 'INSERT', 
-                schema: 'public', 
-                table: 'messages',
-                filter: `agent_id=eq.${user?.id}` 
-            }, (payload) => {
-                console.log('New message received:', payload.new);
-                fetchConversations(); // Refresh list on new message
-            })
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
     }, [user]);
+
+    const loadDemoConversations = () => {
+        // Transform demo conversations
+        const transformed = demoConversations.map(conv => ({
+            phone: conv.phone,
+            contact: conv.contact,
+            messages: conv.messages.map((msg, idx) => ({
+                id: idx,
+                role: msg.role === 'user' ? 'user' : 'assistant',
+                content: msg.content,
+                created_at: msg.created_at
+            })),
+            lastMessage: conv.lastMessage,
+            time: new Date(conv.messages[conv.messages.length - 1].created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            unread: conv.unread,
+            status: conv.contact.status
+        }));
+
+        setConversations(transformed);
+        
+        // Auto-select first or URL-specified conversation
+        if (phoneFromUrl) {
+            setSelectedPhone(phoneFromUrl);
+        } else if (transformed.length > 0) {
+            setSelectedPhone(transformed[0].phone);
+        }
+        
+        setLoading(false);
+    };
 
     const fetchConversations = async () => {
         if (!user) return;
@@ -70,9 +108,8 @@ const Conversations = () => {
                         messages: [],
                         lastMessage: '',
                         time: '',
-                        unread: 0, // TODO: Implement unread logic
-                        status: 'pending', // TODO: Implement status logic
-                        sentiment: 'neutral' // TODO: Implement sentiment logic
+                        unread: 0,
+                        status: 'pending'
                     };
                 }
                 grouped[msg.phone_number].messages.push(msg);
@@ -112,16 +149,35 @@ const Conversations = () => {
     }, [selectedPhone, conversations]);
 
     const handleSendMessage = async (text) => {
-        // TODO: Implement manual send via Backend API
+        if (isDemo) {
+            alert("Mode démo : l'envoi de messages est désactivé.");
+            return;
+        }
         alert("L'envoi manuel n'est pas encore connecté au backend.");
     };
 
+    const getContactName = (phone) => {
+        const conv = conversations.find(c => c.phone === phone);
+        return conv?.contact?.name || phone;
+    };
+
+    const getContactStatus = (phone) => {
+        const conv = conversations.find(c => c.phone === phone);
+        return conv?.contact?.status || 'pending';
+    };
+
     if (loading) {
-        return <div className="p-8 text-center text-white">Chargement des conversations...</div>;
+        return <div className="p-8 text-center">Chargement des conversations...</div>;
     }
 
     return (
         <div className="page-container conversations-page">
+            {isDemo && (
+                <div className="demo-banner">
+                    <span>🎯 Mode Démo - Conversations simulées</span>
+                </div>
+            )}
+            
             <div className="glass-panel conversations-layout">
                 {/* Sidebar List */}
                 <div className="chat-sidebar">
@@ -141,15 +197,27 @@ const Conversations = () => {
                                     onClick={() => setSelectedPhone(chat.phone)}
                                 >
                                     <div className={`avatar ${chat.status}`}>
-                                        <User size={20} />
+                                        {chat.contact ? (
+                                            <span className="avatar-initials">
+                                                {chat.contact.name.split(' ').map(n => n[0]).join('')}
+                                            </span>
+                                        ) : (
+                                            <User size={20} />
+                                        )}
                                     </div>
                                     <div className="conversation-info">
                                         <div className="conversation-header">
-                                            <span className="user-name">{chat.phone}</span>
+                                            <span className="user-name">{chat.contact?.name || chat.phone}</span>
                                             <span className="time">{chat.time}</span>
                                         </div>
                                         <p className="last-message truncate">{chat.lastMessage}</p>
+                                        {chat.contact?.company && (
+                                            <span className="company-name">{chat.contact.company}</span>
+                                        )}
                                     </div>
+                                    {chat.unread > 0 && (
+                                        <div className="unread-badge">{chat.unread}</div>
+                                    )}
                                 </div>
                             ))
                         )}
@@ -162,10 +230,18 @@ const Conversations = () => {
                         <>
                             <div className="chat-header">
                                 <div className="chat-user-info">
-                                    <div className="avatar qualified"><User size={20} /></div>
+                                    <div className={`avatar ${getContactStatus(selectedPhone)}`}>
+                                        <span className="avatar-initials">
+                                            {getContactName(selectedPhone).split(' ').map(n => n[0]).join('').substring(0, 2)}
+                                        </span>
+                                    </div>
                                     <div>
-                                        <h3>{selectedPhone}</h3>
-                                        <span className="status-text">Lead</span>
+                                        <h3>{getContactName(selectedPhone)}</h3>
+                                        <span className="status-text">
+                                            {getContactStatus(selectedPhone) === 'qualified' ? '✅ Qualifié' : 
+                                             getContactStatus(selectedPhone) === 'pending' ? '⏳ En attente' :
+                                             getContactStatus(selectedPhone) === 'contacted' ? '📱 Contacté' : 'Lead'}
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="chat-actions">
@@ -190,8 +266,16 @@ const Conversations = () => {
                             </div>
 
                             <div className={`chat-input-area ${!isAutoPilot ? 'manual-mode' : ''}`}>
-                                <input type="text" placeholder={isAutoPilot ? "L'IA gère cette conversation..." : "Écrivez un message..."} disabled={isAutoPilot} />
-                                <button className="btn-primary send-btn" disabled={isAutoPilot} onClick={() => handleSendMessage("Test")}>
+                                <input 
+                                    type="text" 
+                                    placeholder={isAutoPilot ? "L'IA gère cette conversation..." : "Écrivez un message..."} 
+                                    disabled={isAutoPilot} 
+                                />
+                                <button 
+                                    className="btn-primary send-btn" 
+                                    disabled={isAutoPilot} 
+                                    onClick={() => handleSendMessage("Test")}
+                                >
                                     <Send size={20} />
                                 </button>
                             </div>
