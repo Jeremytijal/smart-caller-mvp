@@ -961,6 +961,258 @@
 }
 
 /* ==========================================================================
+   SCHEDULE & BEHAVIOR CARD
+   ========================================================================== */
+
+.schedule-summary {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.schedule-summary-row {
+    display: flex;
+    gap: 32px;
+}
+
+.schedule-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.schedule-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.schedule-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.days-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.day-badge {
+    padding: 4px 10px;
+    background: rgba(255, 71, 15, 0.1);
+    color: #FF470F;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Behavior Mode Section */
+.behavior-mode-section,
+.delay-section,
+.schedule-fields,
+.days-section {
+    margin-bottom: 20px;
+}
+
+.section-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.behavior-options-row {
+    display: flex;
+    gap: 12px;
+}
+
+.behavior-option-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    background: #f9fafb;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.behavior-option-card:hover {
+    border-color: #d1d5db;
+}
+
+.behavior-option-card.selected {
+    background: rgba(255, 71, 15, 0.04);
+    border-color: #FF470F;
+}
+
+.behavior-option-card svg:first-child {
+    color: #6b7280;
+}
+
+.behavior-option-card.selected svg:first-child {
+    color: #FF470F;
+}
+
+.behavior-option-card span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.behavior-option-card .check-mark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #FF470F;
+}
+
+/* Delay Slider */
+.delay-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.delay-slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #10B981, #F59E0B, #FF470F);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.delay-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #FF470F;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.delay-value-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #FF470F;
+    font-size: 0.9rem;
+    min-width: 80px;
+    justify-content: center;
+}
+
+.delay-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* Time Fields */
+.time-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.time-field {
+    flex: 1;
+}
+
+.time-field label {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-bottom: 6px;
+}
+
+.time-field input[type="time"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+}
+
+.time-field input[type="time"]:focus {
+    outline: none;
+    border-color: #FF470F;
+    box-shadow: 0 0 0 3px rgba(255, 71, 15, 0.1);
+}
+
+.time-separator {
+    padding-bottom: 14px;
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+/* Days Selector */
+.days-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.day-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 2px solid #e5e5e5;
+    background: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.day-btn:hover {
+    border-color: #d1d5db;
+}
+
+.day-btn.selected {
+    background: #FF470F;
+    border-color: #FF470F;
+    color: #fff;
+}
+
+/* Info Message */
+.schedule-info-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(59, 130, 246, 0.08);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #3B82F6;
+    margin-top: 8px;
+}
+
+.schedule-info-message svg {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
    RESPONSIVE
    ========================================================================== */
 

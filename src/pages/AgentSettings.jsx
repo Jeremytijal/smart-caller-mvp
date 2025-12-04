@@ -4,7 +4,7 @@ import {
     Save, Plus, Trash2, MessageSquare, Target, User, Sliders, Zap, 
     AlertTriangle, CheckCircle, Building2, Edit2, UserCircle, 
     MessageCircle, Smartphone, Mail, Shield, HelpCircle, Rocket,
-    Phone, Check, ChevronDown, ChevronUp, ArrowRight
+    Phone, Check, ChevronDown, ChevronUp, ArrowRight, Clock, Calendar, Users, Info
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -16,7 +16,7 @@ const AgentSettings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showToast, setShowToast] = useState(false);
-    
+
     // Edit modes for each section
     const [editingSection, setEditingSection] = useState(null);
 
@@ -53,7 +53,16 @@ const AgentSettings = () => {
         crm: null,
 
         // Quality Criteria
-        quality_criteria: []
+        quality_criteria: [],
+
+        // Behavior & Schedule
+        behaviorMode: 'human',
+        responseDelay: 2,
+        schedule: {
+            startTime: '09:00',
+            endTime: '18:00',
+            days: ['L', 'M', 'Me', 'J', 'V']
+        }
     });
 
     useEffect(() => {
@@ -105,7 +114,16 @@ const AgentSettings = () => {
                     crm: agentConfig.crm || null,
 
                     // Quality
-                    quality_criteria: agentConfig.quality_criteria || []
+                    quality_criteria: agentConfig.quality_criteria || [],
+
+                    // Behavior & Schedule
+                    behaviorMode: agentConfig.behaviorMode || 'human',
+                    responseDelay: agentConfig.responseDelay || 2,
+                    schedule: agentConfig.schedule || {
+                        startTime: '09:00',
+                        endTime: '18:00',
+                        days: ['L', 'M', 'Me', 'J', 'V']
+                    }
                 });
             }
         } catch (error) {
@@ -147,7 +165,11 @@ const AgentSettings = () => {
                     channels: config.channels,
                     crm: config.crm,
                     quality_criteria: config.quality_criteria,
-                    firstMessage: config.first_message_template
+                    firstMessage: config.first_message_template,
+                    // Behavior & Schedule
+                    behaviorMode: config.behaviorMode,
+                    responseDelay: config.responseDelay,
+                    schedule: config.schedule
                 }
             };
 
@@ -201,7 +223,7 @@ const AgentSettings = () => {
 
     if (loading) return <div className="loading-state">Chargement...</div>;
 
-    return (
+        return (
         <div className="agent-config-page">
             {/* Header */}
             <div className="config-header">
@@ -215,7 +237,7 @@ const AgentSettings = () => {
                             Consultez et modifiez les paramètres de votre agent IA.
                         </p>
                     </div>
-                </div>
+                        </div>
                 <button className="btn-primary" onClick={handleSave} disabled={saving}>
                     {saving ? 'Sauvegarde...' : <><Save size={18} /> Sauvegarder</>}
                 </button>
@@ -230,13 +252,13 @@ const AgentSettings = () => {
                             <div className="summary-card-title">
                                 <UserCircle size={20} />
                                 <h3>Identité de l'agent</h3>
-                            </div>
+                </div>
                             <button className="btn-edit" onClick={() => toggleEdit('identity')}>
                                 {editingSection === 'identity' ? <ChevronUp size={14} /> : <Edit2 size={14} />}
                                 {editingSection === 'identity' ? 'Fermer' : 'Modifier'}
-                            </button>
-                        </div>
-                        
+                    </button>
+                </div>
+
                         {editingSection !== 'identity' ? (
                             <>
                                 <div className="agent-identity-preview">
@@ -259,72 +281,72 @@ const AgentSettings = () => {
                             </>
                         ) : (
                             <div className="edit-section">
-                                <div className="form-grid">
-                                    <div className="form-group">
-                                        <label>Nom de l'agent</label>
-                                        <input
-                                            type="text"
-                                            value={config.name}
-                                            onChange={(e) => setConfig({ ...config, name: e.target.value })}
-                                            placeholder="Ex: Thomas"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Rôle / Poste</label>
-                                        <input
-                                            type="text"
-                                            value={config.role}
-                                            onChange={(e) => setConfig({ ...config, role: e.target.value })}
-                                            placeholder="Ex: Expert Produit"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Entreprise</label>
-                                        <input
-                                            type="text"
-                                            value={config.company}
-                                            onChange={(e) => setConfig({ ...config, company: e.target.value })}
-                                            placeholder="Ex: Ma Société"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="tone-control">
-                                    <div className="tone-header">
-                                        <label>Style de communication</label>
-                                        <span className="tone-value">{getToneLabel(config.tone)}</span>
-                                    </div>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        value={config.tone}
-                                        onChange={(e) => setConfig({ ...config, tone: parseInt(e.target.value) })}
-                                        className="range-slider"
-                                    />
-                                    <div className="tone-labels">
-                                        <span>Douceur</span>
-                                        <span>Vente Hard</span>
+                                    <div className="form-grid">
+                                        <div className="form-group">
+                                            <label>Nom de l'agent</label>
+                                            <input
+                                                type="text"
+                                                value={config.name}
+                                                onChange={(e) => setConfig({ ...config, name: e.target.value })}
+                                                placeholder="Ex: Thomas"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Rôle / Poste</label>
+                                            <input
+                                                type="text"
+                                                value={config.role}
+                                                onChange={(e) => setConfig({ ...config, role: e.target.value })}
+                                                placeholder="Ex: Expert Produit"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Entreprise</label>
+                                            <input
+                                                type="text"
+                                                value={config.company}
+                                                onChange={(e) => setConfig({ ...config, company: e.target.value })}
+                                                placeholder="Ex: Ma Société"
+                                            />
                                     </div>
                                 </div>
 
-                                <div className="politeness-control">
-                                    <label>Niveau de familiarité :</label>
-                                    <div className="toggle-group">
-                                        <button
-                                            onClick={() => setConfig({ ...config, politeness: 'vous' })}
-                                            className={`toggle-btn ${config.politeness === 'vous' ? 'active' : ''}`}
-                                        >
-                                            Vouvoiement
-                                        </button>
-                                        <button
-                                            onClick={() => setConfig({ ...config, politeness: 'tu' })}
-                                            className={`toggle-btn ${config.politeness === 'tu' ? 'active' : ''}`}
-                                        >
-                                            Tutoiement
-                                        </button>
+                                    <div className="tone-control">
+                                        <div className="tone-header">
+                                        <label>Style de communication</label>
+                                            <span className="tone-value">{getToneLabel(config.tone)}</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={config.tone}
+                                            onChange={(e) => setConfig({ ...config, tone: parseInt(e.target.value) })}
+                                            className="range-slider"
+                                        />
+                                        <div className="tone-labels">
+                                            <span>Douceur</span>
+                                            <span>Vente Hard</span>
+                                        </div>
                                     </div>
-                                </div>
+
+                                <div className="politeness-control">
+                                        <label>Niveau de familiarité :</label>
+                                        <div className="toggle-group">
+                                            <button
+                                                onClick={() => setConfig({ ...config, politeness: 'vous' })}
+                                                className={`toggle-btn ${config.politeness === 'vous' ? 'active' : ''}`}
+                                            >
+                                                Vouvoiement
+                                            </button>
+                                            <button
+                                                onClick={() => setConfig({ ...config, politeness: 'tu' })}
+                                                className={`toggle-btn ${config.politeness === 'tu' ? 'active' : ''}`}
+                                            >
+                                                Tutoiement
+                                            </button>
+                                        </div>
+                                    </div>
 
                                 <div className="form-group full-width">
                                     <label>Premier message</label>
@@ -351,8 +373,8 @@ const AgentSettings = () => {
                                 {editingSection === 'business' ? <ChevronUp size={14} /> : <Edit2 size={14} />}
                                 {editingSection === 'business' ? 'Fermer' : 'Modifier'}
                             </button>
-                        </div>
-                        
+                                </div>
+
                         {editingSection !== 'business' ? (
                             <>
                                 <div className="summary-grid">
@@ -410,7 +432,7 @@ const AgentSettings = () => {
                                             <option value="Français">Français</option>
                                             <option value="English">English</option>
                                         </select>
-                                    </div>
+                        </div>
                                 </div>
                                 <div className="form-group full-width">
                                     <label>Proposition de valeur</label>
@@ -436,8 +458,8 @@ const AgentSettings = () => {
                                 {editingSection === 'icp' ? <ChevronUp size={14} /> : <Edit2 size={14} />}
                                 {editingSection === 'icp' ? 'Fermer' : 'Modifier'}
                             </button>
-                        </div>
-                        
+                                </div>
+
                         {editingSection !== 'icp' ? (
                             <>
                                 <div className="summary-grid">
@@ -514,7 +536,7 @@ const AgentSettings = () => {
                                 </div>
                             </div>
                         )}
-                    </div>
+                                </div>
 
                     {/* Quality Criteria Card */}
                     <div className="summary-card">
@@ -576,7 +598,7 @@ const AgentSettings = () => {
                                         <button onClick={() => addCriteria('must_have')} className="btn-dashed">
                                             <Plus size={16} /> Ajouter
                                         </button>
-                                    </div>
+                                        </div>
                                 </div>
 
                                 {/* Deal Breakers */}
@@ -588,22 +610,22 @@ const AgentSettings = () => {
                                     <div className="criteria-list">
                                         {config.quality_criteria.filter(c => c.type === 'deal_breaker').map(c => (
                                             <div key={c.id} className="criteria-item deal-breaker">
-                                                <input
-                                                    type="text"
+                                    <input
+                                        type="text"
                                                     value={c.text}
                                                     onChange={(e) => updateCriteria(c.id, e.target.value)}
                                                     placeholder="Ex: Pas de budget"
                                                 />
                                                 <button onClick={() => removeCriteria(c.id)} className="btn-icon delete">
                                                     <Trash2 size={16} />
-                                                </button>
-                                            </div>
+                                    </button>
+                                </div>
                                         ))}
                                         <button onClick={() => addCriteria('deal_breaker')} className="btn-dashed danger">
                                             <Plus size={16} /> Ajouter
                                         </button>
                                     </div>
-                                </div>
+                                    </div>
 
                                 {/* Nice to Have */}
                                 <div className="criteria-section">
@@ -722,6 +744,165 @@ const AgentSettings = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Behavior & Schedule Card */}
+                    <div className="summary-card">
+                        <div className="summary-card-header">
+                            <div className="summary-card-title">
+                                <Clock size={20} />
+                                <h3>Comportement & Planning</h3>
+                            </div>
+                            <button className="btn-edit" onClick={() => toggleEdit('schedule')}>
+                                {editingSection === 'schedule' ? <ChevronUp size={14} /> : <Edit2 size={14} />}
+                                {editingSection === 'schedule' ? 'Fermer' : 'Modifier'}
+                            </button>
+                        </div>
+                        
+                        {editingSection !== 'schedule' ? (
+                            <div className="schedule-summary">
+                                <div className="schedule-summary-row">
+                                    <div className="schedule-info-item">
+                                        <span className="schedule-label">Mode</span>
+                                        <span className="schedule-value">
+                                            {config.behaviorMode === 'human' ? '🧑 Humain' : '⚡ Assistant IA'}
+                                        </span>
+                                    </div>
+                                    {config.behaviorMode === 'human' && (
+                                        <div className="schedule-info-item">
+                                            <span className="schedule-label">Délai de réponse</span>
+                                            <span className="schedule-value">{config.responseDelay} min</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="schedule-summary-row">
+                                    <div className="schedule-info-item">
+                                        <span className="schedule-label">Horaires</span>
+                                        <span className="schedule-value">
+                                            {config.schedule?.startTime || '09:00'} - {config.schedule?.endTime || '18:00'}
+                                        </span>
+                                    </div>
+                                    <div className="schedule-info-item">
+                                        <span className="schedule-label">Jours actifs</span>
+                                        <div className="days-badges">
+                                            {(config.schedule?.days || ['L', 'M', 'Me', 'J', 'V']).map(day => (
+                                                <span key={day} className="day-badge">{day}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="edit-section">
+                                {/* Behavior Mode */}
+                                <div className="behavior-mode-section">
+                                    <label className="section-label">Mode de comportement</label>
+                                    <div className="behavior-options-row">
+                                        <div 
+                                            className={`behavior-option-card ${config.behaviorMode === 'human' ? 'selected' : ''}`}
+                                            onClick={() => setConfig({ ...config, behaviorMode: 'human' })}
+                                        >
+                                            <User size={20} />
+                                            <span>Mode Humain</span>
+                                            {config.behaviorMode === 'human' && <Check size={16} className="check-mark" />}
+                                        </div>
+                                        <div 
+                                            className={`behavior-option-card ${config.behaviorMode === 'assistant' ? 'selected' : ''}`}
+                                            onClick={() => setConfig({ ...config, behaviorMode: 'assistant' })}
+                                        >
+                                            <Zap size={20} />
+                                            <span>Assistant IA</span>
+                                            {config.behaviorMode === 'assistant' && <Check size={16} className="check-mark" />}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Response Delay (only for human mode) */}
+                                {config.behaviorMode === 'human' && (
+                                    <div className="delay-section">
+                                        <label className="section-label">Délai de réponse</label>
+                                        <div className="delay-slider-row">
+                                            <input
+                                                type="range"
+                                                min="1"
+                                                max="5"
+                                                value={config.responseDelay}
+                                                onChange={(e) => setConfig({ ...config, responseDelay: parseInt(e.target.value) })}
+                                                className="delay-slider"
+                                            />
+                                            <div className="delay-value-badge">
+                                                <Clock size={14} />
+                                                {config.responseDelay} min
+                                            </div>
+                                        </div>
+                                        <div className="delay-labels">
+                                            <span>1 min</span>
+                                            <span>5 min</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Schedule */}
+                                <div className="schedule-fields">
+                                    <label className="section-label">Plage horaire</label>
+                                    <div className="time-row">
+                                        <div className="time-field">
+                                            <label>Début</label>
+                                            <input
+                                                type="time"
+                                                value={config.schedule?.startTime || '09:00'}
+                                                onChange={(e) => setConfig({
+                                                    ...config,
+                                                    schedule: { ...config.schedule, startTime: e.target.value }
+                                                })}
+                                            />
+                                        </div>
+                                        <span className="time-separator">à</span>
+                                        <div className="time-field">
+                                            <label>Fin</label>
+                                            <input
+                                                type="time"
+                                                value={config.schedule?.endTime || '18:00'}
+                                                onChange={(e) => setConfig({
+                                                    ...config,
+                                                    schedule: { ...config.schedule, endTime: e.target.value }
+                                                })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="days-section">
+                                    <label className="section-label">Jours d'envoi</label>
+                                    <div className="days-selector">
+                                        {['L', 'M', 'Me', 'J', 'V', 'S', 'D'].map((day) => (
+                                            <button
+                                                key={day}
+                                                type="button"
+                                                className={`day-btn ${(config.schedule?.days || []).includes(day) ? 'selected' : ''}`}
+                                                onClick={() => {
+                                                    const currentDays = config.schedule?.days || [];
+                                                    const newDays = currentDays.includes(day)
+                                                        ? currentDays.filter(d => d !== day)
+                                                        : [...currentDays, day];
+                                                    setConfig({
+                                                        ...config,
+                                                        schedule: { ...config.schedule, days: newDays }
+                                                    });
+                                                }}
+                                            >
+                                                {day}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="schedule-info-message">
+                                    <Info size={14} />
+                                    <span>En dehors de ces horaires, les messages seront mis en file d'attente.</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
