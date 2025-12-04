@@ -57,7 +57,7 @@ const Subscription = () => {
                 'Support email'
             ],
             popular: false,
-            stripePriceId: 'price_starter_monthly' // À remplacer par votre Price ID Stripe
+            stripePriceId: 'price_1SajxUG7TquWCqOJa4tzeJAV' // À remplacer par votre Price ID Stripe
         },
         {
             id: 'growth',
@@ -74,7 +74,7 @@ const Subscription = () => {
                 'Support prioritaire'
             ],
             popular: true,
-            stripePriceId: 'price_growth_monthly' // À remplacer par votre Price ID Stripe
+            stripePriceId: 'price_1SajxyG7TquWCqOJvzhiE9tL' // À remplacer par votre Price ID Stripe
         },
         {
             id: 'scale',
