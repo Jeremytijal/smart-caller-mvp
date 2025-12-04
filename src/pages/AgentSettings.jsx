@@ -216,7 +216,7 @@ const AgentSettings = () => {
                         </p>
                     </div>
                 </div>
-                <button className="btn-primary btn-save" onClick={handleSave} disabled={saving}>
+                <button className="btn-primary" onClick={handleSave} disabled={saving}>
                     {saving ? 'Sauvegarde...' : <><Save size={18} /> Sauvegarder</>}
                 </button>
             </div>
