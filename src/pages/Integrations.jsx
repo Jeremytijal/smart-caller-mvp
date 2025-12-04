@@ -127,7 +127,7 @@ const Integrations = () => {
                         <label>URL DE VOTRE WEBHOOK</label>
                         <div className="url-display-box">
                             <code className="url-text" title={inboundWebhookUrl}>
-                                {inboundWebhookUrl}
+                                {`https://webhook.smart-caller.ai/webhooks/${user?.id?.slice(0, 8)}••••/leads`}
                             </code>
                             <button 
                                 className="btn-copy"
