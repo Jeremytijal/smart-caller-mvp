@@ -22,14 +22,18 @@ const Contacts = () => {
     }, [user]);
 
     const fetchContacts = async () => {
+        if (!user) return;
+        
         try {
+            // Filter contacts by agent_id (user's ID)
             const { data, error } = await supabase
                 .from('contacts')
                 .select('*')
+                .eq('agent_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            setContacts(data);
+            setContacts(data || []);
         } catch (error) {
             console.error('Error fetching contacts:', error);
         } finally {

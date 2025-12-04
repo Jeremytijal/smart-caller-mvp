@@ -24,10 +24,14 @@ const Dashboard = () => {
     }, [user]);
 
     const fetchData = async () => {
+        if (!user) return;
+        
         try {
+            // Filter contacts by agent_id (user's ID)
             const { data: contacts, error } = await supabase
                 .from('contacts')
                 .select('*')
+                .eq('agent_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;

@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import './Conversations.css';
 
 const Conversations = () => {
+    const { user } = useAuth();
     const [conversations, setConversations] = useState([]);
     const [selectedPhone, setSelectedPhone] = useState(null);
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAutoPilot, setIsAutoPilot] = useState(true);
 
-    // Fetch all messages and group them by phone number
+    // Fetch messages filtered by user's agent_id
     useEffect(() => {
-        fetchConversations();
+        if (user) {
+            fetchConversations();
+        }
 
-        // Real-time subscription
+        // Real-time subscription filtered by agent_id
         const channel = supabase
             .channel('public:messages')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+            .on('postgres_changes', { 
+                event: 'INSERT', 
+                schema: 'public', 
+                table: 'messages',
+                filter: `agent_id=eq.${user?.id}` 
+            }, (payload) => {
                 console.log('New message received:', payload.new);
                 fetchConversations(); // Refresh list on new message
             })
@@ -26,20 +35,24 @@ const Conversations = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [user]);
 
     const fetchConversations = async () => {
+        if (!user) return;
+
         try {
+            // Filter messages by agent_id (user's ID)
             const { data, error } = await supabase
                 .from('messages')
                 .select('*')
+                .eq('agent_id', user.id)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
 
             // Group by phone number
             const grouped = {};
-            data.forEach(msg => {
+            (data || []).forEach(msg => {
                 if (!grouped[msg.phone_number]) {
                     grouped[msg.phone_number] = {
                         phone: msg.phone_number,
