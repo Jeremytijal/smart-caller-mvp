@@ -3,106 +3,106 @@ import { Link } from 'react-router-dom';
 import { 
     Zap, MessageSquare, Clock, Target, BarChart3, Users, 
     CheckCircle, ArrowRight, Smartphone, RefreshCw, Calendar,
-    Shield, TrendingUp, Play, Star, ChevronRight, Menu, X
+    Shield, TrendingUp, Play, Star, ChevronRight, Menu, X,
+    ChevronDown, ExternalLink, Bot, UserCheck, Database,
+    Send, Sparkles, Phone, Mail, Globe, Linkedin
 } from 'lucide-react';
 import './LandingPage.css';
 
 const LandingPage = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [openFaq, setOpenFaq] = useState(null);
+
+    const successCases = [
+        { company: "Getaround", metric: "+90%", label: "Réduction des coûts", color: "#10B981" },
+        { company: "InnovTech", metric: "2×", label: "RDV qualifiés", color: "#3B82F6" },
+        { company: "BoostT", metric: "+150", label: "Leads qualifiés/mois", color: "#8B5CF6" }
+    ];
 
     const features = [
         {
-            icon: <Clock size={28} />,
-            title: "Réponse en < 5 minutes",
-            description: "Vos leads reçoivent une réponse SMS instantanée, 24h/24. Multipliez vos chances de conversion par 21x."
+            icon: <Clock size={24} />,
+            title: "Réponses < 5 min, 24/7",
+            description: "L'IA répond en moins de 5 minutes, garde le contexte et pose uniquement les questions qui font avancer le lead."
         },
         {
-            icon: <Target size={28} />,
-            title: "Qualification automatique",
-            description: "Notre IA qualifie chaque lead selon vos critères et score leur potentiel en temps réel."
+            icon: <Database size={24} />,
+            title: "Connecté à votre stack",
+            description: "Intégration facile avec vos outils. On lit/écrit les champs et déclenche vos workflows automatiquement."
         },
         {
-            icon: <RefreshCw size={28} />,
-            title: "Campagnes de réactivation",
-            description: "Relancez vos leads dormants avec des séquences SMS personnalisées et automatisées."
+            icon: <Target size={24} />,
+            title: "Vos règles, appliquées",
+            description: "Définissez ce qui doit être demandé, l'agent collecte les infos par SMS et score le lead selon vos critères."
         },
         {
-            icon: <Calendar size={28} />,
-            title: "Prise de RDV automatique",
-            description: "L'agent propose directement des créneaux et remplit votre agenda commercial."
+            icon: <Calendar size={24} />,
+            title: "Réservation automatique",
+            description: "On propose des créneaux, réserve le RDV, met à jour le CRM, route vers un commercial et trace la source."
         }
     ];
 
-    const stats = [
-        { value: "< 5 min", label: "Temps de réponse moyen" },
-        { value: "21x", label: "Plus de conversions" },
-        { value: "80%", label: "Taux d'ouverture SMS" },
-        { value: "24/7", label: "Disponibilité" }
-    ];
-
-    const useCases = [
+    const faqs = [
         {
-            icon: <Zap />,
-            title: "Lead Response",
-            subtitle: "Inbound",
-            description: "Répondez instantanément à chaque lead entrant par SMS. Qualifiez automatiquement et prenez des RDV.",
-            features: ["Réponse < 5 minutes", "Qualification IA", "Scoring automatique", "Sync CRM"],
-            color: "orange"
+            question: "Un commercial peut-il reprendre la conversation ?",
+            answer: "Oui, vos commerciaux peuvent reprendre la main instantanément dans le même thread SMS."
         },
         {
-            icon: <RefreshCw />,
-            title: "Réactivation",
-            subtitle: "Outbound",
-            description: "Relancez vos leads dormants et bases de données avec des campagnes SMS personnalisées.",
-            features: ["Séquences automatisées", "Personnalisation IA", "A/B Testing", "Nurturing"],
-            color: "blue"
+            question: "Y a-t-il des limites de volume ?",
+            answer: "Non. Nous n'imposons pas de limites strictes sur le volume de conversations."
+        },
+        {
+            question: "Que mettez-vous à jour dans le CRM ?",
+            answer: "Tous les champs dont vous avez besoin : statut, propriétaire, source, score de qualification, notes et liens vers la conversation."
+        },
+        {
+            question: "Comment réservez-vous les RDV ?",
+            answer: "L'agent partage votre lien calendrier dans la conversation et peut directement intégrer avec votre agenda."
+        },
+        {
+            question: "L'agent demande-t-il les infos manquantes ?",
+            answer: "Oui. Il pose les questions requises, comble les lacunes, et ne marque qualifié qu'une fois vos conditions remplies."
+        },
+        {
+            question: "Quelles règles de qualification peut-on définir ?",
+            answer: "Toutes vos règles : rôle, région, taille de deal, mots-clés, champs personnalisés, critères de disqualification. On peut aussi produire un score (0-100)."
         }
     ];
 
-    const testimonials = [
-        {
-            quote: "En 6 semaines, nous avons signé 3 nouveaux contrats grâce aux RDV générés par Smart Caller.",
-            author: "Thomas Bellini",
-            role: "Gérant, Assuretbiens",
-            avatar: "TB"
-        },
-        {
-            quote: "Smart Caller nous a permis de doubler notre nombre de RDV qualifiés tout en réduisant nos coûts de 60%.",
-            author: "Olivier Marcho",
-            role: "Responsable commercial, InnovTech",
-            avatar: "OM"
-        },
-        {
-            quote: "J'avais testé plusieurs outils avant. Là c'est simple : ils gèrent tout, je reçois les RDV.",
-            author: "Michael Johnson",
-            role: "CEO, BoostT",
-            avatar: "MJ"
-        }
+    const conversationMessages = [
+        { type: 'incoming', text: "Bonjour, je suis intéressé par vos services. Comment ça fonctionne ?" },
+        { type: 'outgoing', text: "Bonjour ! Merci pour votre intérêt 🙂 Je suis Sophie de Smart Caller. Pour mieux vous orienter, combien de leads recevez-vous par mois actuellement ?" },
+        { type: 'system', text: "Vérification des critères de qualification...", time: "230ms" },
+        { type: 'incoming', text: "On gère environ 500 leads par mois." },
+        { type: 'outgoing', text: "C'est un bon volume ! Êtes-vous la personne en charge du Marketing ou de la gestion des leads dans votre entreprise ?" },
+        { type: 'system', text: "Critères Smart Caller vérifiés", time: "120ms" },
+        { type: 'incoming', text: "Oui, je suis Directeur Commercial." },
+        { type: 'outgoing', text: "Parfait ! Il semble que Smart Caller pourrait vraiment optimiser votre process. Voulez-vous qu'on planifie une démo de 15 min ?" }
     ];
 
     return (
-        <div className="landing-page">
+        <div className="landing-page patagon-style">
             {/* Navigation */}
             <nav className="landing-nav">
                 <div className="nav-container">
                     <Link to="/" className="nav-logo">
                         <div className="logo-icon">
-                            <Zap size={20} />
+                            <Zap size={18} />
                         </div>
                         <span>Smart Caller</span>
                     </Link>
 
                     <div className="nav-links desktop-only">
                         <a href="#features">Fonctionnalités</a>
-                        <a href="#use-cases">Cas d'usage</a>
-                        <a href="#testimonials">Témoignages</a>
+                        <a href="#how-it-works">Comment ça marche</a>
+                        <a href="#faq">FAQ</a>
                         <a href="#pricing">Tarifs</a>
                     </div>
 
                     <div className="nav-actions desktop-only">
-                        <Link to="/login" className="btn-nav-secondary">Connexion</Link>
+                        <Link to="/login" className="btn-nav-text">Connexion</Link>
                         <Link to="/signup" className="btn-nav-primary">
-                            Essai gratuit <ArrowRight size={16} />
+                            Commencer maintenant
                         </Link>
                     </div>
 
@@ -111,16 +111,15 @@ const LandingPage = () => {
                     </button>
                 </div>
 
-                {/* Mobile Menu */}
                 {mobileMenuOpen && (
                     <div className="mobile-menu">
                         <a href="#features" onClick={() => setMobileMenuOpen(false)}>Fonctionnalités</a>
-                        <a href="#use-cases" onClick={() => setMobileMenuOpen(false)}>Cas d'usage</a>
-                        <a href="#testimonials" onClick={() => setMobileMenuOpen(false)}>Témoignages</a>
+                        <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>Comment ça marche</a>
+                        <a href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
                         <a href="#pricing" onClick={() => setMobileMenuOpen(false)}>Tarifs</a>
                         <div className="mobile-menu-actions">
-                            <Link to="/login" className="btn-nav-secondary">Connexion</Link>
-                            <Link to="/signup" className="btn-nav-primary">Essai gratuit</Link>
+                            <Link to="/login">Connexion</Link>
+                            <Link to="/signup" className="btn-nav-primary">Commencer</Link>
                         </div>
                     </div>
                 )}
@@ -128,302 +127,361 @@ const LandingPage = () => {
 
             {/* Hero Section */}
             <section className="hero-section">
-                <div className="hero-container">
-                    <div className="hero-badge">
-                        <Smartphone size={14} />
-                        <span>Agent SMS propulsé par l'IA</span>
-                    </div>
-                    
-                    <h1 className="hero-title">
-                        Répondez à vos leads en 
-                        <span className="highlight"> moins de 5 minutes</span>
-                        <br />et multipliez vos ventes
-                    </h1>
-                    
-                    <p className="hero-subtitle">
-                        Smart Caller qualifie vos leads par SMS 24/7 et remplit votre agenda commercial automatiquement. 
-                        <strong> +21x de chances de conversion</strong> avec une réponse rapide.
+                <div className="hero-content">
+                    <span className="hero-eyebrow">Qualification de leads par SMS</span>
+                    <h1>Qualifiez chaque lead<br />en quelques secondes</h1>
+                    <p className="hero-description">
+                        Déployez un agent IA qui qualifie vos leads en temps réel par SMS, 
+                        planifie des rendez-vous et met à jour votre CRM automatiquement.
                     </p>
+                    
+                    <div className="hero-badges">
+                        <div className="hero-badge">
+                            <UserCheck size={16} />
+                            <span>Reprise humaine</span>
+                        </div>
+                        <div className="hero-badge">
+                            <MessageSquare size={16} />
+                            <span>SMS → Qualification</span>
+                        </div>
+                        <div className="hero-badge">
+                            <Calendar size={16} />
+                            <span>Prise de RDV</span>
+                        </div>
+                        <div className="hero-badge">
+                            <Database size={16} />
+                            <span>Sync CRM</span>
+                        </div>
+                    </div>
 
                     <div className="hero-actions">
-                        <Link to="/signup" className="btn-hero-primary">
-                            <Zap size={20} />
-                            Démarrer gratuitement
+                        <Link to="/signup" className="btn-primary-large">
+                            Commencer maintenant
                         </Link>
-                        <a href="#demo" className="btn-hero-secondary">
-                            <Play size={18} />
-                            Voir la démo
+                        <a href="#demo" className="btn-secondary-large">
+                            Réserver une démo
                         </a>
                     </div>
-
-                    <div className="hero-stats">
-                        {stats.map((stat, index) => (
-                            <div key={index} className="hero-stat">
-                                <span className="stat-value">{stat.value}</span>
-                                <span className="stat-label">{stat.label}</span>
-                            </div>
-                        ))}
-                    </div>
                 </div>
+            </section>
 
-                {/* Hero Visual */}
-                <div className="hero-visual">
-                    <div className="phone-mockup">
-                        <div className="phone-notch"></div>
-                        <div className="phone-screen">
-                            <div className="sms-conversation">
-                                <div className="sms-bubble incoming">
-                                    <span className="sms-time">14:32</span>
-                                    Bonjour, je suis intéressé par vos services
-                                </div>
-                                <div className="sms-bubble outgoing">
-                                    <span className="sms-time">14:32</span>
-                                    Bonjour ! Merci pour votre intérêt 🙂 Je suis Sophie de Smart Caller. Puis-je vous poser quelques questions pour mieux comprendre vos besoins ?
-                                </div>
-                                <div className="sms-bubble incoming">
-                                    <span className="sms-time">14:35</span>
-                                    Oui bien sûr
-                                </div>
-                                <div className="sms-bubble outgoing">
-                                    <span className="sms-time">14:35</span>
-                                    Parfait ! Quel est votre volume de leads mensuel actuellement ?
-                                </div>
-                                <div className="typing-indicator">
-                                    <span></span><span></span><span></span>
-                                </div>
-                            </div>
+            {/* Success Cases */}
+            <section className="success-section">
+                <div className="success-container">
+                    {successCases.map((item, index) => (
+                        <div key={index} className="success-card">
+                            <span className="success-company">{item.company}</span>
+                            <span className="success-metric" style={{ color: item.color }}>{item.metric}</span>
+                            <span className="success-label">{item.label}</span>
+                            <a href="#" className="success-link">Lire l'histoire →</a>
                         </div>
-                    </div>
-                    <div className="floating-card card-1">
-                        <CheckCircle size={16} className="text-success" />
-                        <span>Lead qualifié</span>
-                    </div>
-                    <div className="floating-card card-2">
-                        <Clock size={16} className="text-orange" />
-                        <span>Réponse en 32s</span>
-                    </div>
-                    <div className="floating-card card-3">
-                        <Calendar size={16} className="text-blue" />
-                        <span>RDV planifié</span>
-                    </div>
+                    ))}
+                    <a href="#" className="more-cases-link">Plus de cas clients →</a>
                 </div>
             </section>
 
-            {/* Problem Section */}
-            <section className="problem-section">
-                <div className="section-container">
-                    <div className="problem-content">
-                        <span className="section-badge red">Le problème</span>
-                        <h2>Chaque minute compte quand un lead vous contacte</h2>
-                        <div className="problem-stats">
-                            <div className="problem-stat">
-                                <span className="big-number">78%</span>
-                                <p>des leads achètent chez le premier à répondre</p>
-                            </div>
-                            <div className="problem-stat">
-                                <span className="big-number">-80%</span>
-                                <p>de chances de conversion après 5 minutes</p>
-                            </div>
-                        </div>
-                        <p className="problem-text">
-                            Vos commerciaux ne peuvent pas répondre 24/7. Les leads refroidissent, 
-                            partent chez la concurrence, et votre coût d'acquisition explose.
-                        </p>
+            {/* Main Value Prop */}
+            <section className="value-section">
+                <div className="value-container">
+                    <div className="value-header">
+                        <h2>Pas un autre chatbot.<br />Un agent IA qui qualifie et agit.</h2>
                     </div>
-                </div>
-            </section>
 
-            {/* Features Section */}
-            <section id="features" className="features-section">
-                <div className="section-container">
-                    <span className="section-badge">La solution</span>
-                    <h2 className="section-title">Un agent SMS qui travaille pour vous 24/7</h2>
-                    <p className="section-subtitle">
-                        Smart Caller répond, qualifie et convertit vos leads automatiquement par SMS
-                    </p>
-
-                    <div className="features-grid">
-                        {features.map((feature, index) => (
-                            <div key={index} className="feature-card">
-                                <div className="feature-icon">{feature.icon}</div>
-                                <h3>{feature.title}</h3>
-                                <p>{feature.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Use Cases Section */}
-            <section id="use-cases" className="usecases-section">
-                <div className="section-container">
-                    <span className="section-badge">Cas d'usage</span>
-                    <h2 className="section-title">2 façons d'utiliser Smart Caller</h2>
-
-                    <div className="usecases-grid">
-                        {useCases.map((useCase, index) => (
-                            <div key={index} className={`usecase-card ${useCase.color}`}>
-                                <div className="usecase-header">
-                                    <div className="usecase-icon">{useCase.icon}</div>
-                                    <div>
-                                        <span className="usecase-subtitle">{useCase.subtitle}</span>
-                                        <h3>{useCase.title}</h3>
+                    <div className="value-grid">
+                        <div className="features-list">
+                            {features.map((feature, index) => (
+                                <div key={index} className="feature-item">
+                                    <div className="feature-icon">{feature.icon}</div>
+                                    <div className="feature-content">
+                                        <h3>{feature.title}</h3>
+                                        <p>{feature.description}</p>
                                     </div>
                                 </div>
-                                <p className="usecase-description">{useCase.description}</p>
-                                <ul className="usecase-features">
-                                    {useCase.features.map((feat, i) => (
-                                        <li key={i}>
-                                            <CheckCircle size={16} />
-                                            {feat}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Link to="/signup" className="usecase-cta">
-                                    Essayer gratuitement <ChevronRight size={18} />
-                                </Link>
+                            ))}
+                        </div>
+
+                        <div className="conversation-preview">
+                            <div className="conversation-header">
+                                <div className="conversation-title">
+                                    <MessageSquare size={16} />
+                                    Conversation avec un prospect
+                                </div>
                             </div>
-                        ))}
+                            <div className="conversation-body">
+                                {conversationMessages.map((msg, index) => (
+                                    msg.type === 'system' ? (
+                                        <div key={index} className="system-message">
+                                            <Sparkles size={12} />
+                                            <span>{msg.text}</span>
+                                            <span className="system-time">{msg.time}</span>
+                                        </div>
+                                    ) : (
+                                        <div key={index} className={`chat-bubble ${msg.type}`}>
+                                            {msg.text}
+                                        </div>
+                                    )
+                                ))}
+                            </div>
+                            <div className="conversation-footer">
+                                <span className="demo-label">Exemple de conversation simulée</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Stats Comparison */}
+            <section className="comparison-section">
+                <div className="comparison-container">
+                    <div className="comparison-content">
+                        <h2>Abandonnez les formulaires, passez au SMS</h2>
+                        <p>Les utilisateurs convertissent dans les apps qu'ils utilisent déjà.</p>
+                    </div>
+                    <div className="comparison-stats">
+                        <div className="stat-bar">
+                            <div className="stat-bar-label">Formulaire</div>
+                            <div className="stat-bar-track">
+                                <div className="stat-bar-fill form" style={{ width: '4%' }}></div>
+                            </div>
+                            <div className="stat-bar-value">0.2%</div>
+                        </div>
+                        <div className="stat-bar">
+                            <div className="stat-bar-label">SMS</div>
+                            <div className="stat-bar-track">
+                                <div className="stat-bar-fill sms" style={{ width: '98%' }}></div>
+                            </div>
+                            <div className="stat-bar-value highlight">4.9%</div>
+                        </div>
+                        <p className="comparison-note">Taux de conversion visiteur → lead qualifié d'après nos résultats.</p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Dashboard Preview */}
+            <section className="dashboard-section">
+                <div className="dashboard-container">
+                    <div className="dashboard-header">
+                        <span className="section-eyebrow">Dashboard en temps réel</span>
+                        <h2>Voyez d'où viennent vos meilleures conversations</h2>
+                        <p>Suivez les conversations, le taux de qualification et de réservation par source, campagne et plus. Identifiez les canaux qui génèrent les leads de meilleure qualité.</p>
+                    </div>
+
+                    <div className="dashboard-preview">
+                        <div className="dashboard-card">
+                            <div className="dashboard-card-header">
+                                <h4>Leads qualifiés par source</h4>
+                                <span className="badge-live">Live</span>
+                            </div>
+                            <div className="dashboard-metrics">
+                                <div className="metric-row">
+                                    <span className="metric-source">Google Ads</span>
+                                    <div className="metric-bar-container">
+                                        <div className="metric-bar" style={{ width: '85%', background: '#FF470F' }}></div>
+                                    </div>
+                                    <span className="metric-value">127</span>
+                                </div>
+                                <div className="metric-row">
+                                    <span className="metric-source">Facebook</span>
+                                    <div className="metric-bar-container">
+                                        <div className="metric-bar" style={{ width: '62%', background: '#3B82F6' }}></div>
+                                    </div>
+                                    <span className="metric-value">93</span>
+                                </div>
+                                <div className="metric-row">
+                                    <span className="metric-source">LinkedIn</span>
+                                    <div className="metric-bar-container">
+                                        <div className="metric-bar" style={{ width: '45%', background: '#8B5CF6' }}></div>
+                                    </div>
+                                    <span className="metric-value">67</span>
+                                </div>
+                                <div className="metric-row">
+                                    <span className="metric-source">Organique</span>
+                                    <div className="metric-bar-container">
+                                        <div className="metric-bar" style={{ width: '30%', background: '#10B981' }}></div>
+                                    </div>
+                                    <span className="metric-value">45</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="dashboard-card">
+                            <div className="dashboard-card-header">
+                                <h4>Performance temps réel</h4>
+                            </div>
+                            <div className="kpi-grid">
+                                <div className="kpi-item">
+                                    <span className="kpi-value">342</span>
+                                    <span className="kpi-label">Conversations</span>
+                                </div>
+                                <div className="kpi-item">
+                                    <span className="kpi-value">68%</span>
+                                    <span className="kpi-label">Taux qualifié</span>
+                                </div>
+                                <div className="kpi-item">
+                                    <span className="kpi-value">< 3 min</span>
+                                    <span className="kpi-label">Temps de réponse</span>
+                                </div>
+                                <div className="kpi-item">
+                                    <span className="kpi-value">89</span>
+                                    <span className="kpi-label">RDV réservés</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-features">
+                        <div className="dashboard-feature">
+                            <CheckCircle size={18} />
+                            <span>Leads qualifiés et réservations par source/campagne</span>
+                        </div>
+                        <div className="dashboard-feature">
+                            <CheckCircle size={18} />
+                            <span>Tendances de qualité et engagement</span>
+                        </div>
+                        <div className="dashboard-feature">
+                            <CheckCircle size={18} />
+                            <span>Temps de réponse par source</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Data Section */}
+            <section className="data-section">
+                <div className="data-container">
+                    <div className="data-content">
+                        <span className="section-eyebrow">Données structurées</span>
+                        <h2>Chaque conversation devient de la donnée exploitable</h2>
+                        <p>On capture UTM/referral, réponses aux questions, résultats de qualification et sentiment, puis on écrit des champs propres dans votre CRM.</p>
+                        
+                        <div className="data-benefits">
+                            <div className="data-benefit">
+                                <CheckCircle size={18} />
+                                <span>Profil complet avec source et score</span>
+                            </div>
+                            <div className="data-benefit">
+                                <CheckCircle size={18} />
+                                <span>Follow-ups plus rapides, appels plus intelligents</span>
+                            </div>
+                            <div className="data-benefit">
+                                <CheckCircle size={18} />
+                                <span>Moins de trous vs formulaires, meilleurs handoffs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="data-visual">
+                        <div className="lead-card">
+                            <div className="lead-card-header">
+                                <div className="lead-avatar">JD</div>
+                                <div className="lead-info">
+                                    <h4>Jean Dupont</h4>
+                                    <span>Directeur Commercial</span>
+                                </div>
+                                <div className="lead-score">
+                                    <span className="score-value">87</span>
+                                    <span className="score-label">Score</span>
+                                </div>
+                            </div>
+                            <div className="lead-card-body">
+                                <div className="lead-field">
+                                    <span className="field-label">Source</span>
+                                    <span className="field-value">Google Ads - Campaign Q4</span>
+                                </div>
+                                <div className="lead-field">
+                                    <span className="field-label">Volume leads</span>
+                                    <span className="field-value">500/mois</span>
+                                </div>
+                                <div className="lead-field">
+                                    <span className="field-label">Budget</span>
+                                    <span className="field-value">2 000€ - 5 000€</span>
+                                </div>
+                                <div className="lead-field">
+                                    <span className="field-label">Statut</span>
+                                    <span className="field-value status-qualified">Qualifié</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* How it Works */}
-            <section className="howitworks-section">
-                <div className="section-container">
-                    <span className="section-badge">Comment ça marche</span>
-                    <h2 className="section-title">Configurez votre agent en 5 minutes</h2>
+            <section id="how-it-works" className="howitworks-section">
+                <div className="howitworks-container">
+                    <span className="section-eyebrow">Comment ça marche</span>
+                    <h2>Opérationnel en 3 étapes</h2>
 
                     <div className="steps-grid">
                         <div className="step-card">
-                            <div className="step-number">1</div>
-                            <h3>Connectez vos sources</h3>
-                            <p>Intégrez Smart Caller à vos formulaires, CRM ou importez un fichier CSV</p>
+                            <div className="step-number">01</div>
+                            <h3>Connectez Smart Caller</h3>
+                            <p>Branchez votre CRM + sources de leads → on trace UTM & referrals dès le premier message.</p>
                         </div>
-                        <div className="step-connector"></div>
                         <div className="step-card">
-                            <div className="step-number">2</div>
-                            <h3>Configurez votre agent</h3>
-                            <p>Définissez le ton, les objectifs et les critères de qualification</p>
+                            <div className="step-number">02</div>
+                            <h3>Recevez des leads qualifiés</h3>
+                            <p>L'IA qualifie selon vos règles → réserve les RDV et synchronise directement avec votre CRM.</p>
                         </div>
-                        <div className="step-connector"></div>
                         <div className="step-card">
-                            <div className="step-number">3</div>
-                            <h3>Recevez des RDV</h3>
-                            <p>L'IA qualifie et planifie les rendez-vous directement dans votre agenda</p>
+                            <div className="step-number">03</div>
+                            <h3>Optimisation continue</h3>
+                            <p>On envoie les événements lead qualifié + RDV → vos pubs s'optimisent pour le revenu, pas les clics.</p>
                         </div>
+                    </div>
+
+                    <div className="howitworks-cta">
+                        <Link to="/signup" className="btn-primary-large">Commencer maintenant</Link>
+                        <a href="#demo" className="btn-secondary-large">Réserver une démo</a>
                     </div>
                 </div>
             </section>
 
-            {/* Testimonials Section */}
-            <section id="testimonials" className="testimonials-section">
-                <div className="section-container">
-                    <span className="section-badge">Témoignages</span>
-                    <h2 className="section-title">Ils ont boosté leur conversion avec Smart Caller</h2>
+            {/* FAQ Section */}
+            <section id="faq" className="faq-section">
+                <div className="faq-container">
+                    <span className="section-eyebrow">FAQ</span>
+                    <h2>Questions fréquentes</h2>
+                    <p className="faq-subtitle">Des questions sur nos services ? Trouvez les réponses ici.</p>
 
-                    <div className="testimonials-grid">
-                        {testimonials.map((testimonial, index) => (
-                            <div key={index} className="testimonial-card">
-                                <div className="testimonial-stars">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} size={16} fill="#FFB800" color="#FFB800" />
-                                    ))}
+                    <div className="faq-list">
+                        {faqs.map((faq, index) => (
+                            <div 
+                                key={index} 
+                                className={`faq-item ${openFaq === index ? 'open' : ''}`}
+                                onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                            >
+                                <div className="faq-question">
+                                    <span>{faq.question}</span>
+                                    <ChevronDown size={20} className="faq-icon" />
                                 </div>
-                                <p className="testimonial-quote">"{testimonial.quote}"</p>
-                                <div className="testimonial-author">
-                                    <div className="author-avatar">{testimonial.avatar}</div>
-                                    <div>
-                                        <span className="author-name">{testimonial.author}</span>
-                                        <span className="author-role">{testimonial.role}</span>
+                                {openFaq === index && (
+                                    <div className="faq-answer">
+                                        {faq.answer}
                                     </div>
-                                </div>
+                                )}
                             </div>
                         ))}
                     </div>
-                </div>
-            </section>
 
-            {/* Pricing Section */}
-            <section id="pricing" className="pricing-section">
-                <div className="section-container">
-                    <span className="section-badge">Tarifs</span>
-                    <h2 className="section-title">Des offres adaptées à votre croissance</h2>
-                    <p className="section-subtitle">Commencez gratuitement, évoluez selon vos besoins</p>
-
-                    <div className="pricing-grid">
-                        <div className="pricing-card">
-                            <h3>Starter</h3>
-                            <p className="pricing-desc">Idéal pour démarrer</p>
-                            <div className="pricing-price">
-                                <span className="price">299€</span>
-                                <span className="period">/mois</span>
-                            </div>
-                            <ul className="pricing-features">
-                                <li><CheckCircle size={16} /> Jusqu'à 500 leads/mois</li>
-                                <li><CheckCircle size={16} /> Réponse SMS instantanée</li>
-                                <li><CheckCircle size={16} /> Qualification IA</li>
-                                <li><CheckCircle size={16} /> Dashboard temps réel</li>
-                                <li><CheckCircle size={16} /> Support email</li>
-                            </ul>
-                            <Link to="/signup" className="btn-pricing">Commencer</Link>
-                        </div>
-
-                        <div className="pricing-card featured">
-                            <div className="pricing-badge">Populaire</div>
-                            <h3>Growth</h3>
-                            <p className="pricing-desc">Pour scaler votre acquisition</p>
-                            <div className="pricing-price">
-                                <span className="price">599€</span>
-                                <span className="period">/mois</span>
-                            </div>
-                            <ul className="pricing-features">
-                                <li><CheckCircle size={16} /> Jusqu'à 2000 leads/mois</li>
-                                <li><CheckCircle size={16} /> Tout Starter +</li>
-                                <li><CheckCircle size={16} /> Campagnes de réactivation</li>
-                                <li><CheckCircle size={16} /> Intégrations CRM</li>
-                                <li><CheckCircle size={16} /> Account manager dédié</li>
-                            </ul>
-                            <Link to="/signup" className="btn-pricing featured">Commencer</Link>
-                        </div>
-
-                        <div className="pricing-card">
-                            <h3>Entreprise</h3>
-                            <p className="pricing-desc">Pour les gros volumes</p>
-                            <div className="pricing-price">
-                                <span className="price">Sur mesure</span>
-                            </div>
-                            <ul className="pricing-features">
-                                <li><CheckCircle size={16} /> Leads illimités</li>
-                                <li><CheckCircle size={16} /> Tout Growth +</li>
-                                <li><CheckCircle size={16} /> API personnalisée</li>
-                                <li><CheckCircle size={16} /> SLA garanti</li>
-                                <li><CheckCircle size={16} /> Support prioritaire 24/7</li>
-                            </ul>
-                            <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-pricing">
-                                Nous contacter
-                            </a>
-                        </div>
+                    <div className="faq-contact">
+                        <p>Encore des questions ?</p>
+                        <a href="#demo" className="btn-text-link">Contactez-nous →</a>
                     </div>
                 </div>
             </section>
 
             {/* CTA Section */}
             <section className="cta-section">
-                <div className="section-container">
-                    <div className="cta-content">
-                        <h2>Prêt à répondre plus vite à vos leads ?</h2>
-                        <p>Rejoignez les entreprises qui ont choisi l'IA pour booster leur conversion</p>
-                        <div className="cta-actions">
-                            <Link to="/signup" className="btn-cta-primary">
-                                <Zap size={20} />
-                                Démarrer gratuitement
-                            </Link>
-                            <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-cta-secondary">
-                                Réserver une démo
-                            </a>
-                        </div>
-                        <p className="cta-note">✨ Essai gratuit • Aucune carte requise • Configuration en 5 min</p>
+                <div className="cta-container">
+                    <h2>Transformez vos SMS en canal de vente #1</h2>
+                    <div className="cta-actions">
+                        <Link to="/signup" className="btn-cta-primary">
+                            Commencer maintenant
+                        </Link>
+                        <a href="#demo" className="btn-cta-secondary">
+                            Réserver une démo
+                        </a>
                     </div>
                 </div>
             </section>
@@ -431,38 +489,51 @@ const LandingPage = () => {
             {/* Footer */}
             <footer className="landing-footer">
                 <div className="footer-container">
-                    <div className="footer-brand">
-                        <div className="footer-logo">
-                            <div className="logo-icon">
-                                <Zap size={20} />
+                    <div className="footer-main">
+                        <div className="footer-brand">
+                            <div className="footer-logo">
+                                <div className="logo-icon">
+                                    <Zap size={18} />
+                                </div>
+                                <span>Smart Caller</span>
                             </div>
-                            <span>Smart Caller</span>
+                            <p>L'agent IA qui qualifie vos leads par SMS, 24/7.</p>
+                            <div className="footer-social">
+                                <a href="#" aria-label="LinkedIn"><Linkedin size={20} /></a>
+                                <a href="#" aria-label="Website"><Globe size={20} /></a>
+                                <a href="#" aria-label="Email"><Mail size={20} /></a>
+                            </div>
                         </div>
-                        <p>L'agent IA qui qualifie vos leads par SMS, 24/7.</p>
+
+                        <div className="footer-links">
+                            <div className="footer-column">
+                                <h4>Produit</h4>
+                                <a href="#features">Fonctionnalités</a>
+                                <a href="#pricing">Tarifs</a>
+                                <a href="#how-it-works">Comment ça marche</a>
+                            </div>
+                            <div className="footer-column">
+                                <h4>Ressources</h4>
+                                <a href="#">Blog</a>
+                                <a href="#">Documentation</a>
+                                <a href="#">Calculateur ROI</a>
+                            </div>
+                            <div className="footer-column">
+                                <h4>Entreprise</h4>
+                                <a href="#">À propos</a>
+                                <a href="#">Contact</a>
+                                <a href="#">Carrières</a>
+                            </div>
+                        </div>
                     </div>
-                    <div className="footer-links">
-                        <div className="footer-column">
-                            <h4>Produit</h4>
-                            <a href="#features">Fonctionnalités</a>
-                            <a href="#pricing">Tarifs</a>
-                            <a href="#use-cases">Cas d'usage</a>
-                        </div>
-                        <div className="footer-column">
-                            <h4>Ressources</h4>
-                            <a href="#">Documentation</a>
-                            <a href="#">Blog</a>
-                            <a href="#">FAQ</a>
-                        </div>
-                        <div className="footer-column">
-                            <h4>Légal</h4>
-                            <a href="#">Mentions légales</a>
+
+                    <div className="footer-bottom">
+                        <p>© 2025 Smart Caller. Tous droits réservés.</p>
+                        <div className="footer-legal">
+                            <a href="#">Politique de confidentialité</a>
                             <a href="#">CGU</a>
-                            <a href="#">Confidentialité</a>
                         </div>
                     </div>
-                </div>
-                <div className="footer-bottom">
-                    <p>© 2025 Smart Caller. Tous droits réservés.</p>
                 </div>
             </footer>
         </div>
@@ -470,4 +541,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-
