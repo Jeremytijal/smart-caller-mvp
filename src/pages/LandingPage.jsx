@@ -318,7 +318,7 @@ const LandingPage = () => {
                                     <span className="kpi-label">Taux qualifié</span>
                                 </div>
                                 <div className="kpi-item">
-                                    <span className="kpi-value">< 3 min</span>
+                                    <span className="kpi-value">&lt; 3 min</span>
                                     <span className="kpi-label">Temps de réponse</span>
                                 </div>
                                 <div className="kpi-item">
