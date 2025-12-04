@@ -102,7 +102,7 @@ const Subscription = () => {
         
         try {
             // Call backend to create Stripe Checkout session
-            const response = await fetch('https://agent.smart-caller.ai/api/stripe/create-checkout-session', {
+            const response = await fetch('https://webhook.smart-caller.ai/api/stripe/create-checkout-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

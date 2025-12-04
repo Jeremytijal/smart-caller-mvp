@@ -216,8 +216,8 @@ const Onboarding = () => {
 
     // Generate unique webhook URL for user
     const webhookUrl = user
-        ? `https://agent.smart-caller.ai/webhooks/${user.id}/leads`
-        : 'https://agent.smart-caller.ai/webhooks/your-id/leads';
+        ? `https://webhook.smart-caller.ai/webhooks/${user.id}/leads`
+        : 'https://webhook.smart-caller.ai/webhooks/your-id/leads';
 
     const copyWebhook = () => {
         navigator.clipboard.writeText(webhookUrl);
@@ -302,7 +302,7 @@ const Onboarding = () => {
 
         try {
             // Try backend API first
-            const response = await fetch('https://agent.smart-caller.ai/api/agents/create', {
+            const response = await fetch('https://webhook.smart-caller.ai/api/agents/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -423,7 +423,7 @@ const Onboarding = () => {
 
             // Optionally trigger SMS campaign via backend
             try {
-                const response = await fetch('https://agent.smart-caller.ai/import-leads', {
+                const response = await fetch('https://webhook.smart-caller.ai/import-leads', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -509,7 +509,7 @@ const Onboarding = () => {
         setLoading(true);
         setLoadingText("Analyse en cours...");
         try {
-            const response = await fetch('https://agent.smart-caller.ai/api/onboarding/analyze', {
+            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: formData.website })
@@ -575,12 +575,12 @@ const Onboarding = () => {
         try {
             // Generate both simulation and persona in parallel
             const [simulationResponse, personaResponse] = await Promise.all([
-                fetch('https://agent.smart-caller.ai/api/onboarding/simulate', {
+                fetch('https://webhook.smart-caller.ai/api/onboarding/simulate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ businessType: formData.businessType, tone: 'Professional' })
                 }),
-                fetch('https://agent.smart-caller.ai/api/onboarding/generate-persona', {
+                fetch('https://webhook.smart-caller.ai/api/onboarding/generate-persona', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ businessType: formData.businessType })
@@ -606,7 +606,7 @@ const Onboarding = () => {
         setLoading(true);
         setLoadingText("Génération de la simulation...");
         try {
-            const response = await fetch('https://agent.smart-caller.ai/api/onboarding/simulate', {
+            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/simulate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ businessType: formData.businessType, tone: 'Professional' })
@@ -625,7 +625,7 @@ const Onboarding = () => {
         setLoading(true);
         setLoadingText("Configuration de l'agent...");
         try {
-            const response = await fetch('https://agent.smart-caller.ai/api/onboarding/generate-persona', {
+            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/generate-persona', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ businessType: formData.businessType })
@@ -725,7 +725,7 @@ const Onboarding = () => {
 
         try {
             // Try backend API first
-            const response = await fetch('https://agent.smart-caller.ai/api/agents/create', {
+            const response = await fetch('https://webhook.smart-caller.ai/api/agents/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

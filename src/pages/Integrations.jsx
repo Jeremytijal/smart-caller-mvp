@@ -16,7 +16,7 @@ const Integrations = () => {
     const [calendarUrl, setCalendarUrl] = useState('');
 
     // Inbound webhook URL (read-only, based on user ID)
-    const inboundWebhookUrl = `https://agent.smart-caller.ai/webhooks/${user?.id}/leads`;
+    const inboundWebhookUrl = `https://webhook.smart-caller.ai/webhooks/${user?.id}/leads`;
 
     useEffect(() => {
         if (user) {

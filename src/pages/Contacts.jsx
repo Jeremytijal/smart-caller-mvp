@@ -106,7 +106,7 @@ const Contacts = () => {
             // 2. Trigger Backend for SMS (if enabled)
             if (sendInitialSms) {
                 // Replace with your actual backend URL
-                const backendUrl = 'https://agent.smart-caller.ai/import-leads';
+                const backendUrl = 'https://webhook.smart-caller.ai/import-leads';
                 // Note: In dev, you might use localhost, but for prod use the real URL.
                 // Ideally use an env var: import.meta.env.VITE_BACKEND_URL
 
