@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
     Save, Plus, Trash2, MessageSquare, Target, User, Sliders, Zap, 
     AlertTriangle, CheckCircle, Building2, Edit2, UserCircle, 
     MessageCircle, Smartphone, Mail, Shield, HelpCircle, Rocket,
-    Phone, Check, ChevronDown, ChevronUp, ArrowRight, Clock, Calendar, Users, Info
+    Phone, Check, ChevronDown, ChevronUp, ArrowRight, Clock, Calendar, Users, Info,
+    CreditCard, Gift, AlertCircle
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +20,13 @@ const AgentSettings = () => {
 
     // Edit modes for each section
     const [editingSection, setEditingSection] = useState(null);
+
+    // Subscription state
+    const [subscription, setSubscription] = useState({
+        plan: null,
+        status: null,
+        trialEndsAt: null
+    });
 
     // Agent Config State
     const [config, setConfig] = useState({
@@ -79,6 +87,13 @@ const AgentSettings = () => {
 
             if (error) throw error;
             if (data) {
+                // Set subscription info
+                setSubscription({
+                    plan: data.subscription_plan,
+                    status: data.subscription_status,
+                    trialEndsAt: data.trial_ends_at
+                });
+
                 const agentConfig = data.agent_config || {};
                 const icp = agentConfig.icp || {};
 
@@ -242,6 +257,60 @@ const AgentSettings = () => {
                     {saving ? 'Sauvegarde...' : <><Save size={18} /> Sauvegarder</>}
                 </button>
             </div>
+
+            {/* Subscription Status Banner */}
+            {!subscription.status || subscription.status === 'inactive' ? (
+                <div className="subscription-banner inactive">
+                    <div className="subscription-banner-content">
+                        <div className="banner-icon">
+                            <AlertCircle size={24} />
+                        </div>
+                        <div className="banner-text">
+                            <h4>Agent non activé</h4>
+                            <p>Choisissez un abonnement pour activer votre agent et commencer à qualifier vos leads.</p>
+                        </div>
+                    </div>
+                    <Link to="/subscription" className="btn-activate-subscription">
+                        <Gift size={18} />
+                        Activer mon agent
+                        <ArrowRight size={16} />
+                    </Link>
+                </div>
+            ) : subscription.status === 'trial' ? (
+                <div className="subscription-banner trial">
+                    <div className="subscription-banner-content">
+                        <div className="banner-icon trial">
+                            <Clock size={24} />
+                        </div>
+                        <div className="banner-text">
+                            <h4>Période d'essai - {subscription.plan?.charAt(0).toUpperCase() + subscription.plan?.slice(1)}</h4>
+                            <p>
+                                Il vous reste {subscription.trialEndsAt ? Math.max(0, Math.ceil((new Date(subscription.trialEndsAt) - new Date()) / (1000 * 60 * 60 * 24))) : 7} jours d'essai. 
+                                10 leads offerts inclus.
+                            </p>
+                        </div>
+                    </div>
+                    <Link to="/subscription" className="btn-upgrade-subscription">
+                        <CreditCard size={18} />
+                        Gérer mon abonnement
+                    </Link>
+                </div>
+            ) : subscription.status === 'active' ? (
+                <div className="subscription-banner active">
+                    <div className="subscription-banner-content">
+                        <div className="banner-icon active">
+                            <CheckCircle size={24} />
+                        </div>
+                        <div className="banner-text">
+                            <h4>Agent actif - Plan {subscription.plan?.charAt(0).toUpperCase() + subscription.plan?.slice(1)}</h4>
+                            <p>Votre agent qualifie vos leads automatiquement 24/7.</p>
+                        </div>
+                    </div>
+                    <Link to="/subscription" className="btn-manage-subscription">
+                        Gérer mon abonnement
+                    </Link>
+                </div>
+            ) : null}
 
             <div className="config-layout">
                 {/* Main Content */}

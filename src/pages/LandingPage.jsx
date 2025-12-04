@@ -471,6 +471,117 @@ const LandingPage = () => {
                 </div>
             </section>
 
+            {/* Pricing Section */}
+            <section id="pricing" className="pricing-section">
+                <div className="pricing-container">
+                    <span className="section-eyebrow">Tarifs</span>
+                    <h2>Des offres simples et transparentes</h2>
+                    <p className="pricing-subtitle">Choisissez le plan adapté à votre volume de leads</p>
+
+                    {/* Early Bird Banner */}
+                    <div className="early-bird-banner">
+                        <div className="early-bird-icon">🎁</div>
+                        <div className="early-bird-content">
+                            <span className="early-bird-title">Offre Early Bird</span>
+                            <span className="early-bird-text">-50% pour les 10 premiers utilisateurs</span>
+                        </div>
+                        <div className="early-bird-badge">Places limitées</div>
+                    </div>
+
+                    {/* Free Trial Banner */}
+                    <div className="trial-banner">
+                        <Zap size={20} />
+                        <span><strong>Testez gratuitement :</strong> 10 leads offerts pendant 7 jours • Carte requise pour activer</span>
+                    </div>
+
+                    <div className="pricing-grid">
+                        {/* Starter */}
+                        <div className="pricing-card">
+                            <div className="pricing-header">
+                                <h3>Starter</h3>
+                                <p className="pricing-desc">Pour petites boîtes / peu de leads</p>
+                            </div>
+                            <div className="pricing-price">
+                                <div className="price-wrapper">
+                                    <span className="price-old">290€</span>
+                                    <span className="price">145€</span>
+                                    <span className="price-period">/mois</span>
+                                </div>
+                                <span className="price-note">Setup : 490€</span>
+                            </div>
+                            <ul className="pricing-features">
+                                <li><CheckCircle size={18} /> Jusqu'à 150 leads/mois</li>
+                                <li><CheckCircle size={18} /> 1 formulaire connecté</li>
+                                <li><CheckCircle size={18} /> Qualification IA automatique</li>
+                                <li><CheckCircle size={18} /> Dashboard temps réel</li>
+                                <li><CheckCircle size={18} /> Support email</li>
+                            </ul>
+                            <Link to="/signup" className="btn-pricing">
+                                Essayer 7 jours gratuit
+                            </Link>
+                        </div>
+
+                        {/* Growth - Featured */}
+                        <div className="pricing-card featured">
+                            <div className="pricing-badge">Populaire</div>
+                            <div className="pricing-header">
+                                <h3>Growth</h3>
+                                <p className="pricing-desc">Pour boîtes avec volume plus sérieux</p>
+                            </div>
+                            <div className="pricing-price">
+                                <div className="price-wrapper">
+                                    <span className="price-old">590€</span>
+                                    <span className="price">295€</span>
+                                    <span className="price-period">/mois</span>
+                                </div>
+                                <span className="price-note">Setup : 790€</span>
+                            </div>
+                            <ul className="pricing-features">
+                                <li><CheckCircle size={18} /> Jusqu'à 500 leads/mois</li>
+                                <li><CheckCircle size={18} /> 2 formulaires connectés</li>
+                                <li><CheckCircle size={18} /> Tout Starter +</li>
+                                <li><CheckCircle size={18} /> Campagnes de réactivation</li>
+                                <li><CheckCircle size={18} /> Intégrations CRM</li>
+                                <li><CheckCircle size={18} /> Support prioritaire</li>
+                            </ul>
+                            <Link to="/signup" className="btn-pricing featured">
+                                Essayer 7 jours gratuit
+                            </Link>
+                        </div>
+
+                        {/* Scale */}
+                        <div className="pricing-card">
+                            <div className="pricing-header">
+                                <h3>Scale</h3>
+                                <p className="pricing-desc">Volume &gt; 500 leads/mois</p>
+                            </div>
+                            <div className="pricing-price">
+                                <div className="price-wrapper">
+                                    <span className="price">Sur mesure</span>
+                                </div>
+                                <span className="price-note">Setup : à partir de 1 500€</span>
+                            </div>
+                            <ul className="pricing-features">
+                                <li><CheckCircle size={18} /> Leads illimités</li>
+                                <li><CheckCircle size={18} /> Formulaires illimités</li>
+                                <li><CheckCircle size={18} /> Tout Growth +</li>
+                                <li><CheckCircle size={18} /> Multi-pays / langues</li>
+                                <li><CheckCircle size={18} /> Intégrations CRM profondes</li>
+                                <li><CheckCircle size={18} /> SLA garanti</li>
+                                <li><CheckCircle size={18} /> Account manager dédié</li>
+                            </ul>
+                            <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-pricing">
+                                Nous contacter
+                            </a>
+                        </div>
+                    </div>
+
+                    <p className="pricing-guarantee">
+                        ✨ Satisfait ou remboursé pendant 14 jours • Sans engagement
+                    </p>
+                </div>
+            </section>
+
             {/* CTA Section */}
             <section className="cta-section">
                 <div className="cta-container">

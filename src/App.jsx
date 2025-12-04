@@ -12,6 +12,7 @@ import SignUp from './pages/SignUp';
 import Campaigns from './pages/Campaigns';
 import CreateCampaign from './pages/CreateCampaign';
 import LandingPage from './pages/LandingPage';
+import Subscription from './pages/Subscription';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -32,6 +33,7 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/subscription" element={<Subscription />} />
 
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />

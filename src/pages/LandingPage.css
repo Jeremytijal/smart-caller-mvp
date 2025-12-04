@@ -1047,6 +1047,263 @@
 }
 
 /* ==========================================================================
+   PRICING SECTION
+   ========================================================================== */
+
+.pricing-section {
+    padding: 100px 32px;
+    background: #ffffff;
+}
+
+.pricing-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.pricing-container h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    margin: 16px 0 12px;
+    letter-spacing: -0.02em;
+}
+
+.pricing-subtitle {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin: 0 0 32px 0;
+}
+
+/* Early Bird Banner */
+.early-bird-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    color: white;
+}
+
+.early-bird-icon {
+    font-size: 1.5rem;
+}
+
+.early-bird-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.early-bird-title {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.early-bird-text {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.early-bird-badge {
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Trial Banner */
+.trial-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    font-size: 0.95rem;
+    color: #4b5563;
+}
+
+.trial-banner svg {
+    color: #FF470F;
+}
+
+.trial-banner strong {
+    color: #0a0a0a;
+}
+
+/* Pricing Grid */
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.pricing-card {
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 24px;
+    padding: 32px 28px;
+    text-align: left;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.pricing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+.pricing-card.featured {
+    background: #ffffff;
+    border: 2px solid #FF470F;
+    box-shadow: 0 8px 32px rgba(255, 71, 15, 0.15);
+    transform: scale(1.02);
+}
+
+.pricing-card.featured:hover {
+    transform: scale(1.02) translateY(-4px);
+}
+
+.pricing-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 20px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border-radius: 100px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pricing-header {
+    margin-bottom: 24px;
+}
+
+.pricing-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    margin: 0 0 8px 0;
+}
+
+.pricing-desc {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.pricing-price {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.price-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.price-old {
+    font-size: 1.25rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0a0a0a;
+}
+
+.price-period {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+.price-note {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+.pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px 0;
+}
+
+.pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 0.95rem;
+    color: #4b5563;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.pricing-features li:last-child {
+    border-bottom: none;
+}
+
+.pricing-features li svg {
+    color: #10B981;
+    flex-shrink: 0;
+}
+
+.btn-pricing {
+    display: block;
+    width: 100%;
+    padding: 14px 24px;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    color: #0a0a0a;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-pricing:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.btn-pricing.featured {
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border: none;
+    color: white;
+}
+
+.btn-pricing.featured:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 71, 15, 0.3);
+}
+
+.pricing-guarantee {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* ==========================================================================
    CTA SECTION
    ========================================================================== */
 

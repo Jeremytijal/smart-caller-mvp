@@ -72,6 +72,130 @@
 }
 
 /* ==========================================================================
+   SUBSCRIPTION BANNER
+   ========================================================================== */
+
+.subscription-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    gap: 20px;
+}
+
+.subscription-banner.inactive {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border: 1px solid #F59E0B;
+}
+
+.subscription-banner.trial {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    border: 1px solid #3B82F6;
+}
+
+.subscription-banner.active {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    border: 1px solid #10B981;
+}
+
+.subscription-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.banner-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.2);
+    color: #D97706;
+}
+
+.banner-icon.trial {
+    background: rgba(59, 130, 246, 0.2);
+    color: #2563EB;
+}
+
+.banner-icon.active {
+    background: rgba(16, 185, 129, 0.2);
+    color: #059669;
+}
+
+.banner-text h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    margin: 0 0 4px 0;
+}
+
+.banner-text p {
+    font-size: 0.9rem;
+    color: #4b5563;
+    margin: 0;
+}
+
+.btn-activate-subscription {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-activate-subscription:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 71, 15, 0.3);
+}
+
+.btn-upgrade-subscription {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #3B82F6;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-upgrade-subscription:hover {
+    background: #2563EB;
+}
+
+.btn-manage-subscription {
+    padding: 12px 20px;
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    color: #059669;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-manage-subscription:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+/* ==========================================================================
    LAYOUT
    ========================================================================== */
 

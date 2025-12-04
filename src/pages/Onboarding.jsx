@@ -2742,7 +2742,7 @@ const Onboarding = () => {
                                             <button className="btn-primary full-width" onClick={async () => {
                                                 setLoadingFinish(true);
                                                 await saveAgentAndFinish();
-                                                navigate('/');
+                                                navigate('/subscription?from=onboarding');
                                             }} disabled={loadingFinish}>
                                                 {loadingFinish ? (
                                                     <><Loader2 className="animate-spin" size={18} /> Configuration...</>
