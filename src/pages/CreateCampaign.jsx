@@ -335,7 +335,7 @@ const CreateCampaign = () => {
 
             const businessType = agentConfig?.businessType || 'Service professionnel';
             
-            const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/onboarding/generate-persona', {
+            const response = await fetch('https://agent.smart-caller.ai/api/onboarding/generate-persona', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
