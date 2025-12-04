@@ -28,7 +28,7 @@ const Conversations = () => {
     // Fetch messages filtered by user's agent_id
     useEffect(() => {
         if (user) {
-            const demoMode = isDemoMode(user.id);
+            const demoMode = isDemoMode(user);
             setIsDemo(demoMode);
             
             if (demoMode) {

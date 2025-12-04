@@ -20,7 +20,7 @@ const Contacts = () => {
 
     useEffect(() => {
         if (user) {
-            const demoMode = isDemoMode(user.id);
+            const demoMode = isDemoMode(user);
             setIsDemo(demoMode);
             
             if (demoMode) {

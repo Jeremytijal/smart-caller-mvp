@@ -360,9 +360,23 @@ export const demoAgentConfig = {
     }
 };
 
-// Helper to check if current user is demo
-export const isDemoMode = (userId) => {
-    return userId === DEMO_USER_ID || localStorage.getItem('demoMode') === 'true';
+// Demo email for identification
+export const DEMO_EMAIL = 'demo@smartcaller.ai';
+
+// Helper to check if current user is demo - requires both email match AND localStorage flag
+export const isDemoMode = (user) => {
+    if (!user) return false;
+    // Only enable demo mode if the user email is the demo email
+    const isDemoEmail = user.email === DEMO_EMAIL;
+    const hasDemoFlag = localStorage.getItem('demoMode') === 'true';
+    
+    // If user is not demo email but has demo flag, clear it
+    if (!isDemoEmail && hasDemoFlag) {
+        localStorage.removeItem('demoMode');
+        return false;
+    }
+    
+    return isDemoEmail && hasDemoFlag;
 };
 
 // Enable demo mode
