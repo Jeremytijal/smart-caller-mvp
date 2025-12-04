@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -6,11 +7,21 @@ import './Conversations.css';
 
 const Conversations = () => {
     const { user } = useAuth();
+    const [searchParams] = useSearchParams();
+    const phoneFromUrl = searchParams.get('phone');
+    
     const [conversations, setConversations] = useState([]);
-    const [selectedPhone, setSelectedPhone] = useState(null);
+    const [selectedPhone, setSelectedPhone] = useState(phoneFromUrl || null);
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAutoPilot, setIsAutoPilot] = useState(true);
+
+    // Set phone from URL parameter when it changes
+    useEffect(() => {
+        if (phoneFromUrl) {
+            setSelectedPhone(phoneFromUrl);
+        }
+    }, [phoneFromUrl]);
 
     // Fetch messages filtered by user's agent_id
     useEffect(() => {

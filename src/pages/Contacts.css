@@ -211,3 +211,37 @@
     border-radius: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
+
+/* View Conversation Button */
+.btn-view-conversation {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 71, 15, 0.08);
+    border: 1px solid rgba(255, 71, 15, 0.2);
+    border-radius: 8px;
+    color: #FF470F;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-view-conversation:hover {
+    background: rgba(255, 71, 15, 0.15);
+    border-color: #FF470F;
+    transform: translateY(-1px);
+}
+
+.btn-view-conversation svg {
+    flex-shrink: 0;
+}
+
+/* Actions column */
+.contacts-table th:last-child,
+.contacts-table td:last-child {
+    text-align: center;
+    width: 140px;
+}

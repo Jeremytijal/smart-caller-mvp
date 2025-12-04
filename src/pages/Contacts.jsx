@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook, MessageSquare } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Contacts.css';
 
 const Contacts = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [importing, setImporting] = useState(false);
@@ -152,6 +153,7 @@ const Contacts = () => {
                                 <th>Score</th>
                                 <th>Statut</th>
                                 <th>Date d'ajout</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -186,6 +188,16 @@ const Contacts = () => {
                                         </span>
                                     </td>
                                     <td>{new Date(contact.created_at).toLocaleDateString()}</td>
+                                    <td>
+                                        <button 
+                                            className="btn-view-conversation"
+                                            onClick={() => navigate(`/conversations?phone=${encodeURIComponent(contact.phone)}`)}
+                                            title="Voir la conversation"
+                                        >
+                                            <MessageSquare size={16} />
+                                            <span>Conversation</span>
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
