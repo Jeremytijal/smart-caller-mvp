@@ -944,18 +944,16 @@ const Onboarding = () => {
                                     </div>
                                 </div>
 
-                                <div className="analysis-footer-centered">
-                                    <button
-                                        className="btn-secondary"
-                                    >
+                                <div className="onboarding-nav-footer">
+                                    <button className="btn-back">
                                         Besoin d'aide ? <HelpCircle size={16} />
                                     </button>
                                     <button
-                                        className="btn-primary px-8 py-3 text-lg"
+                                        className="btn-next"
                                         onClick={analyzeBusiness}
                                         disabled={loading}
                                     >
-                                        {loading ? <><Loader2 className="animate-spin" size={20} /> {loadingText}</> : "Analyser mon entreprise"}
+                                        {loading ? <><Loader2 className="animate-spin" size={20} /> {loadingText}</> : <>Analyser mon entreprise <ArrowRight size={16} /></>}
                                     </button>
                                 </div>
                             </div>
@@ -1392,12 +1390,12 @@ const Onboarding = () => {
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="results-actions">
-                                    <button className="btn-secondary" onClick={() => setStep(0)}>
+                                <div className="onboarding-nav-footer">
+                                    <button className="btn-back" onClick={() => setStep(0)}>
                                         <ArrowLeft size={16} />
                                         Refaire l'analyse
                                     </button>
-                                    <button className="btn-primary" onClick={() => setStep(2)}>
+                                    <button className="btn-next" onClick={() => setStep(2)}>
                                         Continuer vers la définition ICP
                                         <ArrowRight size={16} />
                                     </button>
@@ -1635,12 +1633,12 @@ const Onboarding = () => {
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="icp-actions">
-                                            <button className="btn-secondary" onClick={() => setStep(step - 1)}>
+                                        <div className="onboarding-nav-footer">
+                                            <button className="btn-back" onClick={() => setStep(step - 1)}>
                                                 <ArrowLeft size={16} />
                                                 Retour
                                             </button>
-                                            <button className="btn-primary" onClick={() => setStep(step + 1)}>
+                                            <button className="btn-next" onClick={() => setStep(step + 1)}>
                                                 Valider et continuer
                                                 <ArrowRight size={16} />
                                             </button>
@@ -2183,10 +2181,16 @@ const Onboarding = () => {
                                             </div>
                                         </div>
 
-                                        <button className="btn-primary-lg" onClick={() => setStep(5)}>
-                                            Continuer vers les canaux
-                                            <ArrowRight size={18} />
-                                        </button>
+                                        <div className="onboarding-nav-footer">
+                                            <button className="btn-back" onClick={() => setStep(3)}>
+                                                <ArrowLeft size={16} />
+                                                Retour
+                                            </button>
+                                            <button className="btn-next" onClick={() => setStep(5)}>
+                                                Continuer vers les canaux
+                                                <ArrowRight size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2250,9 +2254,15 @@ const Onboarding = () => {
                                             <Check size={14} className="text-accent" /> Votre agent sera prêt à gérer les conversations.
                                         </div>
                                     </div>
-                                    <div className="footer-actions">
-                                        <button className="btn-secondary" onClick={() => setStep(4)}>Retour</button>
-                                        <button className="btn-primary" onClick={() => setStep(6)}>Continuer vers les intégrations <ArrowRight size={16} /></button>
+                                    <div className="onboarding-nav-footer">
+                                        <button className="btn-back" onClick={() => setStep(4)}>
+                                            <ArrowLeft size={16} />
+                                            Retour
+                                        </button>
+                                        <button className="btn-next" onClick={() => setStep(6)}>
+                                            Continuer vers les intégrations 
+                                            <ArrowRight size={16} />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -2353,12 +2363,13 @@ const Onboarding = () => {
                                     ))}
                                 </div>
 
-                                <div className="integration-footer">
-                                    <button className="btn-secondary" onClick={() => setStep(5)}>
+                                <div className="onboarding-nav-footer">
+                                    <button className="btn-back" onClick={() => setStep(5)}>
                                         <ArrowLeft size={16} /> Retour
                                     </button>
-                                    <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
-                                        Besoin d'aide ? <HelpCircle size={16} />
+                                    <button className="btn-next" onClick={() => setStep(7)}>
+                                        Continuer vers l'activation
+                                        <ArrowRight size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -2660,18 +2671,13 @@ const Onboarding = () => {
                                 </div>
 
                                 {/* Footer */}
-                                <div className="activation-footer">
-                                    <button className="btn-secondary" onClick={() => setStep(6)}>
+                                <div className="onboarding-nav-footer">
+                                    <button className="btn-back" onClick={() => setStep(6)}>
                                         <ArrowLeft size={16} /> Retour
                                     </button>
-                                    <div className="activation-footer-right">
-                                        <button className="btn-text" onClick={finishOnboarding}>
-                                            Essayer en mode démo
-                                        </button>
-                                        <button className="btn-primary btn-activate-large" onClick={() => setStep(8)} disabled={loading}>
-                                            {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer mon agent</>}
-                                        </button>
-                                    </div>
+                                    <button className="btn-next" onClick={() => setStep(8)} disabled={loading}>
+                                        {loading ? <><Loader2 className="animate-spin" size={18} /> Activation...</> : <><Rocket size={18} /> Activer mon agent</>}
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>

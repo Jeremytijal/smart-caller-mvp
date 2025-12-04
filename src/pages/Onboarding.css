@@ -1,6 +1,88 @@
 /* Onboarding.css - Enterprise SaaS Theme */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
+/* ==========================================================================
+   UNIFIED NAVIGATION FOOTER - For all onboarding steps
+   ========================================================================== */
+
+.onboarding-nav-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle, #E5E5E5);
+}
+
+.onboarding-nav-footer .btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 12px;
+    color: #1A1A1A;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 160px;
+}
+
+.onboarding-nav-footer .btn-back:hover {
+    background: #F5F5F5;
+    border-color: #D4D4D4;
+}
+
+.onboarding-nav-footer .btn-next {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+}
+
+.onboarding-nav-footer .btn-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 71, 15, 0.25);
+}
+
+.onboarding-nav-footer .btn-next:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .onboarding-nav-footer {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    
+    .onboarding-nav-footer .btn-back,
+    .onboarding-nav-footer .btn-next {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+/* ==========================================================================
+   ROOT VARIABLES
+   ========================================================================== */
+
 :root {
     /* Colors - Light Theme (Default) */
     --bg-root: #FCFCF9;
