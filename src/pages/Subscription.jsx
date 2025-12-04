@@ -49,7 +49,6 @@ const Subscription = () => {
             description: 'Pour petites boîtes / peu de leads',
             price: 290,
             priceDiscounted: 145,
-            setup: 490,
             features: [
                 'Jusqu\'à 150 leads/mois',
                 '1 formulaire connecté',
@@ -57,7 +56,8 @@ const Subscription = () => {
                 'Dashboard temps réel',
                 'Support email'
             ],
-            popular: false
+            popular: false,
+            stripePriceId: 'price_starter_monthly' // À remplacer par votre Price ID Stripe
         },
         {
             id: 'growth',
@@ -65,7 +65,6 @@ const Subscription = () => {
             description: 'Pour boîtes avec volume plus sérieux',
             price: 590,
             priceDiscounted: 295,
-            setup: 790,
             features: [
                 'Jusqu\'à 500 leads/mois',
                 '2 formulaires connectés',
@@ -74,7 +73,8 @@ const Subscription = () => {
                 'Intégrations CRM',
                 'Support prioritaire'
             ],
-            popular: true
+            popular: true,
+            stripePriceId: 'price_growth_monthly' // À remplacer par votre Price ID Stripe
         },
         {
             id: 'scale',
@@ -82,7 +82,6 @@ const Subscription = () => {
             description: 'Volume > 500 leads/mois',
             price: null,
             priceDiscounted: null,
-            setup: 1500,
             features: [
                 'Leads illimités',
                 'Formulaires illimités',
@@ -92,36 +91,42 @@ const Subscription = () => {
                 'SLA garanti',
                 'Account manager dédié'
             ],
-            popular: false
+            popular: false,
+            stripePriceId: null
         }
     ];
 
-    const handleStartTrial = async (planId) => {
+    const handleStartTrial = async (planId, stripePriceId) => {
         setLoading(true);
+        setSelectedPlan(planId);
         
         try {
-            // Update user's subscription status
-            const trialEndsAt = new Date();
-            trialEndsAt.setDate(trialEndsAt.getDate() + 7); // 7 days trial
-
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    subscription_plan: planId,
-                    subscription_status: 'trial',
-                    trial_ends_at: trialEndsAt.toISOString(),
-                    updated_at: new Date().toISOString()
+            // Call backend to create Stripe Checkout session
+            const response = await fetch('https://app-smart-caller-backend-production.up.railway.app/api/stripe/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    userEmail: user.email,
+                    planId: planId,
+                    priceId: stripePriceId,
+                    trialDays: 7,
+                    successUrl: `${window.location.origin}/?activated=true`,
+                    cancelUrl: `${window.location.origin}/subscription`
                 })
-                .eq('id', user.id);
+            });
 
-            if (error) throw error;
-
-            // Redirect to dashboard
-            navigate('/?activated=true');
+            const data = await response.json();
+            
+            if (data.url) {
+                // Redirect to Stripe Checkout
+                window.location.href = data.url;
+            } else {
+                throw new Error(data.error || 'Erreur lors de la création de la session de paiement');
+            }
         } catch (error) {
             console.error('Error starting trial:', error);
-            alert('Erreur lors de l\'activation de l\'essai. Veuillez réessayer.');
-        } finally {
+            alert('Erreur lors de la redirection vers le paiement. Veuillez réessayer.');
             setLoading(false);
         }
     };
@@ -152,7 +157,7 @@ const Subscription = () => {
                     </div>
                     <div className="early-bird-content">
                         <div className="early-bird-title">
-                            🎉 Offre Early Bird : -50% à vie
+                            🎉 Offre Early Bird : -50% pendant 6 mois
                         </div>
                         <div className="early-bird-text">
                             Plus que <strong>{spotsLeft} places</strong> disponibles à ce tarif
@@ -200,12 +205,12 @@ const Subscription = () => {
                                             <span className="price-current">{plan.priceDiscounted}€</span>
                                             <span className="price-period">/mois</span>
                                         </div>
-                                        <span className="setup-fee">Setup : {plan.setup}€</span>
+                                        <span className="price-note">pendant 6 mois, puis {plan.price}€/mois</span>
                                     </>
                                 ) : (
                                     <>
                                         <span className="price-current">Sur mesure</span>
-                                        <span className="setup-fee">Setup : à partir de {plan.setup}€</span>
+                                        <span className="price-note">Tarif adapté à vos besoins</span>
                                     </>
                                 )}
                             </div>
@@ -224,9 +229,9 @@ const Subscription = () => {
                                     className={`btn-plan ${plan.popular ? 'primary' : 'secondary'}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleStartTrial(plan.id);
+                                        handleStartTrial(plan.id, plan.stripePriceId);
                                     }}
-                                    disabled={loading}
+                                    disabled={loading && selectedPlan === plan.id}
                                 >
                                     {loading && selectedPlan === plan.id ? (
                                         <Loader2 size={18} className="animate-spin" />

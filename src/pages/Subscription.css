@@ -210,9 +210,10 @@
     color: #6b7280;
 }
 
-.setup-fee {
+.price-note {
     display: block;
-    font-size: 0.85rem;
+    margin-top: 6px;
+    font-size: 0.8rem;
     color: #9ca3af;
 }
 

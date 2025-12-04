@@ -483,7 +483,7 @@ const LandingPage = () => {
                         <div className="early-bird-icon">🎁</div>
                         <div className="early-bird-content">
                             <span className="early-bird-title">Offre Early Bird</span>
-                            <span className="early-bird-text">-50% pour les 10 premiers utilisateurs</span>
+                            <span className="early-bird-text">-50% pendant 6 mois pour les 10 premiers utilisateurs</span>
                         </div>
                         <div className="early-bird-badge">Places limitées</div>
                     </div>
@@ -507,7 +507,7 @@ const LandingPage = () => {
                                     <span className="price">145€</span>
                                     <span className="price-period">/mois</span>
                                 </div>
-                                <span className="price-note">Setup : 490€</span>
+                                <span className="price-note">pendant 6 mois, puis 290€/mois</span>
                             </div>
                             <ul className="pricing-features">
                                 <li><CheckCircle size={18} /> Jusqu'à 150 leads/mois</li>
@@ -534,7 +534,7 @@ const LandingPage = () => {
                                     <span className="price">295€</span>
                                     <span className="price-period">/mois</span>
                                 </div>
-                                <span className="price-note">Setup : 790€</span>
+                                <span className="price-note">pendant 6 mois, puis 590€/mois</span>
                             </div>
                             <ul className="pricing-features">
                                 <li><CheckCircle size={18} /> Jusqu'à 500 leads/mois</li>
@@ -559,7 +559,7 @@ const LandingPage = () => {
                                 <div className="price-wrapper">
                                     <span className="price">Sur mesure</span>
                                 </div>
-                                <span className="price-note">Setup : à partir de 1 500€</span>
+                                <span className="price-note">Tarif adapté à vos besoins</span>
                             </div>
                             <ul className="pricing-features">
                                 <li><CheckCircle size={18} /> Leads illimités</li>
