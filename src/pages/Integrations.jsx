@@ -1,130 +1,107 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Webhook, Calendar, CheckCircle, AlertCircle, XCircle, ExternalLink, X, Save } from 'lucide-react';
+import { Webhook, Calendar, CheckCircle, Copy, Check, Save, ExternalLink, Link2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import './Integrations.css';
 
 const Integrations = () => {
     const { user } = useAuth();
-    const [webhookUrl, setWebhookUrl] = useState('');
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-
-    const [integrations, setIntegrations] = useState([
-        {
-            id: 1,
-            name: 'Twilio SMS',
-            icon: MessageSquare,
-            status: 'connected',
-            desc: 'Connectez votre numéro Twilio pour envoyer et recevoir des SMS.',
-            config: { sid: 'AC...', token: '••••••••' }
-        },
-        {
-            id: 2,
-            name: 'CRM Webhook',
-            icon: Webhook,
-            status: 'disconnected',
-            desc: 'Envoyez les leads qualifiés vers votre CRM via Webhook.',
-            config: { url: '' },
-            isWebhook: true
-        },
-        {
-            id: 3,
-            name: 'Google Calendar',
-            icon: Calendar,
-            status: 'disconnected',
-            desc: 'Permettez à l\'IA de planifier des rendez-vous directement.',
-            config: {}
-        },
-    ]);
-
-    const [selectedError, setSelectedError] = useState(null);
-
+    const [saving, setSaving] = useState(null); // 'crm' or 'calendar'
+    const [copied, setCopied] = useState(false);
     const [showJson, setShowJson] = useState(false);
+
+    // Config states
+    const [crmWebhookUrl, setCrmWebhookUrl] = useState('');
+    const [calendarUrl, setCalendarUrl] = useState('');
+
+    // Inbound webhook URL (read-only, based on user ID)
+    const inboundWebhookUrl = `https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`;
 
     useEffect(() => {
         if (user) {
-            fetchWebhookConfig();
+            fetchConfig();
         }
     }, [user]);
 
-    const fetchWebhookConfig = async () => {
+    const fetchConfig = async () => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('webhook_url')
+                .select('webhook_url, agent_config')
                 .eq('id', user.id)
                 .single();
 
             if (error) throw error;
 
-            if (data?.webhook_url) {
-                setWebhookUrl(data.webhook_url);
-                updateIntegrationStatus(2, 'connected', { url: data.webhook_url });
+            if (data) {
+                setCrmWebhookUrl(data.webhook_url || '');
+                setCalendarUrl(data.agent_config?.calendarUrl || '');
             }
         } catch (error) {
-            console.error('Error fetching webhook config:', error);
+            console.error('Error fetching config:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const saveWebhookConfig = async () => {
-        setSaving(true);
+    const saveCrmWebhook = async () => {
+        setSaving('crm');
         try {
             const { error } = await supabase
                 .from('profiles')
-                .update({ webhook_url: webhookUrl })
+                .update({ webhook_url: crmWebhookUrl })
                 .eq('id', user.id);
 
             if (error) throw error;
-
-            updateIntegrationStatus(2, webhookUrl ? 'connected' : 'disconnected', { url: webhookUrl });
-            alert('Configuration Webhook sauvegardée !');
+            alert('Webhook CRM sauvegardé !');
         } catch (error) {
-            console.error('Error saving webhook config:', error);
+            console.error('Error saving CRM webhook:', error);
             alert('Erreur lors de la sauvegarde.');
         } finally {
-            setSaving(false);
+            setSaving(null);
         }
     };
 
-    const updateIntegrationStatus = (id, status, config) => {
-        setIntegrations(prev => prev.map(int =>
-            int.id === id ? { ...int, status, config: { ...int.config, ...config } } : int
-        ));
-    };
+    const saveCalendarUrl = async () => {
+        setSaving('calendar');
+        try {
+            // Fetch current agent_config first
+            const { data: currentData } = await supabase
+                .from('profiles')
+                .select('agent_config')
+                .eq('id', user.id)
+                .single();
 
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'connected': return <CheckCircle size={18} className="text-success" />;
-            case 'error': return <AlertCircle size={18} className="text-danger" />;
-            default: return <XCircle size={18} className="text-muted" />;
+            const updatedConfig = {
+                ...(currentData?.agent_config || {}),
+                calendarUrl: calendarUrl
+            };
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ agent_config: updatedConfig })
+                .eq('id', user.id);
+
+            if (error) throw error;
+            alert('URL de l\'agenda sauvegardée !');
+        } catch (error) {
+            console.error('Error saving calendar URL:', error);
+            alert('Erreur lors de la sauvegarde.');
+        } finally {
+            setSaving(null);
         }
     };
 
-    const getStatusLabel = (status) => {
-        switch (status) {
-            case 'connected': return 'Connecté';
-            case 'error': return 'Erreur';
-            default: return 'Déconnecté';
-        }
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
-    // const getStatusIcon = (status) => {
-    //     switch (status) {
-    //         case 'connected': return <CheckCircle size={18} className="text-success" />;
-    //         case 'error': return <AlertCircle size={18} className="text-danger" />;
-    //         default: return <XCircle size={18} className="text-muted" />;
-    //     }
-    // };
 
-    // const getStatusLabel = (status) => {
-    //     switch (status) {
-    //         case 'connected': return 'Connecté';
-    //         case 'error': return 'Erreur';
-    //         default: return 'Déconnecté';
-    //     }
-    // };
+    if (loading) {
+        return <div className="page-container integrations-page"><div className="loading">Chargement...</div></div>;
+    }
 
     return (
         <div className="page-container integrations-page">
@@ -135,152 +112,128 @@ const Integrations = () => {
                 </div>
             </header>
 
-            <div className="integrations-grid">
-                {/* Inbound Webhook Section */}
-                {/* Inbound Webhook Section - Full Width */}
-                <div className="integration-card full-width webhook-card">
-                    <div className="card-header">
-                        <div className="icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
-                            <Webhook size={24} />
-                        </div>
-                        <div>
-                            <h3>Webhook Entrant</h3>
-                            <p>Recevez des leads enrichis depuis Zapier, votre site, etc.</p>
-                        </div>
+            <div className="integrations-grid three-columns">
+                {/* 1. Webhook Entrant */}
+                <div className="integration-card">
+                    <div className="card-icon-wrapper blue">
+                        <Link2 size={24} />
                     </div>
+                    <h3>Webhook Entrant</h3>
+                    <p className="card-description">
+                        Recevez des leads depuis Zapier, votre site web, ou tout autre outil.
+                    </p>
 
-                    <div className="webhook-content">
-                        <div className="input-group">
-                            <label>URL DE VOTRE WEBHOOK</label>
-                            <div className="url-container">
-                                <code className="webhook-url">
-                                    {`https://app-smart-caller.../webhooks/${user?.id?.slice(0, 8)}.../leads`}
-                                </code>
-                                <button
-                                    className="btn-icon-copy"
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(`https://app-smart-caller-backend-production.up.railway.app/webhooks/${user?.id}/leads`);
-                                        alert('URL copiée !');
-                                    }}
-                                    title="Copier l'URL"
-                                >
-                                    <span className="copy-text">Copier le lien</span>
-                                </button>
-                            </div>
+                    <div className="card-content">
+                        <label>URL DE VOTRE WEBHOOK</label>
+                        <div className="url-display-box">
+                            <code className="url-text">
+                                {`https://app-smart-caller.../webhooks/${user?.id?.slice(0, 8)}...`}
+                            </code>
+                            <button 
+                                className="btn-copy"
+                                onClick={() => copyToClipboard(inboundWebhookUrl)}
+                            >
+                                {copied ? <Check size={16} /> : <Copy size={16} />}
+                                {copied ? 'Copié !' : 'Copier'}
+                            </button>
                         </div>
 
-                        <div className="input-group">
-                            <button
-                                className="btn-secondary text-sm w-fit"
-                                onClick={() => setShowJson(!showJson)}
-                            >
-                                {showJson ? 'Masquer l\'exemple JSON' : 'Voir le format JSON attendu'}
-                            </button>
+                        <button
+                            className="btn-secondary btn-json"
+                            onClick={() => setShowJson(!showJson)}
+                        >
+                            {showJson ? 'Masquer le format JSON' : 'Voir le format JSON attendu'}
+                        </button>
 
-                            {showJson && (
-                                <div className="mt-4 animate-fade-in">
-                                    <label>EXEMPLE DE PAYLOAD JSON</label>
-                                    <pre className="json-preview">
-                                        {`{
+                        {showJson && (
+                            <pre className="json-preview">
+{`{
   "name": "Jean Dupont",
   "phone": "+33612345678",
   "email": "jean@example.com",
   "company_name": "Tech Corp",
-  "job_title": "CTO",
-  "source": "LinkedIn",
-  "budget_range": "5k-10k"
+  "source": "Website"
 }`}
-                                    </pre>
-                                </div>
-                            )}
-                        </div>
+                            </pre>
+                        )}
                     </div>
                 </div>
 
-                {integrations.map((integration) => (
-                    <div key={integration.id} className={`integration-card ${!integration.connected && !integration.isWebhook ? 'disabled' : ''}`}>
-                        <div className="card-header">
-                            <div className="icon-wrapper" style={{ background: integration.color + '20', color: integration.color }}>
-                                <integration.icon size={24} />
-                            </div>
-                            <div>
-                                <h3>{integration.name}</h3>
-                                <p>{integration.desc}</p>
-                            </div>
-                            {integration.status === 'connected' && (
-                                <div className="status-badge connected">
-                                    <CheckCircle size={14} /> Connecté
-                                </div>
-                            )}
-                        </div>
-
-                        {integration.isWebhook ? (
-                            <div className="config-fields">
-                                <div className="input-group">
-                                    <label>WEBHOOK SORTANT (Export)</label>
-                                    <input
-                                        type="text"
-                                        placeholder="https://hooks.zapier.com/..."
-                                        value={webhookUrl}
-                                        onChange={(e) => setWebhookUrl(e.target.value)}
-                                    />
-                                </div>
-                                <button
-                                    className="btn-primary w-full flex items-center justify-center gap-2"
-                                    onClick={saveWebhookConfig}
-                                    disabled={saving}
-                                >
-                                    {saving ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
-                                </button>
-                            </div>
-                        ) : (
-                            integration.status === 'connected' ? (
-                                <div className="config-fields">
-                                    {Object.keys(integration.config).map(key => (
-                                        <div key={key} className="input-group">
-                                            <label>{key.toUpperCase()}</label>
-                                            <input type="text" value={integration.config[key]} readOnly />
-                                        </div>
-                                    ))}
-                                    <button className="btn-secondary w-full">Configurer</button>
-                                </div>
-                            ) : (
-                                <button className="btn-primary w-full">Connecter</button>
-                            )
+                {/* 2. CRM Webhook */}
+                <div className="integration-card">
+                    <div className="card-icon-wrapper orange">
+                        <Webhook size={24} />
+                    </div>
+                    <div className="card-status-row">
+                        <h3>CRM Webhook</h3>
+                        {crmWebhookUrl && (
+                            <span className="status-badge connected">
+                                <CheckCircle size={12} /> Actif
+                            </span>
                         )}
                     </div>
-                ))}
-            </div>
+                    <p className="card-description">
+                        Envoyez automatiquement les leads qualifiés vers votre CRM via webhook.
+                    </p>
 
-            {/* Error Modal */}
-            {
-                selectedError && (
-                    <div className="modal-overlay" onClick={() => setSelectedError(null)}>
-                        <div className="glass-panel modal-content" onClick={e => e.stopPropagation()}>
-                            <div className="modal-header">
-                                <h3 className="text-danger flex items-center gap-2">
-                                    <AlertCircle size={20} />
-                                    Erreur de Connexion
-                                </h3>
-                                <button className="btn-icon" onClick={() => setSelectedError(null)}>
-                                    <X size={20} />
-                                </button>
-                            </div>
-                            <div className="modal-body">
-                                <p className="mb-4">Une erreur est survenue lors de la dernière tentative de connexion avec <strong>{selectedError.name}</strong>.</p>
-                                <div className="code-block">
-                                    <code>{selectedError.errorLog}</code>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn-secondary" onClick={() => setSelectedError(null)}>Fermer</button>
-                                <button className="btn-primary">Réessayer</button>
-                            </div>
-                        </div>
+                    <div className="card-content">
+                        <label>URL DU WEBHOOK (SORTANT)</label>
+                        <input
+                            type="url"
+                            placeholder="https://hooks.zapier.com/..."
+                            value={crmWebhookUrl}
+                            onChange={(e) => setCrmWebhookUrl(e.target.value)}
+                            className="input-field"
+                        />
+
+                        <button
+                            className="btn-primary btn-save"
+                            onClick={saveCrmWebhook}
+                            disabled={saving === 'crm'}
+                        >
+                            {saving === 'crm' ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
+                        </button>
                     </div>
-                )
-            }
-        </div >
+                </div>
+
+                {/* 3. Agenda */}
+                <div className="integration-card">
+                    <div className="card-icon-wrapper green">
+                        <Calendar size={24} />
+                    </div>
+                    <div className="card-status-row">
+                        <h3>Agenda</h3>
+                        {calendarUrl && (
+                            <span className="status-badge connected">
+                                <CheckCircle size={12} /> Actif
+                            </span>
+                        )}
+                    </div>
+                    <p className="card-description">
+                        Permettez à l'IA de proposer des créneaux et planifier des rendez-vous.
+                    </p>
+
+                    <div className="card-content">
+                        <label>URL DE VOTRE AGENDA (CALENDLY, CAL.COM...)</label>
+                        <input
+                            type="url"
+                            placeholder="https://calendly.com/votre-nom"
+                            value={calendarUrl}
+                            onChange={(e) => setCalendarUrl(e.target.value)}
+                            className="input-field"
+                        />
+
+                        <button
+                            className="btn-primary btn-save"
+                            onClick={saveCalendarUrl}
+                            disabled={saving === 'calendar'}
+                        >
+                            {saving === 'calendar' ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
