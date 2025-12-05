@@ -5408,6 +5408,13 @@ textarea:focus {
     margin-left: 2px;
 }
 
+.webhook-hint {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
 .webhook-url-box code {
     flex: 1;
     padding: 12px 16px;
