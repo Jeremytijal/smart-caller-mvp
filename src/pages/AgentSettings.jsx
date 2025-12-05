@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { CONTACT_URL } from '../config';
 import './AgentSettings.css';
 
 const AgentSettings = () => {
@@ -1028,7 +1029,7 @@ const AgentSettings = () => {
                     </div>
 
                     <div className="config-help">
-                        <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                        <button className="btn-text" onClick={() => window.open(CONTACT_URL, '_blank')}>
                             <HelpCircle size={16} /> Besoin d'aide ?
                         </button>
                     </div>

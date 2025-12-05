@@ -7,6 +7,7 @@ import {
     ChevronDown, ExternalLink, Bot, UserCheck, Database,
     Send, Sparkles, Phone, Mail, Globe, Linkedin
 } from 'lucide-react';
+import { CALENDLY_URL } from '../config';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -570,7 +571,7 @@ const LandingPage = () => {
                                 <li><CheckCircle size={18} /> SLA garanti</li>
                                 <li><CheckCircle size={18} /> Account manager dédié</li>
                             </ul>
-                            <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="btn-pricing">
+                            <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="btn-pricing">
                                 Nous contacter
                             </a>
                         </div>

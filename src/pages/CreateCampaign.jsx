@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { endpoints } from '../config';
 import './CreateCampaign.css';
 
 const CreateCampaign = () => {
@@ -386,7 +387,7 @@ const CreateCampaign = () => {
 
             const businessType = agentConfig?.businessType || 'Service professionnel';
             
-            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/generate-persona', {
+            const response = await fetch(endpoints.generatePersona, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

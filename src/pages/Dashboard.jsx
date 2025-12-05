@@ -12,6 +12,7 @@ import {
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isDemoMode, demoStats, demoContacts } from '../data/demoData';
+import { endpoints } from '../config';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -68,7 +69,7 @@ const Dashboard = () => {
         }
 
         try {
-            const res = await fetch(`https://webhook.smart-caller.ai/api/notifications/${user.id}`);
+            const res = await fetch(endpoints.notifications(user.id));
             if (res.ok) {
                 const data = await res.json();
                 setNotifications(data.notifications || []);

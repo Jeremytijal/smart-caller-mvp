@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon, Building2, Users, UserCircle, Euro, AlertCircle, MessageSquareWarning, CheckCircle2, X, Plus, ArrowLeft, Sparkles, Package, Layers, PlusCircle, Trophy, AlertTriangle, Phone, Trash2, Upload, FileText, Link2, Copy, ExternalLink, PartyPopper } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { endpoints, WEBHOOK_BASE_URL, DOCS_URL, CONTACT_URL } from '../config';
 import './Onboarding.css';
 
 const Onboarding = () => {
@@ -217,8 +218,8 @@ const Onboarding = () => {
 
     // Generate unique webhook URL for user
     const webhookUrl = user
-        ? `https://webhook.smart-caller.ai/webhooks/${user.id}/leads`
-        : 'https://webhook.smart-caller.ai/webhooks/your-id/leads';
+        ? `${WEBHOOK_BASE_URL}/${user.id}/leads`
+        : `${WEBHOOK_BASE_URL}/your-id/leads`;
 
     const copyWebhook = () => {
         navigator.clipboard.writeText(webhookUrl);
@@ -303,7 +304,7 @@ const Onboarding = () => {
 
         try {
             // Try backend API first
-            const response = await fetch('https://webhook.smart-caller.ai/api/agents/create', {
+            const response = await fetch(endpoints.createAgent, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -424,7 +425,7 @@ const Onboarding = () => {
 
             // Optionally trigger SMS campaign via backend
             try {
-                const response = await fetch('https://webhook.smart-caller.ai/import-leads', {
+                const response = await fetch(endpoints.importLeads, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -510,7 +511,7 @@ const Onboarding = () => {
         setLoading(true);
         setLoadingText("Analyse en cours...");
         try {
-            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/analyze', {
+            const response = await fetch(endpoints.analyzeWebsite, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: formData.website })
@@ -583,12 +584,12 @@ const Onboarding = () => {
         try {
             // Generate both simulation and persona in parallel
             const [simulationResponse, personaResponse] = await Promise.all([
-                fetch('https://webhook.smart-caller.ai/api/onboarding/simulate', {
+                fetch(endpoints.simulateConversation, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ businessType: formData.businessType, tone: 'Professional' })
                 }),
-                fetch('https://webhook.smart-caller.ai/api/onboarding/generate-persona', {
+                fetch(endpoints.generatePersona, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ businessType: formData.businessType })
@@ -614,7 +615,7 @@ const Onboarding = () => {
         setLoading(true);
         setLoadingText("Génération de la simulation...");
         try {
-            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/simulate', {
+            const response = await fetch(endpoints.simulateConversation, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ businessType: formData.businessType, tone: 'Professional' })
@@ -640,7 +641,7 @@ const Onboarding = () => {
         setPlaygroundLoading(true);
 
         try {
-            const response = await fetch('https://webhook.smart-caller.ai/api/playground/test', {
+            const response = await fetch(endpoints.playgroundTest, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -683,7 +684,7 @@ const Onboarding = () => {
         setLoading(true);
         setLoadingText("Configuration de l'agent...");
         try {
-            const response = await fetch('https://webhook.smart-caller.ai/api/onboarding/generate-persona', {
+            const response = await fetch(endpoints.generatePersona, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ businessType: formData.businessType })
@@ -783,7 +784,7 @@ const Onboarding = () => {
 
         try {
             // Try backend API first
-            const response = await fetch('https://webhook.smart-caller.ai/api/agents/create', {
+            const response = await fetch(endpoints.createAgent, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2748,7 +2749,7 @@ const Onboarding = () => {
                                         </div>
 
                                         <div className="activation-help">
-                                            <button className="btn-text" onClick={() => window.open('https://smartcaller.ai/contact', '_blank')}>
+                                            <button className="btn-text" onClick={() => window.open(CONTACT_URL, '_blank')}>
                                                 <HelpCircle size={16} /> Besoin d'aide ?
                                             </button>
                                         </div>
@@ -2808,7 +2809,7 @@ const Onboarding = () => {
                                             <label>Votre webhook Smart Caller :</label>
                                             <div className="webhook-url-box">
                                                 <div className="webhook-url-display">
-                                                    <span className="webhook-prefix">https://webhook.smart-caller.ai/webhooks/</span>
+                                                    <span className="webhook-prefix">{WEBHOOK_BASE_URL}/</span>
                                                     <span className="webhook-id">{user?.id?.slice(0, 8) || 'xxxxxxxx'}...</span>
                                                 </div>
                                                 <button className="btn-copy" onClick={copyWebhook}>
@@ -2842,7 +2843,7 @@ const Onboarding = () => {
                                                     <><Check size={18} /> C'est configuré, allons-y !</>
                                                 )}
                                             </button>
-                                            <a href="https://docs.smartcaller.ai/webhook" target="_blank" rel="noopener noreferrer" className="btn-text-link">
+                                            <a href={`${DOCS_URL}/webhook`} target="_blank" rel="noopener noreferrer" className="btn-text-link">
                                                 <ExternalLink size={14} /> Voir la documentation
                                             </a>
                                         </div>

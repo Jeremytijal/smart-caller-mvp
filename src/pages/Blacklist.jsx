@@ -4,6 +4,7 @@ import {
     Phone, Calendar, X, Check, FileText, Info
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { endpoints } from '../config';
 import './Blacklist.css';
 
 const Blacklist = () => {
@@ -26,7 +27,7 @@ const Blacklist = () => {
     const fetchBlacklist = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`https://webhook.smart-caller.ai/api/blacklist/${user.id}`);
+            const res = await fetch(endpoints.blacklist(user.id));
             const data = await res.json();
             setBlacklist(data.blacklist || []);
             setStats(data.stats || { total: 0, bySource: {} });
@@ -41,7 +42,7 @@ const Blacklist = () => {
         if (!newPhone) return;
 
         try {
-            await fetch(`https://webhook.smart-caller.ai/api/blacklist/${user.id}`, {
+            await fetch(endpoints.blacklist(user.id), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone: newPhone, reason: newReason })
@@ -60,7 +61,7 @@ const Blacklist = () => {
         if (!window.confirm('Retirer ce numéro de la liste noire ?')) return;
 
         try {
-            await fetch(`https://webhook.smart-caller.ai/api/blacklist/${user.id}/${encodeURIComponent(phone)}`, {
+            await fetch(endpoints.blacklistDelete(user.id, phone), {
                 method: 'DELETE'
             });
             fetchBlacklist();
@@ -79,7 +80,7 @@ const Blacklist = () => {
                 .map(p => p.trim())
                 .filter(p => p.length > 0);
 
-            const res = await fetch(`https://webhook.smart-caller.ai/api/blacklist/${user.id}/import`, {
+            const res = await fetch(endpoints.blacklistImport(user.id), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phoneNumbers, reason: 'Import CSV' })
@@ -100,7 +101,7 @@ const Blacklist = () => {
 
     const exportBlacklist = async () => {
         try {
-            const res = await fetch(`https://webhook.smart-caller.ai/api/blacklist/${user.id}/export`);
+            const res = await fetch(endpoints.blacklistExport(user.id));
             const data = await res.json();
             
             const csv = [

@@ -4,6 +4,7 @@ import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook, Messag
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isDemoMode, demoContacts } from '../data/demoData';
+import { endpoints } from '../config';
 import './Contacts.css';
 
 const Contacts = () => {
@@ -106,7 +107,7 @@ const Contacts = () => {
             // 2. Trigger Backend for SMS (if enabled)
             if (sendInitialSms) {
                 // Replace with your actual backend URL
-                const backendUrl = 'https://webhook.smart-caller.ai/import-leads';
+                const backendUrl = endpoints.importLeads;
                 // Note: In dev, you might use localhost, but for prod use the real URL.
                 // Ideally use an env var: import.meta.env.VITE_BACKEND_URL
 

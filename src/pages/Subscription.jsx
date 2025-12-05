@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
+import { endpoints, CALENDLY_URL, STRIPE_PUBLIC_KEY } from '../config';
 import './Subscription.css';
 
 const Subscription = () => {
@@ -102,7 +103,7 @@ const Subscription = () => {
         
         try {
             // Call backend to create Stripe Checkout session
-            const response = await fetch('https://webhook.smart-caller.ai/api/stripe/create-checkout-session', {
+            const response = await fetch(endpoints.createCheckoutSession, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -132,7 +133,7 @@ const Subscription = () => {
     };
 
     const handleContactSales = () => {
-        window.open('https://calendly.com/smart-caller', '_blank');
+        window.open(CALENDLY_URL, '_blank');
     };
 
     return (

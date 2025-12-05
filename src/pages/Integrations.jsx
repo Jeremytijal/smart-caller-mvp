@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Webhook, Calendar, CheckCircle, Copy, Check, Save, ExternalLink, Link2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { WEBHOOK_BASE_URL } from '../config';
 import './Integrations.css';
 
 const Integrations = () => {
@@ -16,7 +17,7 @@ const Integrations = () => {
     const [calendarUrl, setCalendarUrl] = useState('');
 
     // Inbound webhook URL (read-only, based on user ID)
-    const inboundWebhookUrl = `https://webhook.smart-caller.ai/webhooks/${user?.id}/leads`;
+    const inboundWebhookUrl = `${WEBHOOK_BASE_URL}/${user?.id}/leads`;
 
     useEffect(() => {
         if (user) {
@@ -127,7 +128,7 @@ const Integrations = () => {
                         <label>URL DE VOTRE WEBHOOK</label>
                         <div className="url-display-box">
                             <code className="url-text" title={inboundWebhookUrl}>
-                                {`https://webhook.smart-caller.ai/webhooks/${user?.id?.slice(0, 8)}••••/leads`}
+                                {`${WEBHOOK_BASE_URL}/${user?.id?.slice(0, 8)}••••/leads`}
                             </code>
                             <button 
                                 className="btn-copy"
