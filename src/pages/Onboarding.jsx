@@ -557,10 +557,17 @@ const Onboarding = () => {
     };
 
     const selectAgent = (agent) => {
+        // Map agent type to goal
+        const goalMapping = {
+            'qualifier': 'qualify',
+            'scheduler': 'book',
+            'support': 'expert'
+        };
+        
         setFormData(prev => ({
             ...prev,
             selectedAgentId: agent.id,
-            goal: agent.id === 'scheduler' ? 'book' : 'qualify' // Map to existing logic
+            goal: goalMapping[agent.id] || 'qualify'
         }));
         // Go to loading screen first
         setStep(3.5);
