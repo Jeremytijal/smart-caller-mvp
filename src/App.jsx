@@ -13,7 +13,6 @@ import Campaigns from './pages/Campaigns';
 import CreateCampaign from './pages/CreateCampaign';
 import LandingPage from './pages/LandingPage';
 import Subscription from './pages/Subscription';
-import Templates from './pages/Templates';
 import Blacklist from './pages/Blacklist';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -43,7 +42,6 @@ function App() {
               <Route path="contacts" element={<Contacts />} />
               <Route path="campaigns" element={<Campaigns />} />
               <Route path="campaigns/new" element={<CreateCampaign />} />
-              <Route path="templates" element={<Templates />} />
               <Route path="blacklist" element={<Blacklist />} />
               <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />

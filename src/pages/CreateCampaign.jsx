@@ -6,7 +6,7 @@ import {
     Sparkles, AlertCircle, Info, Zap, Phone,
     Mail, MessageCircle, Eye, ArrowLeft, Building2, User,
     Users, Upload, FileText, X, Database, Filter, CheckSquare,
-    Square, Search
+    Square, Search, Copy
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -113,6 +113,51 @@ const CreateCampaign = () => {
         { id: 'sam', label: 'S' },
         { id: 'dim', label: 'D' }
     ];
+
+    // Message templates by objective
+    const messageTemplates = {
+        reactivation: [
+            { id: 1, title: 'Relance amicale', message: 'Bonjour {{name}}, cela fait un moment ! On a pensé à vous chez {{company}}. Des nouveautés pourraient vous intéresser. On en parle ?' },
+            { id: 2, title: 'Offre spéciale', message: 'Bonjour {{name}}, pour nos anciens clients, -20% cette semaine. Ça vous dit ?' },
+            { id: 3, title: 'Prise de nouvelles', message: 'Bonjour {{name}}, comment ça va depuis notre dernier échange ? Je voulais savoir si vos besoins avaient évolué.' }
+        ],
+        booking: [
+            { id: 4, title: 'Proposition RDV', message: 'Bonjour {{name}}, seriez-vous disponible pour un appel de 15 min cette semaine ? Je vous propose créneaux.' },
+            { id: 5, title: 'RDV démo', message: 'Bonjour {{name}}, je peux vous faire une démo rapide de notre solution. Quel jour vous arrange ?' },
+            { id: 6, title: 'Confirmation', message: 'Bonjour {{name}}, je confirme notre RDV. Au plaisir d\'échanger avec vous !' }
+        ],
+        qualification: [
+            { id: 7, title: 'Premier contact', message: 'Bonjour {{name}}, merci pour votre intérêt ! Puis-je vous poser quelques questions pour mieux vous conseiller ?' },
+            { id: 8, title: 'Questions budget', message: 'Bonjour {{name}}, avez-vous déjà une enveloppe budgétaire en tête pour ce projet ?' },
+            { id: 9, title: 'Besoins', message: 'Bonjour {{name}}, quel est votre principal défi actuellement ? On peut sûrement vous aider.' }
+        ],
+        nurturing: [
+            { id: 10, title: 'Contenu utile', message: 'Bonjour {{name}}, je vous partage un article qui pourrait vous intéresser sur [sujet]. Qu\'en pensez-vous ?' },
+            { id: 11, title: 'Conseil gratuit', message: 'Bonjour {{name}}, petite astuce du jour : [conseil]. Ça peut vous faire gagner du temps !' },
+            { id: 12, title: 'Check-in', message: 'Bonjour {{name}}, comment avancent vos projets ? Besoin d\'un coup de main ?' }
+        ],
+        upsell: [
+            { id: 13, title: 'Nouvelle offre', message: 'Bonjour {{name}}, on vient de sortir une nouvelle fonctionnalité qui pourrait vous plaire. Je vous en dis plus ?' },
+            { id: 14, title: 'Upgrade', message: 'Bonjour {{name}}, avec l\'offre Premium, vous pourriez [bénéfice]. Ça vous intéresse ?' },
+            { id: 15, title: 'Cross-sell', message: 'Bonjour {{name}}, nos clients qui utilisent [produit A] adorent aussi [produit B]. On en parle ?' }
+        ],
+        feedback: [
+            { id: 16, title: 'Avis rapide', message: 'Bonjour {{name}}, votre avis compte ! Sur 10, comment noteriez-vous notre service ?' },
+            { id: 17, title: 'Témoignage', message: 'Bonjour {{name}}, satisfait de notre collaboration ? Un petit témoignage nous aiderait beaucoup !' },
+            { id: 18, title: 'Amélioration', message: 'Bonjour {{name}}, qu\'est-ce qu\'on pourrait améliorer selon vous ? On est tout ouïe.' }
+        ]
+    };
+
+    // Get relevant templates based on selected objectives
+    const getRelevantTemplates = () => {
+        let templates = [];
+        campaign.objectives.forEach(objId => {
+            if (messageTemplates[objId]) {
+                templates = [...templates, ...messageTemplates[objId]];
+            }
+        });
+        return templates.slice(0, 6); // Max 6 templates
+    };
 
     // Steps configuration - Added "Leads" step
     const steps = [
@@ -845,6 +890,30 @@ const CreateCampaign = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Templates suggérés */}
+                        {campaign.objectives.length > 0 && (
+                            <div className="templates-section">
+                                <div className="templates-header">
+                                    <FileText size={18} />
+                                    <span>Templates suggérés</span>
+                                    <small>Cliquez pour utiliser</small>
+                                </div>
+                                <div className="templates-grid">
+                                    {getRelevantTemplates().map(tpl => (
+                                        <div 
+                                            key={tpl.id}
+                                            className="template-card"
+                                            onClick={() => setCampaign({ ...campaign, firstMessage: tpl.message })}
+                                        >
+                                            <span className="template-title">{tpl.title}</span>
+                                            <p className="template-preview">{tpl.message.substring(0, 60)}...</p>
+                                            <Copy size={14} className="template-copy-icon" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="message-preview">
                             <div className="preview-header">

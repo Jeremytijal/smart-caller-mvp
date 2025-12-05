@@ -38,7 +38,6 @@ const Sidebar = () => {
     { icon: MessageSquare, label: 'Conversations', path: '/conversations' },
     { icon: Users, label: 'Contacts', path: '/contacts' },
     { icon: Megaphone, label: 'Campagnes', path: '/campaigns' },
-    { icon: FileText, label: 'Templates', path: '/templates' },
     { icon: Ban, label: 'Liste noire', path: '/blacklist' },
     { icon: Link2, label: 'Intégrations', path: '/integrations' },
     { icon: Settings, label: 'Configuration', path: '/settings' },
