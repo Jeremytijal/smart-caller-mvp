@@ -6,7 +6,7 @@ import {
     Sparkles, AlertCircle, Info, Zap, Phone,
     Mail, MessageCircle, Eye, ArrowLeft, Building2, User,
     Users, Upload, FileText, X, Database, Filter, CheckSquare,
-    Square, Search, Copy
+    Square, Search, Copy, FlaskConical
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -36,6 +36,10 @@ const CreateCampaign = () => {
         objectives: [],
         channel: 'sms',
         firstMessage: '',
+        // A/B Testing
+        abTestEnabled: false,
+        messageB: '',
+        abSplit: 50, // % of contacts who receive version A
         schedule: {
             startDate: '',
             startTime: '09:00',
@@ -49,6 +53,8 @@ const CreateCampaign = () => {
             stopOnReply: true
         }
     });
+    
+    const [activeMessageTab, setActiveMessageTab] = useState('A');
 
     // Objectives options
     const objectives = [
@@ -852,9 +858,55 @@ const CreateCampaign = () => {
                             <p>Rédigez le message d'accroche qui sera envoyé à vos contacts</p>
                         </div>
 
+                        {/* A/B Test Toggle */}
+                        <div className="ab-test-toggle">
+                            <label className="toggle-switch">
+                                <input 
+                                    type="checkbox"
+                                    checked={campaign.abTestEnabled}
+                                    onChange={(e) => setCampaign({ ...campaign, abTestEnabled: e.target.checked })}
+                                />
+                                <span className="toggle-slider"></span>
+                            </label>
+                            <div className="toggle-label">
+                                <span>A/B Testing</span>
+                                <small>Testez 2 versions pour optimiser vos résultats</small>
+                            </div>
+                            {campaign.abTestEnabled && (
+                                <div className="ab-badge">
+                                    <Zap size={12} />
+                                    Actif
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Message Tabs for A/B Testing */}
+                        {campaign.abTestEnabled && (
+                            <div className="message-tabs">
+                                <button 
+                                    className={`tab-btn ${activeMessageTab === 'A' ? 'active' : ''}`}
+                                    onClick={() => setActiveMessageTab('A')}
+                                >
+                                    <span className="tab-letter">A</span>
+                                    Version A
+                                    <span className="tab-percent">{campaign.abSplit}%</span>
+                                </button>
+                                <button 
+                                    className={`tab-btn ${activeMessageTab === 'B' ? 'active' : ''}`}
+                                    onClick={() => setActiveMessageTab('B')}
+                                >
+                                    <span className="tab-letter">B</span>
+                                    Version B
+                                    <span className="tab-percent">{100 - campaign.abSplit}%</span>
+                                </button>
+                            </div>
+                        )}
+
                         <div className="message-editor">
                             <div className="editor-header">
-                                <label className="form-label">Message d'introduction *</label>
+                                <label className="form-label">
+                                    {campaign.abTestEnabled ? `Message version ${activeMessageTab} *` : 'Message d\'introduction *'}
+                                </label>
                                 <button 
                                     className="btn-generate"
                                     onClick={generateFirstMessage}
@@ -868,19 +920,22 @@ const CreateCampaign = () => {
                             <textarea
                                 className="message-textarea"
                                 placeholder="Bonjour {{name}}, je suis {{agent_name}} de {{company}}..."
-                                value={campaign.firstMessage}
-                                onChange={(e) => setCampaign({ ...campaign, firstMessage: e.target.value })}
+                                value={activeMessageTab === 'A' || !campaign.abTestEnabled ? campaign.firstMessage : campaign.messageB}
+                                onChange={(e) => {
+                                    if (activeMessageTab === 'A' || !campaign.abTestEnabled) {
+                                        setCampaign({ ...campaign, firstMessage: e.target.value });
+                                    } else {
+                                        setCampaign({ ...campaign, messageB: e.target.value });
+                                    }
+                                }}
                                 rows={6}
                             />
 
                             <div className="editor-footer">
                                 <div className="char-count">
-                                    <span className={campaign.firstMessage.length > 160 ? 'warning' : ''}>
-                                        {campaign.firstMessage.length} / 160 caractères
+                                    <span className={(activeMessageTab === 'A' ? campaign.firstMessage : campaign.messageB).length > 160 ? 'warning' : ''}>
+                                        {(activeMessageTab === 'A' || !campaign.abTestEnabled ? campaign.firstMessage : campaign.messageB).length} / 160 caractères
                                     </span>
-                                    {campaign.firstMessage.length > 160 && (
-                                        <span className="sms-count">({Math.ceil(campaign.firstMessage.length / 160)} SMS)</span>
-                                    )}
                                 </div>
                                 <div className="variables-hint">
                                     <span>Variables : </span>
@@ -890,6 +945,33 @@ const CreateCampaign = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* A/B Split Slider */}
+                        {campaign.abTestEnabled && (
+                            <div className="ab-split-section">
+                                <label className="form-label">Répartition du test</label>
+                                <div className="split-slider">
+                                    <div className="split-labels">
+                                        <span>A: {campaign.abSplit}%</span>
+                                        <span>B: {100 - campaign.abSplit}%</span>
+                                    </div>
+                                    <input 
+                                        type="range" 
+                                        min="10" 
+                                        max="90" 
+                                        value={campaign.abSplit}
+                                        onChange={(e) => setCampaign({ ...campaign, abSplit: parseInt(e.target.value) })}
+                                    />
+                                    <div className="split-bar">
+                                        <div className="split-a" style={{ width: `${campaign.abSplit}%` }}>A</div>
+                                        <div className="split-b" style={{ width: `${100 - campaign.abSplit}%` }}>B</div>
+                                    </div>
+                                </div>
+                                <p className="split-hint">
+                                    Sur {selectedContacts.length} contacts : {Math.round(selectedContacts.length * campaign.abSplit / 100)} recevront A, {Math.round(selectedContacts.length * (100 - campaign.abSplit) / 100)} recevront B
+                                </p>
+                            </div>
+                        )}
 
                         {/* Templates suggérés */}
                         {campaign.objectives.length > 0 && (
@@ -904,7 +986,13 @@ const CreateCampaign = () => {
                                         <div 
                                             key={tpl.id}
                                             className="template-card"
-                                            onClick={() => setCampaign({ ...campaign, firstMessage: tpl.message })}
+                                            onClick={() => {
+                                                if (activeMessageTab === 'A' || !campaign.abTestEnabled) {
+                                                    setCampaign({ ...campaign, firstMessage: tpl.message });
+                                                } else {
+                                                    setCampaign({ ...campaign, messageB: tpl.message });
+                                                }
+                                            }}
                                         >
                                             <span className="template-title">{tpl.title}</span>
                                             <p className="template-preview">{tpl.message.substring(0, 60)}...</p>
@@ -915,28 +1003,53 @@ const CreateCampaign = () => {
                             </div>
                         )}
 
-                        <div className="message-preview">
+                        {/* Preview - Side by side if A/B enabled */}
+                        <div className={`message-preview ${campaign.abTestEnabled ? 'ab-preview' : ''}`}>
                             <div className="preview-header">
                                 <Eye size={16} />
-                                <span>Aperçu</span>
+                                <span>Aperçu {campaign.abTestEnabled ? 'A/B' : ''}</span>
                             </div>
-                            <div className="phone-mockup">
-                                <div className="phone-notch"></div>
-                                <div className="phone-screen">
-                                    <div className="phone-status">
-                                        <span>{agentConfig?.name || 'Smart Caller'}</span>
-                                        <span className="time">10:30</span>
-                                    </div>
-                                    <div className="phone-messages">
-                                        <div className="message-bubble agent">
-                                            {campaign.firstMessage
-                                                .replace(/\{\{name\}\}/g, 'Jean')
-                                                .replace(/\{\{company\}\}/g, agentConfig?.company || 'Votre Entreprise')
-                                                .replace(/\{\{agent_name\}\}/g, agentConfig?.name || 'Agent')
-                                                || 'Votre message apparaîtra ici...'}
+                            <div className="preview-phones">
+                                <div className="phone-mockup">
+                                    {campaign.abTestEnabled && <span className="phone-label">Version A</span>}
+                                    <div className="phone-notch"></div>
+                                    <div className="phone-screen">
+                                        <div className="phone-status">
+                                            <span>{agentConfig?.name || 'Smart Caller'}</span>
+                                            <span className="time">10:30</span>
+                                        </div>
+                                        <div className="phone-messages">
+                                            <div className="message-bubble agent">
+                                                {campaign.firstMessage
+                                                    .replace(/\{\{name\}\}/g, 'Jean')
+                                                    .replace(/\{\{company\}\}/g, agentConfig?.company || 'Votre Entreprise')
+                                                    .replace(/\{\{agent_name\}\}/g, agentConfig?.name || 'Agent')
+                                                    || 'Votre message apparaîtra ici...'}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                {campaign.abTestEnabled && (
+                                    <div className="phone-mockup">
+                                        <span className="phone-label">Version B</span>
+                                        <div className="phone-notch"></div>
+                                        <div className="phone-screen">
+                                            <div className="phone-status">
+                                                <span>{agentConfig?.name || 'Smart Caller'}</span>
+                                                <span className="time">10:30</span>
+                                            </div>
+                                            <div className="phone-messages">
+                                                <div className="message-bubble agent">
+                                                    {campaign.messageB
+                                                        .replace(/\{\{name\}\}/g, 'Jean')
+                                                        .replace(/\{\{company\}\}/g, agentConfig?.company || 'Votre Entreprise')
+                                                        .replace(/\{\{agent_name\}\}/g, agentConfig?.name || 'Agent')
+                                                        || 'Message B apparaîtra ici...'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

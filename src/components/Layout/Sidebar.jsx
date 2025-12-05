@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -14,15 +14,68 @@ import {
   Building2,
   Calendar,
   FileText,
-  Ban
+  Ban,
+  Zap,
+  TrendingUp,
+  HelpCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../supabaseClient';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [usage, setUsage] = useState({ current: 0, limit: 150, plan: 'Starter' });
+
+  useEffect(() => {
+    if (user) {
+      fetchUsage();
+    }
+  }, [user]);
+
+  const fetchUsage = async () => {
+    try {
+      // Get contacts count this month
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const { count } = await supabase
+        .from('contacts')
+        .select('*', { count: 'exact', head: true })
+        .eq('agent_id', user.id)
+        .gte('created_at', startOfMonth.toISOString());
+
+      // Get user's subscription plan
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_plan, subscription_status')
+        .eq('id', user.id)
+        .single();
+
+      const planLimits = {
+        'starter': 150,
+        'growth': 500,
+        'scale': 9999
+      };
+
+      const planName = profile?.subscription_plan || 'starter';
+      const limit = planLimits[planName.toLowerCase()] || 150;
+
+      setUsage({
+        current: count || 0,
+        limit,
+        plan: planName.charAt(0).toUpperCase() + planName.slice(1)
+      });
+    } catch (error) {
+      console.error('Error fetching usage:', error);
+    }
+  };
+
+  const usagePercent = Math.min((usage.current / usage.limit) * 100, 100);
+  const isNearLimit = usagePercent >= 80;
 
   const handleLogout = async () => {
     try {
@@ -76,6 +129,34 @@ const Sidebar = () => {
             </NavLink>
           ))}
         </nav>
+
+        {/* Usage Indicator */}
+        <div className={`usage-card ${isNearLimit ? 'warning' : ''}`}>
+          <div className="usage-header">
+            <div className="usage-icon">
+              <Zap size={16} />
+            </div>
+            <span className="usage-plan">{usage.plan}</span>
+          </div>
+          <div className="usage-stats">
+            <span className="usage-current">{usage.current}</span>
+            <span className="usage-separator">/</span>
+            <span className="usage-limit">{usage.limit === 9999 ? '∞' : usage.limit}</span>
+            <span className="usage-label">leads ce mois</span>
+          </div>
+          <div className="usage-bar">
+            <div 
+              className="usage-bar-fill" 
+              style={{ width: `${usagePercent}%` }}
+            ></div>
+          </div>
+          {isNearLimit && (
+            <button className="usage-upgrade" onClick={() => navigate('/subscription')}>
+              <TrendingUp size={14} />
+              Upgrader
+            </button>
+          )}
+        </div>
 
         <div className="sidebar-footer">
           <button className="nav-item account-btn" onClick={() => setShowAccountModal(true)}>
@@ -133,6 +214,17 @@ const Sidebar = () => {
             </div>
 
             <div className="account-modal-footer">
+              <button 
+                className="btn-tour" 
+                onClick={() => {
+                  localStorage.removeItem('smartcaller_tour_completed');
+                  setShowAccountModal(false);
+                  window.location.reload();
+                }}
+              >
+                <HelpCircle size={16} />
+                Revoir le guide
+              </button>
               <button className="btn-secondary" onClick={() => setShowAccountModal(false)}>
                 Fermer
               </button>
