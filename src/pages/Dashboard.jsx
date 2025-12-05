@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
     Users, CheckCircle, XCircle, MessageSquare, Clock, ArrowRight, Calendar, 
     TrendingUp, Zap, Download, Bell, BellRing, X, ChevronRight, 
-    BarChart3, Target, Send, Reply, AlertCircle, Filter, RefreshCw
+    BarChart3, Target, Send, Reply, AlertCircle, Filter, RefreshCw,
+    ArrowUpRight, ArrowDownRight, Flame, Eye
 } from 'lucide-react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -17,7 +18,7 @@ const Dashboard = () => {
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [isDemo, setIsDemo] = useState(false);
-    const [dateRange, setDateRange] = useState('7d'); // 7d, 30d, 90d
+    const [dateRange, setDateRange] = useState('7d');
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
     
@@ -52,19 +53,15 @@ const Dashboard = () => {
                 fetchData();
             }
             
-            // Load notifications
             loadNotifications();
         }
     }, [user, dateRange]);
 
     const loadNotifications = async () => {
         if (isDemoMode(user)) {
-            // Demo notifications
             const notifs = [
-                { id: 1, type: 'hot_lead', title: '🔥 Lead chaud !', message: 'Jean Dupont - Score: 92', time: 'Il y a 5 min', read: false },
-                { id: 2, type: 'reply', title: '💬 Nouvelle réponse', message: 'Marie Martin a répondu', time: 'Il y a 15 min', read: false },
-                { id: 3, type: 'milestone', title: '🎉 Objectif atteint !', message: '100 leads qualifiés ce mois', time: 'Il y a 1h', read: true },
-                { id: 4, type: 'warning', title: '⚠️ Inactivité', message: '3 leads sans réponse 48h', time: 'Il y a 2h', read: true },
+                { id: 1, type: 'hot_lead', title: 'Lead chaud !', message: 'Jean Dupont - Score: 92', time: 'Il y a 5 min', read: false },
+                { id: 2, type: 'reply', title: 'Nouvelle réponse', message: 'Marie Martin a répondu', time: 'Il y a 15 min', read: false },
             ];
             setNotifications(notifs);
             return;
@@ -82,7 +79,6 @@ const Dashboard = () => {
     };
 
     const loadDemoData = () => {
-        // Enhanced demo metrics
         setMetrics({
             total: demoStats.totalLeads,
             qualified: demoStats.qualifiedLeads,
@@ -97,7 +93,6 @@ const Dashboard = () => {
             avgConversationLength: 4.2
         });
 
-        // Demo activity
         setRecentActivity(demoStats.recentActivity.map((item, index) => ({
             id: index,
             user: item.contact,
@@ -111,25 +106,21 @@ const Dashboard = () => {
             details: item.score ? `Score: ${item.score}` : item.details || item.source || item.message?.substring(0, 30) + '...'
         })));
 
-        // Demo funnel
         setFunnelData([
-            { value: demoStats.totalLeads, name: 'Total des leads', fill: '#FF470F' },
-            { value: 234, name: 'Contactés', fill: '#FF6B35' },
-            { value: demoStats.qualifiedLeads, name: 'Qualifiés', fill: '#10B981' },
-            { value: demoStats.meetingsBooked, name: 'RDV', fill: '#3B82F6' },
+            { value: demoStats.totalLeads, name: 'Leads', fill: '#FF470F' },
+            { value: 234, name: 'Contactés', fill: '#FF8A65' },
+            { value: demoStats.qualifiedLeads, name: 'Qualifiés', fill: '#4CAF50' },
+            { value: demoStats.meetingsBooked, name: 'RDV', fill: '#2196F3' },
         ]);
 
-        // Demo weekly data
         setActivityData(demoStats.weeklyData.map(d => ({
             name: d.day,
             leads: d.leads,
             qualified: d.qualified
         })));
 
-        // Demo source data
         setSourceData(demoStats.sourceData);
 
-        // Demo trend data (last 30 days)
         const trendDays = [];
         for (let i = 29; i >= 0; i--) {
             const date = new Date();
@@ -143,11 +134,10 @@ const Dashboard = () => {
         }
         setTrendData(trendDays);
 
-        // Hot leads
         setHotLeads([
-            { id: 1, name: 'Jean Dupont', company: 'Tech Corp', score: 92, lastMessage: 'Intéressé par une démo', time: 'Il y a 5 min' },
-            { id: 2, name: 'Marie Martin', company: 'StartupXYZ', score: 88, lastMessage: 'Budget validé', time: 'Il y a 15 min' },
-            { id: 3, name: 'Pierre Durand', company: 'BigCo', score: 85, lastMessage: 'Besoin urgent', time: 'Il y a 30 min' },
+            { id: 1, name: 'Jean Dupont', company: 'Tech Corp', score: 92, lastMessage: 'Intéressé par une démo', time: '5 min' },
+            { id: 2, name: 'Marie Martin', company: 'StartupXYZ', score: 88, lastMessage: 'Budget validé', time: '15 min' },
+            { id: 3, name: 'Pierre Durand', company: 'BigCo', score: 85, lastMessage: 'Besoin urgent', time: '30 min' },
         ]);
 
         setLoading(false);
@@ -157,7 +147,6 @@ const Dashboard = () => {
         if (!user) return;
         
         try {
-            // Fetch contacts
             const { data: contacts, error } = await supabase
                 .from('contacts')
                 .select('*')
@@ -166,13 +155,11 @@ const Dashboard = () => {
 
             if (error) throw error;
 
-            // Fetch messages for response metrics
             const { data: messages } = await supabase
                 .from('messages')
                 .select('*')
                 .eq('agent_id', user.id);
 
-            // Calculate metrics
             const total = contacts?.length || 0;
             const qualified = contacts?.filter(c => c.score >= 70).length || 0;
             const disqualified = contacts?.filter(c => c.score !== null && c.score < 30).length || 0;
@@ -182,7 +169,6 @@ const Dashboard = () => {
                 : 0;
             const qualificationRate = total > 0 ? Math.round((qualified / total) * 100) : 0;
 
-            // Message metrics
             const sent = messages?.filter(m => m.role === 'assistant').length || 0;
             const received = messages?.filter(m => m.role === 'user').length || 0;
             const responseRate = sent > 0 ? Math.round((received / sent) * 100) : 0;
@@ -201,7 +187,6 @@ const Dashboard = () => {
                 avgConversationLength: received > 0 ? Math.round(received / total * 10) / 10 : 0
             });
 
-            // Recent Activity
             setRecentActivity((contacts || []).slice(0, 5).map(c => ({
                 id: c.id,
                 user: c.name,
@@ -211,14 +196,12 @@ const Dashboard = () => {
                 details: c.score_reason || c.source || 'En attente'
             })));
 
-            // Funnel Data
             setFunnelData([
-                { value: total, name: 'Total des leads', fill: '#FF470F' },
-                { value: scoredContacts.length, name: 'Scorés', fill: '#FF6B35' },
-                { value: qualified, name: 'Qualifiés', fill: '#10B981' },
+                { value: total, name: 'Leads', fill: '#FF470F' },
+                { value: scoredContacts.length, name: 'Scorés', fill: '#FF8A65' },
+                { value: qualified, name: 'Qualifiés', fill: '#4CAF50' },
             ]);
 
-            // Weekly Activity
             const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
             const activityMap = { 'Dim': 0, 'Lun': 0, 'Mar': 0, 'Mer': 0, 'Jeu': 0, 'Ven': 0, 'Sam': 0 };
             const qualifiedMap = { 'Dim': 0, 'Lun': 0, 'Mar': 0, 'Mer': 0, 'Jeu': 0, 'Ven': 0, 'Sam': 0 };
@@ -236,7 +219,6 @@ const Dashboard = () => {
             }));
             setActivityData([...chartData.slice(1), chartData[0]]);
 
-            // Source Performance
             const sourceMap = {};
             (contacts || []).forEach(c => {
                 const source = c.source || 'Direct';
@@ -255,7 +237,6 @@ const Dashboard = () => {
             })).sort((a, b) => b.leads - a.leads).slice(0, 5);
             setSourceData(sourceArr);
 
-            // Hot Leads (score > 80)
             const hot = (contacts || [])
                 .filter(c => c.score >= 80)
                 .slice(0, 3)
@@ -276,7 +257,6 @@ const Dashboard = () => {
         }
     };
 
-    // Export CSV function
     const exportToCSV = async () => {
         try {
             const { data: contacts } = await supabase
@@ -289,7 +269,6 @@ const Dashboard = () => {
                 return;
             }
 
-            // Create CSV content
             const headers = ['Nom', 'Email', 'Téléphone', 'Entreprise', 'Poste', 'Source', 'Score', 'Statut', 'Date'];
             const rows = contacts.map(c => [
                 c.name || '',
@@ -308,7 +287,6 @@ const Dashboard = () => {
                 ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
             ].join('\n');
 
-            // Download
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -326,283 +304,297 @@ const Dashboard = () => {
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    const stats = [
-        { label: 'Total des leads', value: metrics.total, icon: Users, color: '#FF470F', trend: '+12%' },
-        { label: 'Qualifiés', value: metrics.qualified, icon: CheckCircle, color: '#10B981', trend: '+8%' },
-        { label: 'Score moyen', value: `${metrics.avgScore}`, icon: Target, color: '#F59E0B', trend: '+5' },
-        { label: 'Taux de qualif.', value: `${metrics.qualificationRate}%`, icon: Zap, color: '#8B5CF6', trend: '+3%' },
-        { label: 'Taux de réponse', value: `${metrics.responseRate}%`, icon: Reply, color: '#3B82F6', trend: '+15%' },
-        { label: 'Temps réponse', value: metrics.responseTime, icon: Clock, color: '#EC4899', trend: null },
-    ];
-
-    if (loading) return <div className="dashboard-loading"><RefreshCw className="animate-spin" size={32} /> Chargement...</div>;
+    if (loading) {
+        return (
+            <div className="dashboard-loading">
+                <RefreshCw className="animate-spin" size={24} />
+                <span>Chargement...</span>
+            </div>
+        );
+    }
 
     return (
-        <div className="page-container dashboard-page">
+        <div className="dashboard-v2">
             {/* Header */}
-            <header className="dashboard-header">
-                <div className="header-left">
+            <header className="dash-header">
+                <div className="dash-header-left">
                     <h1>Tableau de bord</h1>
-                    <p className="text-muted">Aperçu des performances de votre agent IA</p>
+                    <span className="dash-subtitle">Vue d'ensemble de vos performances</span>
                 </div>
-                <div className="header-actions">
-                    {isDemo && (
-                        <div className="demo-badge">
-                            <span>🎯 Mode Démo</span>
-                        </div>
-                    )}
+                <div className="dash-header-right">
+                    {isDemo && <span className="demo-pill">Mode Démo</span>}
                     
-                    {/* Date Range Filter */}
-                    <div className="date-filter">
-                        <button 
-                            className={dateRange === '7d' ? 'active' : ''} 
-                            onClick={() => setDateRange('7d')}
-                        >7 jours</button>
-                        <button 
-                            className={dateRange === '30d' ? 'active' : ''} 
-                            onClick={() => setDateRange('30d')}
-                        >30 jours</button>
-                        <button 
-                            className={dateRange === '90d' ? 'active' : ''} 
-                            onClick={() => setDateRange('90d')}
-                        >90 jours</button>
+                    <div className="period-selector">
+                        {['7d', '30d', '90d'].map(period => (
+                            <button 
+                                key={period}
+                                className={dateRange === period ? 'active' : ''}
+                                onClick={() => setDateRange(period)}
+                            >
+                                {period === '7d' ? '7j' : period === '30d' ? '30j' : '90j'}
+                            </button>
+                        ))}
                     </div>
 
-                    {/* Notifications */}
-                    <button className="btn-icon notification-btn" onClick={() => setShowNotifications(!showNotifications)}>
-                        {unreadCount > 0 ? <BellRing size={20} /> : <Bell size={20} />}
-                        {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+                    <button className="icon-btn" onClick={() => setShowNotifications(!showNotifications)}>
+                        <Bell size={18} />
+                        {unreadCount > 0 && <span className="notif-dot">{unreadCount}</span>}
                     </button>
 
-                    {/* Export CSV */}
-                    <button className="btn-secondary" onClick={exportToCSV}>
-                        <Download size={18} />
-                        Exporter CSV
+                    <button className="export-btn" onClick={exportToCSV}>
+                        <Download size={16} />
+                        Export
                     </button>
                 </div>
             </header>
 
-            {/* Notifications Panel */}
+            {/* Notifications Dropdown */}
             {showNotifications && (
-                <div className="notifications-panel glass-panel">
-                    <div className="notifications-header">
-                        <h3>Notifications</h3>
-                        <button className="btn-icon" onClick={() => setShowNotifications(false)}>
-                            <X size={18} />
-                        </button>
+                <div className="notif-dropdown">
+                    <div className="notif-header">
+                        <span>Notifications</span>
+                        <button onClick={() => setShowNotifications(false)}><X size={16} /></button>
                     </div>
-                    <div className="notifications-list">
-                        {notifications.map(notif => (
-                            <div 
-                                key={notif.id} 
-                                className={`notification-item ${notif.read ? 'read' : ''}`}
-                                onClick={() => markNotificationRead(notif.id)}
-                            >
-                                <div className="notification-content">
-                                    <span className="notification-title">{notif.title}</span>
-                                    <span className="notification-message">{notif.message}</span>
-                                    <span className="notification-time">{notif.time}</span>
+                    {notifications.length === 0 ? (
+                        <div className="notif-empty">Aucune notification</div>
+                    ) : (
+                        notifications.map(n => (
+                            <div key={n.id} className={`notif-item ${n.read ? 'read' : ''}`} onClick={() => markNotificationRead(n.id)}>
+                                <div className="notif-content">
+                                    <strong>{n.title}</strong>
+                                    <span>{n.message}</span>
+                                    <small>{n.time}</small>
                                 </div>
-                                {!notif.read && <span className="unread-dot"></span>}
+                                {!n.read && <span className="notif-unread"></span>}
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
+
+            {/* Hot Leads Alert - More subtle */}
+            {hotLeads.length > 0 && (
+                <div className="hot-alert">
+                    <Flame size={16} className="hot-icon" />
+                    <span><strong>{hotLeads.length} leads chauds</strong> à traiter : {hotLeads.map(l => l.name).join(', ')}</span>
+                    <button className="hot-btn">Voir <ChevronRight size={14} /></button>
+                </div>
+            )}
+
+            {/* Main KPIs - Clean Grid */}
+            <div className="kpi-grid">
+                <div className="kpi-card">
+                    <div className="kpi-header">
+                        <span className="kpi-label">Total leads</span>
+                        <span className="kpi-trend up">+12%</span>
+                    </div>
+                    <div className="kpi-value">{metrics.total}</div>
+                    <div className="kpi-bar">
+                        <div className="kpi-bar-fill" style={{ width: '100%', background: '#FF470F' }}></div>
+                    </div>
+                </div>
+
+                <div className="kpi-card">
+                    <div className="kpi-header">
+                        <span className="kpi-label">Qualifiés</span>
+                        <span className="kpi-trend up">+8%</span>
+                    </div>
+                    <div className="kpi-value">{metrics.qualified}</div>
+                    <div className="kpi-bar">
+                        <div className="kpi-bar-fill" style={{ width: `${metrics.qualificationRate}%`, background: '#4CAF50' }}></div>
+                    </div>
+                </div>
+
+                <div className="kpi-card">
+                    <div className="kpi-header">
+                        <span className="kpi-label">Score moyen</span>
+                        <span className="kpi-trend up">+5</span>
+                    </div>
+                    <div className="kpi-value">{metrics.avgScore}<small>/100</small></div>
+                    <div className="kpi-bar">
+                        <div className="kpi-bar-fill" style={{ width: `${metrics.avgScore}%`, background: '#FF9800' }}></div>
+                    </div>
+                </div>
+
+                <div className="kpi-card">
+                    <div className="kpi-header">
+                        <span className="kpi-label">Taux de qualif.</span>
+                        <span className="kpi-trend up">+3%</span>
+                    </div>
+                    <div className="kpi-value">{metrics.qualificationRate}%</div>
+                    <div className="kpi-bar">
+                        <div className="kpi-bar-fill" style={{ width: `${metrics.qualificationRate}%`, background: '#9C27B0' }}></div>
+                    </div>
+                </div>
+
+                <div className="kpi-card">
+                    <div className="kpi-header">
+                        <span className="kpi-label">Taux de réponse</span>
+                        <span className="kpi-trend up">+15%</span>
+                    </div>
+                    <div className="kpi-value">{metrics.responseRate}%</div>
+                    <div className="kpi-bar">
+                        <div className="kpi-bar-fill" style={{ width: `${metrics.responseRate}%`, background: '#2196F3' }}></div>
+                    </div>
+                </div>
+
+                <div className="kpi-card">
+                    <div className="kpi-header">
+                        <span className="kpi-label">Temps de réponse</span>
+                    </div>
+                    <div className="kpi-value">{metrics.responseTime}</div>
+                    <div className="kpi-subtext">Réponse instantanée</div>
+                </div>
+            </div>
+
+            {/* Secondary Stats Row */}
+            <div className="stats-row">
+                <div className="stat-mini">
+                    <Send size={16} />
+                    <span className="stat-mini-value">{metrics.messagesSent}</span>
+                    <span className="stat-mini-label">envoyés</span>
+                </div>
+                <div className="stat-mini">
+                    <MessageSquare size={16} />
+                    <span className="stat-mini-value">{metrics.messagesReceived}</span>
+                    <span className="stat-mini-label">reçus</span>
+                </div>
+                <div className="stat-mini">
+                    <BarChart3 size={16} />
+                    <span className="stat-mini-value">{metrics.avgConversationLength}</span>
+                    <span className="stat-mini-label">échanges/lead</span>
+                </div>
+                <div className="stat-mini">
+                    <Calendar size={16} />
+                    <span className="stat-mini-value">{metrics.meetings}</span>
+                    <span className="stat-mini-label">RDV</span>
+                </div>
+            </div>
+
+            {/* Charts Section */}
+            <div className="charts-section">
+                {/* Funnel */}
+                <div className="chart-card funnel-card">
+                    <h3>Entonnoir</h3>
+                    <div className="funnel-visual">
+                        {funnelData.map((item, i) => (
+                            <div key={i} className="funnel-step">
+                                <div 
+                                    className="funnel-bar" 
+                                    style={{ 
+                                        width: `${(item.value / (funnelData[0]?.value || 1)) * 100}%`,
+                                        background: item.fill 
+                                    }}
+                                >
+                                    <span className="funnel-value">{item.value}</span>
+                                </div>
+                                <span className="funnel-label">{item.name}</span>
                             </div>
                         ))}
                     </div>
                 </div>
-            )}
 
-            {/* Hot Leads Alert */}
-            {hotLeads.length > 0 && (
-                <div className="hot-leads-banner">
-                    <div className="hot-leads-icon">🔥</div>
-                    <div className="hot-leads-content">
-                        <span className="hot-leads-title">{hotLeads.length} leads chauds à traiter</span>
-                        <span className="hot-leads-list">
-                            {hotLeads.map(l => l.name).join(', ')}
-                        </span>
-                    </div>
-                    <button className="btn-primary-small">
-                        Voir <ChevronRight size={16} />
-                    </button>
-                </div>
-            )}
-
-            {/* Stats Grid */}
-            <div className="stats-grid">
-                {stats.map((stat, index) => (
-                    <div key={index} className="glass-panel stat-card">
-                        <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
-                            <stat.icon size={24} />
-                        </div>
-                        <div className="stat-info">
-                            <span className="stat-value">{stat.value}</span>
-                            <span className="stat-label">{stat.label}</span>
-                        </div>
-                        {stat.trend && (
-                            <span className="stat-trend positive">{stat.trend}</span>
-                        )}
-                    </div>
-                ))}
-            </div>
-
-            {/* Secondary Metrics */}
-            <div className="secondary-metrics">
-                <div className="metric-card">
-                    <Send size={18} />
-                    <span className="metric-value">{metrics.messagesSent}</span>
-                    <span className="metric-label">Messages envoyés</span>
-                </div>
-                <div className="metric-card">
-                    <MessageSquare size={18} />
-                    <span className="metric-value">{metrics.messagesReceived}</span>
-                    <span className="metric-label">Réponses reçues</span>
-                </div>
-                <div className="metric-card">
-                    <BarChart3 size={18} />
-                    <span className="metric-value">{metrics.avgConversationLength}</span>
-                    <span className="metric-label">Échanges/lead</span>
-                </div>
-                <div className="metric-card">
-                    <Calendar size={18} />
-                    <span className="metric-value">{metrics.meetings}</span>
-                    <span className="metric-label">RDV réservés</span>
-                </div>
-            </div>
-
-            <div className="charts-grid">
-                {/* Funnel Chart */}
-                <div className="glass-panel chart-card">
-                    <h3>Entonnoir de conversion</h3>
-                    <div className="chart-container">
-                        <ResponsiveContainer width="100%" height={280}>
-                            <FunnelChart>
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    itemStyle={{ color: '#1a1a1a' }}
-                                />
-                                <Funnel dataKey="value" data={funnelData} isAnimationActive>
-                                    <LabelList position="right" fill="#1a1a1a" stroke="none" dataKey="name" />
-                                </Funnel>
-                            </FunnelChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Weekly Activity Chart */}
-                <div className="glass-panel chart-card">
-                    <h3>Activité de la semaine</h3>
-                    <div className="chart-container">
-                        <ResponsiveContainer width="100%" height={280}>
-                            <BarChart data={activityData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" vertical={false} />
-                                <XAxis dataKey="name" stroke="#6b7280" axisLine={false} tickLine={false} />
-                                <YAxis stroke="#6b7280" axisLine={false} tickLine={false} />
-                                <Tooltip
+                {/* Activity Chart */}
+                <div className="chart-card activity-card">
+                    <h3>Activité hebdomadaire</h3>
+                    <div className="chart-wrapper">
+                        <ResponsiveContainer width="100%" height={200}>
+                            <BarChart data={activityData} barGap={4}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 12 }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 12 }} />
+                                <Tooltip 
                                     cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-                                    contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px' }}
+                                    contentStyle={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '8px', fontSize: '12px' }}
                                 />
                                 <Bar dataKey="leads" fill="#FF470F" radius={[4, 4, 0, 0]} name="Leads" />
-                                <Bar dataKey="qualified" fill="#10B981" radius={[4, 4, 0, 0]} name="Qualifiés" />
+                                <Bar dataKey="qualified" fill="#4CAF50" radius={[4, 4, 0, 0]} name="Qualifiés" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
+                    <div className="chart-legend">
+                        <span><i style={{ background: '#FF470F' }}></i> Leads</span>
+                        <span><i style={{ background: '#4CAF50' }}></i> Qualifiés</span>
+                    </div>
                 </div>
             </div>
 
-            {/* Trend Chart (if demo or has data) */}
+            {/* Trend Chart */}
             {(isDemo || trendData.length > 0) && (
-                <div className="glass-panel chart-card full-width">
-                    <h3>Tendance sur 30 jours</h3>
-                    <div className="chart-container">
-                        <ResponsiveContainer width="100%" height={250}>
+                <div className="chart-card trend-card">
+                    <h3>Évolution sur 30 jours</h3>
+                    <div className="chart-wrapper">
+                        <ResponsiveContainer width="100%" height={180}>
                             <AreaChart data={trendData}>
                                 <defs>
-                                    <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#FF470F" stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor="#FF470F" stopOpacity={0}/>
+                                    <linearGradient id="gradLeads" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#FF470F" stopOpacity={0.2}/>
+                                        <stop offset="100%" stopColor="#FF470F" stopOpacity={0}/>
                                     </linearGradient>
-                                    <linearGradient id="colorQualified" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                                    <linearGradient id="gradQualified" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#4CAF50" stopOpacity={0.2}/>
+                                        <stop offset="100%" stopColor="#4CAF50" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" vertical={false} />
-                                <XAxis dataKey="date" stroke="#6b7280" axisLine={false} tickLine={false} tick={{ fontSize: 11 }} />
-                                <YAxis stroke="#6b7280" axisLine={false} tickLine={false} />
-                                <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5', borderRadius: '8px' }} />
-                                <Area type="monotone" dataKey="leads" stroke="#FF470F" fillOpacity={1} fill="url(#colorLeads)" name="Leads" />
-                                <Area type="monotone" dataKey="qualified" stroke="#10B981" fillOpacity={1} fill="url(#colorQualified)" name="Qualifiés" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 10 }} interval={4} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
+                                <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: '8px', fontSize: '12px' }} />
+                                <Area type="monotone" dataKey="leads" stroke="#FF470F" strokeWidth={2} fill="url(#gradLeads)" name="Leads" />
+                                <Area type="monotone" dataKey="qualified" stroke="#4CAF50" strokeWidth={2} fill="url(#gradQualified)" name="Qualifiés" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
             )}
 
-            {/* Source Performance */}
-            {sourceData.length > 0 && (
-                <div className="glass-panel source-card">
-                    <h3>Performance par source</h3>
-                    <div className="source-grid">
-                        {sourceData.map((source, index) => (
-                            <div key={index} className="source-item">
-                                <div className="source-header">
-                                    <span className="source-name">{source.source}</span>
-                                    <span className="source-rate">{source.rate}%</span>
+            {/* Bottom Section */}
+            <div className="bottom-section">
+                {/* Sources */}
+                {sourceData.length > 0 && (
+                    <div className="chart-card sources-card">
+                        <h3>Performance par source</h3>
+                        <div className="sources-list">
+                            {sourceData.map((s, i) => (
+                                <div key={i} className="source-row">
+                                    <span className="source-name">{s.source}</span>
+                                    <div className="source-bar-wrapper">
+                                        <div className="source-bar" style={{ width: `${s.rate}%` }}></div>
+                                    </div>
+                                    <span className="source-rate">{s.rate}%</span>
                                 </div>
-                                <div className="source-bar-track">
-                                    <div 
-                                        className="source-bar-fill" 
-                                        style={{ 
-                                            width: `${source.rate}%`,
-                                            background: index === 0 ? '#FF470F' : 
-                                                       index === 1 ? '#3B82F6' :
-                                                       index === 2 ? '#8B5CF6' :
-                                                       index === 3 ? '#10B981' : '#F59E0B'
-                                        }}
-                                    ></div>
-                                </div>
-                                <div className="source-stats">
-                                    <span>{source.leads} leads</span>
-                                    <span>{source.qualified} qualifiés</span>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Recent Activity */}
-            <div className="glass-panel recent-activity">
-                <div className="activity-header">
-                    <h3>Activité récente</h3>
-                    <button className="btn-text-link">Voir tout <ArrowRight size={16} /></button>
-                </div>
-                <div className="activity-list">
+                {/* Recent Activity */}
+                <div className="chart-card activity-list-card">
+                    <div className="card-header">
+                        <h3>Activité récente</h3>
+                        <button className="see-all">Voir tout <ArrowRight size={14} /></button>
+                    </div>
                     {recentActivity.length === 0 ? (
-                        <div className="empty-state">
-                            <MessageSquare size={32} className="text-muted" />
-                            <p>Aucune activité récente</p>
+                        <div className="empty-activity">
+                            <MessageSquare size={24} />
+                            <span>Aucune activité</span>
                         </div>
                     ) : (
-                        recentActivity.map((item) => (
-                            <div key={item.id} className="activity-item">
-                                <div className={`status-indicator ${item.status}`}></div>
-                                <div className="activity-details">
-                                    <span className="activity-user">{item.user}</span>
-                                    <span className="activity-action text-xs text-muted">{item.details}</span>
+                        <div className="activity-items">
+                            {recentActivity.map(item => (
+                                <div key={item.id} className="activity-row">
+                                    <span className={`activity-dot ${item.status}`}></span>
+                                    <div className="activity-info">
+                                        <strong>{item.user}</strong>
+                                        <small>{item.details}</small>
+                                    </div>
+                                    <div className="activity-right">
+                                        <span className={`activity-badge ${item.status}`}>{item.action}</span>
+                                        <small>{item.time}</small>
+                                    </div>
                                 </div>
-                                <div className="activity-meta">
-                                    <span className={`badge ${
-                                        item.status === 'qualified' ? 'badge-success' : 
-                                        item.status === 'meeting' ? 'badge-info' :
-                                        item.status === 'disqualified' ? 'badge-danger' : 
-                                        'badge-default'
-                                    }`}>
-                                        {item.action}
-                                    </span>
-                                    <span className="activity-time">{item.time}</span>
-                                </div>
-                            </div>
-                        ))
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>
