@@ -116,6 +116,7 @@ const Onboarding = () => {
     const [newMessage, setNewMessage] = useState('');
     const [senderRole, setSenderRole] = useState('lead'); // 'agent' or 'lead'
     const [theme, setTheme] = useState('light');
+    const [playgroundLoading, setPlaygroundLoading] = useState(false);
 
     const toggleTheme = () => {
         setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -618,6 +619,56 @@ const Onboarding = () => {
             alert("Erreur de simulation.");
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Playground: Test agent with real AI responses
+    const testAgentInPlayground = async (userMessage) => {
+        if (!userMessage.trim()) return;
+
+        // Add user message to simulation
+        const updatedSimulation = [...simulation, { sender: 'lead', text: userMessage }];
+        setSimulation(updatedSimulation);
+        setNewMessage('');
+        setPlaygroundLoading(true);
+
+        try {
+            const response = await fetch('https://webhook.smart-caller.ai/api/playground/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: userMessage,
+                    conversationHistory: updatedSimulation,
+                    agentConfig: {
+                        agentName: formData.agentPersona?.role || 'Assistant Commercial',
+                        company: formData.businessType || 'notre entreprise',
+                        firstMessage: formData.agentPersona?.firstMessage || 'Bonjour ! Comment puis-je vous aider ?',
+                        behaviorMode: formData.behaviorMode || 'assistant',
+                        goal: formData.goal || 'qualify'
+                    }
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.response) {
+                setSimulation(prev => [...prev, { sender: 'agent', text: data.response }]);
+            } else {
+                // Fallback response
+                setSimulation(prev => [...prev, { 
+                    sender: 'agent', 
+                    text: "Merci pour votre message. Comment puis-je vous aider ?" 
+                }]);
+            }
+        } catch (error) {
+            console.error('Playground error:', error);
+            // Fallback response on error
+            setSimulation(prev => [...prev, { 
+                sender: 'agent', 
+                text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?" 
+            }]);
+        } finally {
+            setPlaygroundLoading(false);
         }
     };
 
@@ -2120,7 +2171,28 @@ const Onboarding = () => {
                                                                 <div className="welcome-avatar">
                                                                     <Zap size={24} />
                                                                 </div>
-                                                                <p>Testez votre agent en envoyant un message</p>
+                                                                <h4>Testez votre agent</h4>
+                                                                <p>Envoyez un message pour voir comment votre agent répond aux prospects</p>
+                                                                <div className="suggested-messages">
+                                                                    <button 
+                                                                        className="suggested-msg"
+                                                                        onClick={() => testAgentInPlayground("Bonjour, je suis intéressé par vos services")}
+                                                                    >
+                                                                        💬 "Bonjour, je suis intéressé..."
+                                                                    </button>
+                                                                    <button 
+                                                                        className="suggested-msg"
+                                                                        onClick={() => testAgentInPlayground("Quels sont vos tarifs ?")}
+                                                                    >
+                                                                        💰 "Quels sont vos tarifs ?"
+                                                                    </button>
+                                                                    <button 
+                                                                        className="suggested-msg"
+                                                                        onClick={() => testAgentInPlayground("J'ai un projet urgent")}
+                                                                    >
+                                                                        ⚡ "J'ai un projet urgent"
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     ) : (
@@ -2137,6 +2209,18 @@ const Onboarding = () => {
                                                                     </div>
                                                                 </div>
                                                             ))}
+                                                            {playgroundLoading && (
+                                                                <div className="chat-message agent">
+                                                                    <div className="chat-message-avatar">
+                                                                        <Zap size={12} />
+                                                                    </div>
+                                                                    <div className="chat-message-bubble typing">
+                                                                        <div className="typing-indicator">
+                                                                            <span></span><span></span><span></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -2148,34 +2232,28 @@ const Onboarding = () => {
                                                         value={newMessage}
                                                         onChange={(e) => setNewMessage(e.target.value)}
                                                         onKeyDown={(e) => {
-                                                            if (e.key === 'Enter' && newMessage.trim()) {
-                                                                setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
-                                                                setNewMessage('');
-                                                                setTimeout(() => {
-                                                                    setSimulation(prev => [...prev, {
-                                                                        sender: 'agent',
-                                                                        text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?"
-                                                                    }]);
-                                                                }, 1000);
+                                                            if (e.key === 'Enter' && newMessage.trim() && !playgroundLoading) {
+                                                                testAgentInPlayground(newMessage);
                                                             }
                                                         }}
+                                                        disabled={playgroundLoading}
                                                     />
                                                     <button
-                                                        className="btn-send-chat"
+                                                        className={`btn-send-chat ${playgroundLoading ? 'loading' : ''}`}
                                                         onClick={() => {
-                                                            if (newMessage.trim()) {
-                                                                setSimulation([...simulation, { sender: 'lead', text: newMessage }]);
-                                                                setNewMessage('');
-                                                                setTimeout(() => {
-                                                                    setSimulation(prev => [...prev, {
-                                                                        sender: 'agent',
-                                                                        text: formData.agentPersona?.firstMessage || "Merci pour votre message. Comment puis-je vous aider ?"
-                                                                    }]);
-                                                                }, 1000);
+                                                            if (newMessage.trim() && !playgroundLoading) {
+                                                                testAgentInPlayground(newMessage);
                                                             }
                                                         }}
+                                                        disabled={playgroundLoading}
                                                     >
-                                                        <Send size={16} />
+                                                        {playgroundLoading ? (
+                                                            <div className="typing-indicator-small">
+                                                                <span></span><span></span><span></span>
+                                                            </div>
+                                                        ) : (
+                                                            <Send size={16} />
+                                                        )}
                                                     </button>
                                                 </div>
                                             </div>
