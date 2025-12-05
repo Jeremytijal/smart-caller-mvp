@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, Loader2, Rocket, Play } from 'lucide-react';
+import { ArrowRight, Loader2, Rocket, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { enableDemoMode } from '../data/demoData';
 import './Auth.css';
@@ -82,32 +82,26 @@ const Login = () => {
                     <form onSubmit={handleSubmit} className="auth-form">
                         <div className="form-group">
                             <label>Email</label>
-                            <div className="input-wrapper">
-                                <Mail size={18} className="input-icon" />
-                                <input
-                                    type="email"
-                                    placeholder="nom@entreprise.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    className="input-field"
-                                />
-                            </div>
+                            <input
+                                type="email"
+                                placeholder="nom@entreprise.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="input-field-clean"
+                            />
                         </div>
 
                         <div className="form-group">
                             <label>Mot de passe</label>
-                            <div className="input-wrapper">
-                                <Lock size={18} className="input-icon" />
-                                <input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    className="input-field"
-                                />
-                            </div>
+                            <input
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className="input-field-clean"
+                            />
                         </div>
 
                         <div className="form-options">
@@ -163,10 +157,9 @@ const Login = () => {
 
                     <div className="testimonial-card">
                         <div className="testimonial-photo">
-                            <img 
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfh8TOQr1l9FrjfGmO8KKvCHOqPkGb3rNd4A&s" 
-                                alt="Alex Hormozi"
-                            />
+                            <div className="photo-placeholder">
+                                <span>AH</span>
+                            </div>
                             <div className="photo-accent"></div>
                         </div>
                         

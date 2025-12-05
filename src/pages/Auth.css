@@ -121,6 +121,28 @@
     box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
 }
 
+/* Clean input without icons */
+.input-field-clean {
+    width: 100%;
+    padding: 14px 16px;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 10px;
+    color: #1A1A1A;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.input-field-clean::placeholder {
+    color: #AAAAAA;
+}
+
+.input-field-clean:focus {
+    outline: none;
+    border-color: #1A1A1A;
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
+}
+
 /* Terms Text */
 .terms-text {
     font-size: 0.8rem;
@@ -271,8 +293,8 @@
 }
 
 .testimonial-photo img {
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
     border-radius: 16px;
     object-fit: cover;
     filter: grayscale(100%);
@@ -283,14 +305,27 @@
     filter: grayscale(0%);
 }
 
+.photo-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #FE6D10 0%, #FF8A00 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+}
+
 .photo-accent {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 40px;
-    height: 40px;
+    top: -6px;
+    right: -6px;
+    width: 28px;
+    height: 28px;
     background: #FE6D10;
-    border-radius: 8px;
+    border-radius: 6px;
     z-index: -1;
 }
 
@@ -352,9 +387,10 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     padding: 24px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
+    backdrop-filter: blur(10px);
 }
 
 .stat-item {
@@ -363,15 +399,28 @@
 
 .stat-value {
     display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 10px rgba(254, 109, 16, 0.3);
+}
+
+.stat-item:first-child .stat-value {
+    color: #FF6B6B;
+}
+
+.stat-item:nth-child(2) .stat-value {
+    color: #10B981;
+}
+
+.stat-item:nth-child(3) .stat-value {
     color: #FE6D10;
-    margin-bottom: 4px;
 }
 
 .stat-label {
-    font-size: 0.75rem;
-    color: #888888;
+    font-size: 0.8rem;
+    color: #CCCCCC;
     line-height: 1.3;
 }
 
