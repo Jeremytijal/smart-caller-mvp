@@ -27,7 +27,7 @@ const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [usage, setUsage] = useState({ current: 0, limit: 150, plan: 'Starter' });
+  const [usage, setUsage] = useState({ current: 0, limit: 10, plan: 'Essai gratuit', isTrial: true });
 
   useEffect(() => {
     if (user) {
@@ -61,13 +61,21 @@ const Sidebar = () => {
         'scale': 9999
       };
 
-      const planName = profile?.subscription_plan || 'starter';
-      const limit = planLimits[planName.toLowerCase()] || 150;
+      // Check if user has an active paid subscription
+      const hasActiveSubscription = profile?.subscription_status === 'active' && profile?.subscription_plan;
+      const planName = hasActiveSubscription ? profile.subscription_plan : null;
+      
+      // Trial = 10 leads, Paid = plan limit
+      const limit = hasActiveSubscription ? (planLimits[planName.toLowerCase()] || 150) : 10;
+      const displayPlan = hasActiveSubscription 
+        ? (planName.charAt(0).toUpperCase() + planName.slice(1))
+        : 'Essai gratuit';
 
       setUsage({
         current: count || 0,
         limit,
-        plan: planName.charAt(0).toUpperCase() + planName.slice(1)
+        plan: displayPlan,
+        isTrial: !hasActiveSubscription
       });
     } catch (error) {
       console.error('Error fetching usage:', error);
@@ -131,9 +139,9 @@ const Sidebar = () => {
         </nav>
 
         {/* Usage Indicator */}
-        <div className={`usage-card ${isNearLimit ? 'warning' : ''}`}>
+        <div className={`usage-card ${isNearLimit ? 'warning' : ''} ${usage.isTrial ? 'trial' : ''}`}>
           <div className="usage-header">
-            <div className="usage-icon">
+            <div className={`usage-icon ${usage.isTrial ? 'trial' : ''}`}>
               <Zap size={16} />
             </div>
             <span className="usage-plan">{usage.plan}</span>
@@ -142,7 +150,7 @@ const Sidebar = () => {
             <span className="usage-current">{usage.current}</span>
             <span className="usage-separator">/</span>
             <span className="usage-limit">{usage.limit === 9999 ? '∞' : usage.limit}</span>
-            <span className="usage-label">leads ce mois</span>
+            <span className="usage-label">leads {usage.isTrial ? 'gratuits' : 'ce mois'}</span>
           </div>
           <div className="usage-bar">
             <div 
@@ -150,10 +158,10 @@ const Sidebar = () => {
               style={{ width: `${usagePercent}%` }}
             ></div>
           </div>
-          {isNearLimit && (
+          {(isNearLimit || usage.isTrial) && (
             <button className="usage-upgrade" onClick={() => navigate('/subscription')}>
               <TrendingUp size={14} />
-              Upgrader
+              {usage.isTrial ? "S'abonner" : 'Upgrader'}
             </button>
           )}
         </div>
