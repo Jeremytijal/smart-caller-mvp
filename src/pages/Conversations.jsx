@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User } from 'lucide-react';
+import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User, Download, FileText } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isDemoMode, demoConversations } from '../data/demoData';
@@ -166,6 +166,38 @@ const Conversations = () => {
         return conv?.contact?.status || 'pending';
     };
 
+    // Export conversation to text file
+    const exportConversation = (phone) => {
+        if (!phone || messages.length === 0) {
+            alert('Aucun message à exporter');
+            return;
+        }
+
+        const contactName = getContactName(phone);
+        const lines = [
+            `Conversation avec ${contactName}`,
+            `Téléphone: ${phone}`,
+            `Exporté le: ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`,
+            '—'.repeat(50),
+            ''
+        ];
+
+        messages.forEach(msg => {
+            const sender = msg.role === 'user' ? contactName : 'Smart Caller';
+            const time = new Date(msg.created_at).toLocaleString('fr-FR');
+            lines.push(`[${time}] ${sender}:`);
+            lines.push(msg.content);
+            lines.push('');
+        });
+
+        const content = lines.join('\n');
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `conversation_${contactName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+        link.click();
+    };
+
     if (loading) {
         return <div className="p-8 text-center">Chargement des conversations...</div>;
     }
@@ -245,6 +277,13 @@ const Conversations = () => {
                                     </div>
                                 </div>
                                 <div className="chat-actions">
+                                    <button 
+                                        className="btn-icon-sm" 
+                                        title="Exporter la conversation"
+                                        onClick={() => exportConversation(selectedPhone)}
+                                    >
+                                        <Download size={18} />
+                                    </button>
                                     <div className={`auto-pilot-toggle ${isAutoPilot ? 'active' : ''}`} onClick={() => setIsAutoPilot(!isAutoPilot)}>
                                         <Power size={16} />
                                         <span>{isAutoPilot ? 'Auto-Pilot ON' : 'Mode Manuel'}</span>

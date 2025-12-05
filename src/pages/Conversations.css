@@ -202,7 +202,28 @@
 
 .chat-actions {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-icon-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #f5f5f5;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon-sm:hover {
+    background: #FF470F;
+    border-color: #FF470F;
+    color: white;
 }
 
 .icon-btn {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook, MessageSquare } from 'lucide-react';
+import { Upload, FileText, Check, AlertCircle, User, Send, Plus, Webhook, MessageSquare, Download } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isDemoMode, demoContacts } from '../data/demoData';
@@ -135,6 +135,38 @@ const Contacts = () => {
         }
     };
 
+    // Export contacts to CSV
+    const exportToCSV = () => {
+        if (contacts.length === 0) {
+            alert('Aucun contact à exporter');
+            return;
+        }
+
+        const headers = ['Nom', 'Email', 'Téléphone', 'Entreprise', 'Poste', 'Source', 'Score', 'Statut', 'Date'];
+        const rows = contacts.map(c => [
+            c.name || '',
+            c.email || '',
+            c.phone || '',
+            c.company_name || '',
+            c.job_title || '',
+            c.source || '',
+            c.score || '',
+            c.score >= 70 ? 'Qualifié' : c.score < 30 && c.score !== null ? 'Disqualifié' : 'En cours',
+            new Date(c.created_at).toLocaleDateString('fr-FR')
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `contacts_smartcaller_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    };
+
     return (
         <div className="page-container contacts-page">
             <header className="page-header">
@@ -148,6 +180,9 @@ const Contacts = () => {
                             <span>🎯 Mode Démo</span>
                         </div>
                     )}
+                    <button className="btn-secondary" onClick={exportToCSV}>
+                        <Download size={18} /> Exporter CSV
+                    </button>
                     <Link to="/integrations" className="btn-secondary">
                         <Webhook size={18} /> Connecter un Webhook
                     </Link>
