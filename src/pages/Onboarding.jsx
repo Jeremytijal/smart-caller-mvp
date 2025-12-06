@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon, Building2, Users, UserCircle, Euro, AlertCircle, MessageSquareWarning, CheckCircle2, X, Plus, ArrowLeft, Sparkles, Package, Layers, PlusCircle, Trophy, AlertTriangle, Phone, Trash2, Upload, FileText, Link2, Copy, ExternalLink, PartyPopper } from 'lucide-react';
 import { supabase } from '../supabaseClient';
@@ -1004,7 +1004,7 @@ const Onboarding = () => {
                                 </div>
 
                                 <div className="onboarding-nav-footer">
-                                    <button className="btn-back">
+                                    <button className="btn-back" onClick={() => window.open(SALES_CALL_URL, '_blank')}>
                                         Besoin d'aide ? <HelpCircle size={16} />
                                     </button>
                                     <button
@@ -2843,9 +2843,9 @@ const Onboarding = () => {
                                                     <><Check size={18} /> C'est configuré, allons-y !</>
                                                 )}
                                             </button>
-                                            <a href={`${DOCS_URL}/webhook`} target="_blank" rel="noopener noreferrer" className="btn-text-link">
+                                            <Link to="/webhook" className="btn-text-link">
                                                 <ExternalLink size={14} /> Voir la documentation
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
 
@@ -2854,11 +2854,11 @@ const Onboarding = () => {
                                         <div className="card-icon-wrapper csv-icon">
                                             <Upload size={28} />
                                         </div>
-                                        <div className="card-badge free">100 leads gratuits</div>
+                                        <div className="card-badge free">10 leads gratuits</div>
                                         <h3>Tester avec vos leads</h3>
                                         <p className="card-description">
                                             Importez un fichier CSV avec vos leads existants.
-                                            Testez gratuitement sur 100 contacts pour voir la magie opérer.
+                                            Testez gratuitement sur 10 contacts pour voir la magie opérer.
                                         </p>
 
                                         <div className="csv-upload-section">

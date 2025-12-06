@@ -16,6 +16,7 @@ import Subscription from './pages/Subscription';
 import Blacklist from './pages/Blacklist';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import WebhookDocs from './pages/WebhookDocs';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/webhook" element={<WebhookDocs />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/onboarding" element={<Onboarding />} />
