@@ -127,7 +127,7 @@ const SignUp = () => {
                         </div>
 
                         <p className="terms-text">
-                            En vous inscrivant, vous acceptez nos <a href="/terms">Conditions d'utilisation</a> et notre <a href="/privacy">Politique de confidentialité</a>.
+                            En vous inscrivant, vous acceptez nos <Link to="/terms">Conditions d'utilisation</Link> et notre <Link to="/privacy">Politique de confidentialité</Link>.
                         </p>
 
                         <button type="submit" className="btn-signup" disabled={isLoading}>

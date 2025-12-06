@@ -14,6 +14,8 @@ import CreateCampaign from './pages/CreateCampaign';
 import LandingPage from './pages/LandingPage';
 import Subscription from './pages/Subscription';
 import Blacklist from './pages/Blacklist';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -31,6 +33,8 @@ function App() {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/onboarding" element={<Onboarding />} />
