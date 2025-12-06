@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check, MessageSquare, Rocket, Zap, Globe, Briefcase, Target, Smartphone, CreditCard, ChevronRight, Edit2, Loader2, Play, User, HelpCircle, Shield, Info, Box, Star, Clock, Calendar, Instagram, Facebook, Mail, MessageCircle, RefreshCw, Send, Sun, Moon, Building2, Users, UserCircle, Euro, AlertCircle, MessageSquareWarning, CheckCircle2, X, Plus, ArrowLeft, Sparkles, Package, Layers, PlusCircle, Trophy, AlertTriangle, Phone, Trash2, Upload, FileText, Link2, Copy, ExternalLink, PartyPopper } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import { endpoints, WEBHOOK_BASE_URL, DOCS_URL, CONTACT_URL } from '../config';
+import { endpoints, WEBHOOK_BASE_URL, DOCS_URL, SALES_CALL_URL } from '../config';
 import './Onboarding.css';
 
 const Onboarding = () => {
@@ -2749,7 +2749,7 @@ const Onboarding = () => {
                                         </div>
 
                                         <div className="activation-help">
-                                            <button className="btn-text" onClick={() => window.open(CONTACT_URL, '_blank')}>
+                                            <button className="btn-text" onClick={() => window.open(SALES_CALL_URL, '_blank')}>
                                                 <HelpCircle size={16} /> Besoin d'aide ?
                                             </button>
                                         </div>

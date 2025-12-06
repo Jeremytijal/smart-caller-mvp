@@ -18,8 +18,9 @@ export const LANDING_URL = import.meta.env.VITE_LANDING_URL || 'https://smart-ca
 export const DOCS_URL = import.meta.env.VITE_DOCS_URL || 'https://docs.smart-caller.ai';
 
 // External Links
-export const CALENDLY_URL = import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/smart-caller';
+export const CALENDLY_URL = import.meta.env.VITE_CALENDLY_URL || 'https://zcal.co/i/CkMTM7p_';
 export const CONTACT_URL = `${LANDING_URL}/contact`;
+export const SALES_CALL_URL = 'https://zcal.co/i/CkMTM7p_';
 
 // API Endpoints helper
 export const endpoints = {
@@ -79,6 +80,7 @@ export default {
     DOCS_URL,
     CALENDLY_URL,
     CONTACT_URL,
+    SALES_CALL_URL,
     endpoints,
     features,
 };
