@@ -157,7 +157,11 @@ const Login = () => {
 
                     <div className="testimonial-card">
                         <div className="testimonial-photo">
-                            <img src="/alex.png" alt="Alex Hormozi" className="photo-image" />
+                            <img 
+                                src="https://pbs.twimg.com/profile_images/1697596017685321728/xDqJ3ITi_400x400.jpg" 
+                                alt="Alex Hormozi" 
+                                className="photo-image" 
+                            />
                             <div className="photo-accent"></div>
                         </div>
                         
