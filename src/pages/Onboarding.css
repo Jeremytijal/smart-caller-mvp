@@ -466,11 +466,10 @@ textarea:focus {
 }
 
 .badge-centered {
-    display: block;
+    display: inline-block;
     width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: var(--space-sm);
+    margin: 0 auto var(--space-sm) auto;
+    text-align: center;
 }
 
 .btn-text {

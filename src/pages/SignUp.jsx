@@ -179,9 +179,7 @@ const SignUp = () => {
 
                     <div className="testimonial-card">
                         <div className="testimonial-photo">
-                            <div className="photo-placeholder">
-                                <span>AH</span>
-                            </div>
+                            <img src="/alex.png" alt="Alex Hormozi" className="photo-image" />
                             <div className="photo-accent"></div>
                         </div>
                         

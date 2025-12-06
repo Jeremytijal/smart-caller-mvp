@@ -318,6 +318,14 @@
     color: white;
 }
 
+.photo-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    object-position: center top;
+}
+
 .photo-accent {
     position: absolute;
     top: -6px;
