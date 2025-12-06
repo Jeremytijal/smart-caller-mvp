@@ -17,7 +17,9 @@ import {
   Ban,
   Zap,
   TrendingUp,
-  HelpCircle
+  HelpCircle,
+  CreditCard,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../supabaseClient';
@@ -28,6 +30,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [usage, setUsage] = useState({ current: 0, limit: 10, plan: 'Essai gratuit', isTrial: true });
+  const [subscription, setSubscription] = useState({ plan: null, status: null, trialEndsAt: null });
 
   useEffect(() => {
     if (user) {
@@ -51,9 +54,16 @@ const Sidebar = () => {
       // Get user's subscription plan
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_plan, subscription_status')
+        .select('subscription_plan, subscription_status, trial_ends_at')
         .eq('id', user.id)
         .single();
+
+      // Set subscription info for account modal
+      setSubscription({
+        plan: profile?.subscription_plan || null,
+        status: profile?.subscription_status || null,
+        trialEndsAt: profile?.trial_ends_at || null
+      });
 
       const planLimits = {
         'starter': 150,
@@ -218,6 +228,48 @@ const Sidebar = () => {
                     <span className="info-value">{formatDate(user?.created_at)}</span>
                   </div>
                 </div>
+
+                {/* Subscription Info */}
+                <div className="account-info-item subscription-item">
+                  <CreditCard size={18} />
+                  <div>
+                    <span className="info-label">Abonnement</span>
+                    <span className="info-value">
+                      {subscription.plan 
+                        ? subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)
+                        : 'Essai gratuit'}
+                      {subscription.status === 'trial' && (
+                        <span className="status-badge trial">Période d'essai</span>
+                      )}
+                      {subscription.status === 'active' && (
+                        <span className="status-badge active">Actif</span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {(subscription.status === 'trial' || !subscription.status) && subscription.trialEndsAt && (
+                  <div className="account-info-item trial-item">
+                    <Clock size={18} />
+                    <div>
+                      <span className="info-label">Fin de l'essai</span>
+                      <span className="info-value trial-date">{formatDate(subscription.trialEndsAt)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {(!subscription.status || subscription.status === 'trial') && (
+                  <button 
+                    className="btn-upgrade-account"
+                    onClick={() => {
+                      setShowAccountModal(false);
+                      navigate('/subscription');
+                    }}
+                  >
+                    <Zap size={16} />
+                    Passer à un plan payant
+                  </button>
+                )}
               </div>
             </div>
 

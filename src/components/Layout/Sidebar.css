@@ -238,6 +238,63 @@
     color: #6b7280;
 }
 
+/* Subscription Badge */
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-badge.trial {
+    background: #FEF3C7;
+    color: #D97706;
+}
+
+.status-badge.active {
+    background: #D1FAE5;
+    color: #059669;
+}
+
+/* Trial Info Item */
+.trial-item svg {
+    color: #D97706 !important;
+}
+
+.trial-date {
+    color: #D97706 !important;
+    font-weight: 600 !important;
+}
+
+/* Upgrade Button */
+.btn-upgrade-account {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(255, 71, 15, 0.25);
+}
+
+.btn-upgrade-account:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 71, 15, 0.35);
+}
+
 .account-modal-footer {
     padding: 16px 24px;
     border-top: 1px solid #e5e5e5;
