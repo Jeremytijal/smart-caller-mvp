@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Rocket, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { enableDemoMode } from '../data/demoData';
+import { API_URL } from '../config';
 import './Auth.css';
 
 const SignUp = () => {
@@ -21,7 +22,21 @@ const SignUp = () => {
         setIsLoading(true);
         setError('');
         try {
-            await signup(name, email, password);
+            const { user } = await signup(name, email, password);
+            
+            // Notify admin about new user (async, don't wait)
+            fetch(`${API_URL}/api/notify/new-user`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    user: { 
+                        id: user?.id, 
+                        email, 
+                        name 
+                    } 
+                })
+            }).catch(err => console.log('Notification error:', err));
+            
             navigate('/onboarding');
         } catch (error) {
             console.error('Signup failed', error);
