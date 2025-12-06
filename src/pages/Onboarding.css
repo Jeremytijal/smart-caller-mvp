@@ -466,8 +466,7 @@ textarea:focus {
 }
 
 .badge-centered {
-    display: inline-block;
-    width: fit-content;
+    display: table;
     margin: 0 auto var(--space-sm) auto;
     text-align: center;
 }
