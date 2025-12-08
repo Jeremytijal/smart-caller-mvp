@@ -143,21 +143,15 @@ const SignUp = () => {
                         <span>ou</span>
                     </div>
 
-                    <button 
-                        type="button" 
-                        className="btn-demo" 
-                        onClick={handleDemoLogin}
-                        disabled={isDemoLoading}
+                    <a 
+                        href="https://www.loom.com/share/2ba3fd2dc31d40a0a1984625ceec14f4" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-demo"
                     >
-                        {isDemoLoading ? (
-                            <Loader2 size={20} className="animate-spin" />
-                        ) : (
-                            <>
-                                <Play size={18} />
-                                Voir la démo
-                            </>
-                        )}
-                    </button>
+                        <Play size={18} />
+                        Voir la démo
+                    </a>
 
                     <div className="auth-footer-section">
                         <p>Vous avez déjà un compte ? <Link to="/login" className="link-accent">Se connecter</Link></p>
