@@ -417,13 +417,23 @@ const CreateCampaign = () => {
             return;
         }
 
+        if (!agentConfig) {
+            alert('Aucun agent configuré. Veuillez d\'abord créer votre agent.');
+            return;
+        }
+
         setLoading(true);
         try {
-            console.log('Campaign to launch:', {
+            // Inclure l'agentId et la config de l'agent dans la campagne
+            const campaignData = {
                 ...campaign,
+                agentId: user.id,
+                agentConfig: agentConfig,
                 contacts: selectedContacts,
                 totalContacts: selectedContacts.length
-            });
+            };
+
+            console.log('Campaign to launch:', campaignData);
             
             alert(`Campagne créée avec succès ! ${selectedContacts.length} contacts seront contactés selon le planning défini.`);
             navigate('/campaigns');
