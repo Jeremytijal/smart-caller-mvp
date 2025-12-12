@@ -12,6 +12,7 @@ import SignUp from './pages/SignUp';
 import Campaigns from './pages/Campaigns';
 import CreateCampaign from './pages/CreateCampaign';
 import LandingPage from './pages/LandingPage';
+import LandingSEO from './pages/LandingSEO';
 import Subscription from './pages/Subscription';
 import Blacklist from './pages/Blacklist';
 import Terms from './pages/Terms';
@@ -32,6 +33,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/landing" element={<LandingPage />} />
+          <Route path="/seo" element={<LandingSEO />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/terms" element={<Terms />} />
