@@ -14,6 +14,7 @@ import CreateCampaign from './pages/CreateCampaign';
 import LandingPage from './pages/LandingPage';
 import LandingSEO from './pages/LandingSEO';
 import Funnel from './pages/Funnel';
+import FunnelV2 from './pages/FunnelV2';
 import Subscription from './pages/Subscription';
 import Blacklist from './pages/Blacklist';
 import Terms from './pages/Terms';
@@ -36,6 +37,7 @@ function App() {
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/seo" element={<LandingSEO />} />
           <Route path="/funnel" element={<Funnel />} />
+          <Route path="/demo" element={<FunnelV2 />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/terms" element={<Terms />} />
