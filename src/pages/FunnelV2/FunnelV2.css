@@ -470,11 +470,11 @@
 
 .chat-input-area input {
     flex: 1;
-    background: var(--fv2-card);
+    background: #FFFFFF;
     border: 1px solid var(--fv2-border);
     border-radius: 24px;
     padding: 14px 20px;
-    color: var(--fv2-text);
+    color: #1A1A1A;
     font-size: 0.95rem;
     outline: none;
 }
@@ -484,7 +484,7 @@
 }
 
 .chat-input-area input::placeholder {
-    color: var(--fv2-text-muted);
+    color: #9CA3AF;
 }
 
 .send-button {
@@ -754,6 +754,7 @@
 .summary-header h2 {
     font-size: 1.5rem;
     margin: 0 0 8px 0;
+    color: var(--fv2-text);
 }
 
 .summary-header p {
@@ -793,6 +794,7 @@
 .score-number {
     font-size: 1.5rem;
     font-weight: 700;
+    color: var(--fv2-text);
 }
 
 .score-label {
@@ -803,6 +805,7 @@
 .score-details h3 {
     font-size: 1rem;
     margin: 0 0 8px 0;
+    color: var(--fv2-text);
 }
 
 .score-details p {
@@ -876,6 +879,7 @@
     gap: 10px;
     font-size: 1rem;
     margin: 0 0 16px 0;
+    color: var(--fv2-text);
 }
 
 .summary-reasons h3 svg {
@@ -908,6 +912,7 @@
     gap: 10px;
     font-size: 1rem;
     margin: 0 0 16px 0;
+    color: var(--fv2-text);
 }
 
 .summary-actions h3 svg {
