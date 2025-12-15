@@ -48,7 +48,7 @@ const SandboxChat = ({ onConversationEnd }) => {
     // Send initial message on mount
     useEffect(() => {
         const timer = setTimeout(() => {
-            addMessage('assistant', "Hey ! 👋 Bienvenue dans la démo Smart Caller.\n\nJouez le rôle d'un prospect : imaginez que vous contactez une entreprise pour un besoin B2B. Allez-y, dites-moi ce que vous cherchez !");
+            addMessage('assistant', "Hey ! 👋 Bienvenue dans la démo.\n\nTu joues le rôle d'un prospect B2B. Dis-moi ce qui t'amène, je vais te montrer comment je qualifie !");
         }, 800);
         return () => clearTimeout(timer);
     }, []);
