@@ -202,6 +202,40 @@ const SandboxChat = ({ onConversationEnd }) => {
         }, 1000);
     };
 
+    // Save conversation to backend
+    const saveConversation = async (ended = false) => {
+        try {
+            await fetch(`${API_URL}/api/sandbox/conversation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId,
+                    messages: messages.map(m => ({
+                        role: m.role,
+                        content: m.content,
+                        timestamp: m.timestamp
+                    })),
+                    qualification: qualificationData,
+                    rdvProposed: qualificationData.rdvProposed,
+                    rdvAccepted: qualificationData.rdvAccepted,
+                    rdvSlot: qualificationData.rdvSlot,
+                    ended,
+                    userAgent: navigator.userAgent,
+                    referrer: document.referrer
+                })
+            });
+        } catch (error) {
+            console.error('Error saving conversation:', error);
+        }
+    };
+
+    // Save conversation periodically (after each AI response)
+    useEffect(() => {
+        if (messages.length > 1) {
+            saveConversation(false);
+        }
+    }, [messages.length]);
+
     // End conversation and trigger callback
     const endConversation = (qualified) => {
         setConversationEnded(true);
@@ -212,6 +246,9 @@ const SandboxChat = ({ onConversationEnd }) => {
             messages: messages,
             sessionId
         };
+        
+        // Save final conversation state
+        saveConversation(true);
         
         if (onConversationEnd) {
             onConversationEnd(finalData);
