@@ -77,13 +77,13 @@ const ConversationSummary = ({ data, onRequestDemo }) => {
                         <circle 
                             cx="50" cy="50" r="45" 
                             fill="none" 
-                            stroke="#E5E5E5" 
+                            stroke="#333333" 
                             strokeWidth="8"
                         />
                         <circle 
                             cx="50" cy="50" r="45" 
                             fill="none" 
-                            stroke={isQualified ? '#10B981' : '#EF4444'}
+                            stroke={isQualified ? '#FF470F' : '#EF4444'}
                             strokeWidth="8"
                             strokeDasharray={`${displayScore * 2.83} 283`}
                             strokeLinecap="round"
@@ -250,22 +250,35 @@ const ConversationSummary = ({ data, onRequestDemo }) => {
                 </div>
             </div>
 
-            {/* CTA Section - Only if qualified AND rdv accepted */}
-            {isQualified && rdvAccepted && (
-                <div className="summary-cta">
-                    <div className="cta-content">
-                        <Zap size={24} />
-                        <div>
-                            <h3>Impressionné par l'expérience ?</h3>
-                            <p>Smart Caller peut faire exactement la même chose avec vos vrais leads, 24h/24.</p>
-                        </div>
+            {/* CTA Section - Always visible */}
+            <div className="summary-cta">
+                <div className="cta-content">
+                    <Zap size={24} />
+                    <div>
+                        <h3>Impressionné par l'expérience ?</h3>
+                        <p>Smart Caller peut faire exactement la même chose avec vos vrais leads, 24h/24.</p>
                     </div>
-                    <button className="cta-button" onClick={onRequestDemo}>
-                        Voir Smart Caller sur mes leads
-                        <ArrowRight size={18} />
-                    </button>
                 </div>
-            )}
+                <div className="cta-buttons">
+                    <a 
+                        href="https://zcal.co/i/CkMTM7p_" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="cta-button secondary"
+                    >
+                        <Calendar size={18} />
+                        Réserver un rendez-vous
+                    </a>
+                    <a 
+                        href="/signup" 
+                        className="cta-button primary"
+                    >
+                        <Zap size={18} />
+                        Lancer mon agent IA maintenant
+                        <ArrowRight size={18} />
+                    </a>
+                </div>
+            </div>
 
             {/* Footer notice */}
             <div className="summary-footer">

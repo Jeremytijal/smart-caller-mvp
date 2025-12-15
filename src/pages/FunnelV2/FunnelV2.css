@@ -741,8 +741,9 @@
 }
 
 .status-badge.qualified {
-    background: rgba(16, 185, 129, 0.2);
-    color: var(--fv2-success);
+    background: rgba(255, 71, 15, 0.15);
+    color: var(--fv2-primary);
+    border: 1px solid rgba(255, 71, 15, 0.3);
 }
 
 .status-badge.not-qualified {
@@ -830,12 +831,12 @@
 .detail-icon {
     width: 36px;
     height: 36px;
-    background: var(--fv2-bg);
+    background: rgba(255, 71, 15, 0.1);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--fv2-text-muted);
+    color: var(--fv2-primary);
     flex-shrink: 0;
 }
 
@@ -852,7 +853,7 @@
 }
 
 .detail-value.positive {
-    color: var(--fv2-success);
+    color: var(--fv2-primary);
 }
 
 .detail-value.urgency-danger {
@@ -878,7 +879,7 @@
 }
 
 .summary-reasons h3 svg {
-    color: var(--fv2-success);
+    color: var(--fv2-primary);
 }
 
 .summary-reasons ul {
@@ -927,7 +928,7 @@
 }
 
 .action-item.success svg {
-    color: var(--fv2-success);
+    color: var(--fv2-primary);
 }
 
 .action-item.neutral svg {
@@ -948,7 +949,7 @@
     margin-bottom: 24px;
 }
 
-.summary-cta .cta-content svg {
+.summary-cta .cta-content > svg {
     color: var(--fv2-primary);
     flex-shrink: 0;
 }
@@ -956,6 +957,7 @@
 .summary-cta .cta-content h3 {
     font-size: 1.1rem;
     margin: 0 0 8px 0;
+    color: var(--fv2-text);
 }
 
 .summary-cta .cta-content p {
@@ -964,14 +966,18 @@
     font-size: 0.95rem;
 }
 
+.summary-cta .cta-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .summary-cta .cta-button {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
-    background: var(--fv2-primary);
-    color: white;
     border: none;
     border-radius: 12px;
     padding: 16px;
@@ -979,10 +985,27 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    text-decoration: none;
+}
+
+.summary-cta .cta-button.primary {
+    background: var(--fv2-primary);
+    color: white;
+}
+
+.summary-cta .cta-button.secondary {
+    background: transparent;
+    color: var(--fv2-primary);
+    border: 2px solid var(--fv2-primary);
 }
 
 .summary-cta .cta-button:hover {
     filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.summary-cta .cta-button.secondary:hover {
+    background: rgba(255, 71, 15, 0.1);
 }
 
 .summary-footer {
