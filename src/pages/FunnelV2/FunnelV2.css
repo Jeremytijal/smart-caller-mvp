@@ -22,9 +22,16 @@
 /* Global */
 .funnel-v2 {
     min-height: 100vh;
+    min-height: 100dvh;
     background: var(--fv2-bg);
     color: var(--fv2-text);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
 }
 
 /* ==========================================================================
@@ -72,13 +79,15 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    padding-bottom: 100px; /* Space for fixed input */
 }
 
 .sandbox-container-fullscreen .sandbox-chat .chat-input-area {
-    position: sticky;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 100;
 }
 
 .sandbox-container-fullscreen .conversation-summary-container {
