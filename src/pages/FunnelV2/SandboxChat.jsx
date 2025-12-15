@@ -48,7 +48,7 @@ const SandboxChat = ({ onConversationEnd }) => {
     // Send initial message on mount
     useEffect(() => {
         const timer = setTimeout(() => {
-            addMessage('assistant', "Bonjour 👋 merci pour votre message.\nPouvez-vous m'en dire un peu plus sur votre besoin ?");
+            addMessage('assistant', "Hey ! 👋 Bienvenue dans la démo Smart Caller.\n\nJouez le rôle d'un prospect : imaginez que vous contactez une entreprise pour un besoin B2B. Allez-y, dites-moi ce que vous cherchez !");
         }, 800);
         return () => clearTimeout(timer);
     }, []);
@@ -248,7 +248,7 @@ const SandboxChat = ({ onConversationEnd }) => {
             <div className="chat-messages">
                 {/* Intro notice */}
                 <div className="chat-notice">
-                    <p>🎭 Vous jouez le rôle d'un prospect. Répondez comme si vous contactiez une entreprise.</p>
+                    <p>🚀 Testez l'IA en direct ! Imaginez un besoin B2B et voyez comment Smart Caller vous qualifie.</p>
                 </div>
 
                 {messages.map((msg) => (
