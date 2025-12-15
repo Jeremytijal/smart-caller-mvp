@@ -424,22 +424,39 @@ const CreateCampaign = () => {
 
         setLoading(true);
         try {
-            // Inclure l'agentId et la config de l'agent dans la campagne
-            const campaignData = {
-                ...campaign,
-                agentId: user.id,
-                agentConfig: agentConfig,
-                contacts: selectedContacts,
-                totalContacts: selectedContacts.length
-            };
+            console.log('🚀 Launching campaign:', campaign.name);
+            console.log('Contacts:', selectedContacts.length);
+            console.log('Channel:', campaign.channel);
 
-            console.log('Campaign to launch:', campaignData);
+            // Call backend to send messages
+            const response = await fetch(endpoints.launchCampaign, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    agentId: user.id,
+                    contactIds: selectedContacts,
+                    channel: campaign.channel,
+                    firstMessage: campaign.firstMessage,
+                    messageB: campaign.messageB,
+                    abTestEnabled: campaign.abTestEnabled,
+                    abSplit: campaign.abSplit,
+                    campaignName: campaign.name
+                })
+            });
+
+            const result = await response.json();
             
-            alert(`Campagne créée avec succès ! ${selectedContacts.length} contacts seront contactés selon le planning défini.`);
+            if (!response.ok) {
+                throw new Error(result.error || 'Erreur lors du lancement');
+            }
+
+            console.log('Campaign result:', result);
+            
+            alert(`✅ Campagne lancée avec succès !\n\n${result.sent}/${result.totalContacts} messages envoyés.\n${result.failed > 0 ? `⚠️ ${result.failed} échecs` : ''}`);
             navigate('/campaigns');
         } catch (error) {
             console.error('Error launching campaign:', error);
-            alert('Erreur lors de la création de la campagne');
+            alert('Erreur lors du lancement de la campagne: ' + error.message);
         } finally {
             setLoading(false);
         }
