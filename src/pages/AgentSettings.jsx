@@ -763,39 +763,58 @@ const AgentSettings = () => {
                                 </div>
                             ) : (
                                 <div className="edit-section channels-edit">
-                                    <label className="channel-toggle">
-                                        <input
-                                            type="checkbox"
-                                            checked={config.channels?.sms || false}
-                                            onChange={(e) => setConfig({
-                                                ...config,
-                                                channels: { ...config.channels, sms: e.target.checked }
-                                            })}
-                                        />
-                                        <Smartphone size={16} /> SMS
-                                    </label>
-                                    <label className="channel-toggle">
-                                        <input
-                                            type="checkbox"
-                                            checked={config.channels?.whatsapp || false}
-                                            onChange={(e) => setConfig({
-                                                ...config,
-                                                channels: { ...config.channels, whatsapp: e.target.checked }
-                                            })}
-                                        />
-                                        <MessageCircle size={16} /> WhatsApp
-                                    </label>
-                                    <label className="channel-toggle">
-                                        <input
-                                            type="checkbox"
-                                            checked={config.channels?.email || false}
-                                            onChange={(e) => setConfig({
-                                                ...config,
-                                                channels: { ...config.channels, email: e.target.checked }
-                                            })}
-                                        />
-                                        <Mail size={16} /> Email
-                                    </label>
+                                    <div className="channel-option">
+                                        <label className="channel-toggle">
+                                            <input
+                                                type="checkbox"
+                                                checked={config.channels?.sms || false}
+                                                onChange={(e) => setConfig({
+                                                    ...config,
+                                                    channels: { ...config.channels, sms: e.target.checked }
+                                                })}
+                                            />
+                                            <Smartphone size={16} /> SMS
+                                        </label>
+                                        <span className="channel-status connected">Twilio connecté</span>
+                                    </div>
+                                    <div className="channel-option">
+                                        <label className="channel-toggle">
+                                            <input
+                                                type="checkbox"
+                                                checked={config.channels?.whatsapp || false}
+                                                onChange={(e) => setConfig({
+                                                    ...config,
+                                                    channels: { ...config.channels, whatsapp: e.target.checked }
+                                                })}
+                                            />
+                                            <MessageCircle size={16} /> WhatsApp
+                                        </label>
+                                        <span className="channel-status connected">via Twilio</span>
+                                    </div>
+                                    {config.channels?.whatsapp && (
+                                        <div className="channel-info-box whatsapp">
+                                            <Info size={14} />
+                                            <span>
+                                                Configurez l'URL webhook <code>/incoming-whatsapp</code> dans votre 
+                                                <a href="https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn" target="_blank" rel="noopener noreferrer"> console Twilio</a>.
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="channel-option">
+                                        <label className="channel-toggle disabled">
+                                            <input
+                                                type="checkbox"
+                                                checked={config.channels?.email || false}
+                                                onChange={(e) => setConfig({
+                                                    ...config,
+                                                    channels: { ...config.channels, email: e.target.checked }
+                                                })}
+                                                disabled
+                                            />
+                                            <Mail size={16} /> Email
+                                        </label>
+                                        <span className="channel-status coming-soon">Bientôt</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
