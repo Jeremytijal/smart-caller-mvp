@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, Bot, User, Loader, Calendar, Check, X } from 'lucide-react';
+import { Send, Bot, User, Loader, Calendar, Check, X, ExternalLink, CreditCard, Globe } from 'lucide-react';
 import CalendarPicker from './CalendarPicker';
 import { API_URL } from '../../config';
 
@@ -48,7 +48,7 @@ const SandboxChat = ({ onConversationEnd }) => {
     // Send initial message on mount
     useEffect(() => {
         const timer = setTimeout(() => {
-            addMessage('assistant', "Hey ! 👋 Bienvenue dans la démo.\n\nTu joues le rôle d'un prospect B2B. Dis-moi ce qui t'amène, je vais te montrer comment je qualifie !");
+            addMessage('assistant', "Hey ! 👋 Bienvenue dans la démo Smart Caller.\n\nJoue le rôle d'un prospect et discute avec moi pour voir comment je qualifie. Vas-y, dis-moi ce qui t'amène !");
         }, 800);
         return () => clearTimeout(timer);
     }, []);
@@ -283,9 +283,19 @@ const SandboxChat = ({ onConversationEnd }) => {
 
             {/* Messages Container */}
             <div className="chat-messages">
-                {/* Intro notice */}
+                {/* Intro notice with links */}
                 <div className="chat-notice">
-                    <p>🚀 Testez l'IA en direct ! Imaginez un besoin B2B et voyez comment Smart Caller vous qualifie.</p>
+                    <p>🚀 <strong>Testez l'IA en direct !</strong> Discutez avec moi ci-dessous pour voir comment Smart Caller qualifie vos leads.</p>
+                    <div className="notice-links">
+                        <a href="https://smart-caller.ai" target="_blank" rel="noopener noreferrer" className="notice-link">
+                            <Globe size={14} />
+                            Voir le site
+                        </a>
+                        <a href="https://agent.smart-caller.ai/subscription" target="_blank" rel="noopener noreferrer" className="notice-link primary">
+                            <CreditCard size={14} />
+                            Voir les tarifs
+                        </a>
+                    </div>
                 </div>
 
                 {messages.map((msg) => (
