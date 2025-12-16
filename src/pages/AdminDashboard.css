@@ -120,6 +120,16 @@
     color: #8b5cf6;
 }
 
+.stat-icon.teal {
+    background: rgba(20, 184, 166, 0.15);
+    color: #14b8a6;
+}
+
+.stat-icon.pink {
+    background: rgba(236, 72, 153, 0.15);
+    color: #ec4899;
+}
+
 .stat-content {
     display: flex;
     flex-direction: column;
@@ -234,6 +244,44 @@
 
 @keyframes spin {
     100% { transform: rotate(360deg); }
+}
+
+/* Admin Tabs */
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.admin-tabs button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    color: #9ca3af;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-tabs button:hover {
+    border-color: #3a3a3a;
+    color: #f5f5f5;
+}
+
+.admin-tabs button.active {
+    background: linear-gradient(135deg, #FF470F 0%, #FF6B3D 100%);
+    border-color: transparent;
+    color: white;
+}
+
+/* Admin Content */
+.admin-content {
+    min-height: 400px;
 }
 
 /* Agents List */
@@ -436,6 +484,118 @@
     padding: 40px 20px;
     color: #6b7280;
     gap: 12px;
+}
+
+/* Campaigns List */
+.campaigns-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.campaign-card {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 16px 20px;
+    transition: all 0.2s;
+}
+
+.campaign-card:hover {
+    border-color: #3a3a3a;
+}
+
+.campaign-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.campaign-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.campaign-info svg {
+    color: #FF470F;
+}
+
+.campaign-info > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.campaign-name {
+    font-weight: 600;
+    color: #f5f5f5;
+}
+
+.campaign-agent {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.campaign-stats {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.campaign-stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    padding: 6px 12px;
+    background: #0a0a0a;
+    border-radius: 8px;
+}
+
+.campaign-stats .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-weight: 600;
+}
+
+.campaign-stats .badge.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.campaign-stats .badge.completed {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.campaign-stats .badge.draft {
+    background: rgba(107, 114, 128, 0.15);
+    color: #6b7280;
+}
+
+.campaign-stats .badge.paused {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.campaign-message {
+    margin-top: 12px;
+    padding: 12px;
+    background: #0a0a0a;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    line-height: 1.5;
+}
+
+.campaign-message strong {
+    color: #f5f5f5;
 }
 
 /* Access Denied */

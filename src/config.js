@@ -64,6 +64,13 @@ export const endpoints = {
     
     // Follow-ups
     followUps: (userId) => `${API_URL}/api/follow-ups/${userId}`,
+    
+    // Admin
+    adminProfiles: `${API_URL}/api/admin/profiles`,
+    adminCampaigns: `${API_URL}/api/admin/campaigns`,
+    adminMessages: `${API_URL}/api/admin/messages`,
+    adminStats: `${API_URL}/api/admin/stats`,
+    adminContacts: `${API_URL}/api/admin/contacts`,
 };
 
 // Feature flags

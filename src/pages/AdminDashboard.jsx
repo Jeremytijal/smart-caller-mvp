@@ -4,10 +4,10 @@ import {
     Users, Bot, Building2, Target, MessageSquare, 
     Calendar, Shield, ChevronDown, ChevronUp, 
     Search, Filter, RefreshCw, LogOut, Eye,
-    Clock, CheckCircle, XCircle, AlertCircle
+    Clock, CheckCircle, XCircle, AlertCircle, Send, Megaphone
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../supabaseClient';
+import { endpoints } from '../config';
 import './AdminDashboard.css';
 
 /**
@@ -24,15 +24,21 @@ const AdminDashboard = () => {
     
     const [loading, setLoading] = useState(true);
     const [profiles, setProfiles] = useState([]);
+    const [campaigns, setCampaigns] = useState([]);
     const [stats, setStats] = useState({
         totalUsers: 0,
         usersWithAgents: 0,
         totalAgents: 0,
-        activeSubscriptions: 0
+        activeSubscriptions: 0,
+        totalCampaigns: 0,
+        totalMessages: 0,
+        sandboxTotal: 0,
+        sandboxQualified: 0
     });
     const [expandedAgent, setExpandedAgent] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all'); // all, with-agent, without-agent
+    const [activeTab, setActiveTab] = useState('users'); // users, campaigns
     
     // Vérifier si l'utilisateur est admin
     const isAdmin = user && ADMIN_EMAILS.includes(user.email);
@@ -48,34 +54,55 @@ const AdminDashboard = () => {
             return;
         }
         
-        fetchAllProfiles();
+        fetchAllData();
     }, [user, isAdmin, navigate]);
     
-    const fetchAllProfiles = async () => {
+    const fetchAllData = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .order('created_at', { ascending: false });
-                
-            if (error) throw error;
-            
-            setProfiles(data || []);
-            
-            // Calculer les stats
-            const usersWithAgents = data.filter(p => p.agent_config && p.agent_config.name).length;
-            const activeSubscriptions = data.filter(p => p.subscription_status === 'active' || p.subscription_status === 'trialing').length;
-            
-            setStats({
-                totalUsers: data.length,
-                usersWithAgents,
-                totalAgents: usersWithAgents,
-                activeSubscriptions
+            // Fetch profiles
+            const profilesRes = await fetch(endpoints.adminProfiles, {
+                headers: { 'X-Admin-Email': user.email }
             });
+            const profilesData = await profilesRes.json();
+            
+            if (profilesData.success) {
+                setProfiles(profilesData.profiles || []);
+            }
+            
+            // Fetch campaigns
+            const campaignsRes = await fetch(endpoints.adminCampaigns, {
+                headers: { 'X-Admin-Email': user.email }
+            });
+            const campaignsData = await campaignsRes.json();
+            
+            if (campaignsData.success) {
+                setCampaigns(campaignsData.campaigns || []);
+            }
+            
+            // Fetch stats
+            const statsRes = await fetch(endpoints.adminStats, {
+                headers: { 'X-Admin-Email': user.email }
+            });
+            const statsData = await statsRes.json();
+            
+            if (statsData.success) {
+                setStats({
+                    totalUsers: statsData.stats.users.total,
+                    usersWithAgents: statsData.stats.users.withAgents,
+                    totalAgents: statsData.stats.users.withAgents,
+                    activeSubscriptions: statsData.stats.users.activeSubscriptions,
+                    totalCampaigns: statsData.stats.campaigns.total,
+                    totalMessages: statsData.stats.messages.total,
+                    messagesSent: statsData.stats.campaigns.messagesSent,
+                    sandboxTotal: statsData.stats.sandbox.total,
+                    sandboxQualified: statsData.stats.sandbox.qualified,
+                    sandboxRate: statsData.stats.sandbox.qualificationRate
+                });
+            }
             
         } catch (error) {
-            console.error('Error fetching profiles:', error);
+            console.error('Error fetching admin data:', error);
         } finally {
             setLoading(false);
         }
@@ -178,13 +205,47 @@ const AdminDashboard = () => {
                 </div>
                 <div className="stat-card">
                     <div className="stat-icon purple">
-                        <Target size={24} />
+                        <Megaphone size={24} />
                     </div>
                     <div className="stat-content">
-                        <span className="stat-value">{stats.totalUsers > 0 ? ((stats.usersWithAgents / stats.totalUsers) * 100).toFixed(0) : 0}%</span>
-                        <span className="stat-label">Taux de création</span>
+                        <span className="stat-value">{stats.totalCampaigns}</span>
+                        <span className="stat-label">Campagnes</span>
                     </div>
                 </div>
+                <div className="stat-card">
+                    <div className="stat-icon teal">
+                        <Send size={24} />
+                    </div>
+                    <div className="stat-content">
+                        <span className="stat-value">{stats.messagesSent || 0}</span>
+                        <span className="stat-label">Messages envoyés</span>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon pink">
+                        <MessageSquare size={24} />
+                    </div>
+                    <div className="stat-content">
+                        <span className="stat-value">{stats.sandboxTotal}</span>
+                        <span className="stat-label">Sandbox ({stats.sandboxRate || 0}% qualifiés)</span>
+                    </div>
+                </div>
+            </div>
+            
+            {/* Tabs */}
+            <div className="admin-tabs">
+                <button 
+                    className={activeTab === 'users' ? 'active' : ''} 
+                    onClick={() => setActiveTab('users')}
+                >
+                    <Users size={18} /> Utilisateurs & Agents
+                </button>
+                <button 
+                    className={activeTab === 'campaigns' ? 'active' : ''} 
+                    onClick={() => setActiveTab('campaigns')}
+                >
+                    <Megaphone size={18} /> Campagnes
+                </button>
             </div>
             
             {/* Filters */}
@@ -193,51 +254,101 @@ const AdminDashboard = () => {
                     <Search size={18} />
                     <input 
                         type="text"
-                        placeholder="Rechercher par email, nom d'agent..."
+                        placeholder={activeTab === 'users' ? "Rechercher par email, nom d'agent..." : "Rechercher une campagne..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="filter-tabs">
-                    <button 
-                        className={filter === 'all' ? 'active' : ''}
-                        onClick={() => setFilter('all')}
-                    >
-                        Tous ({profiles.length})
-                    </button>
-                    <button 
-                        className={filter === 'with-agent' ? 'active' : ''}
-                        onClick={() => setFilter('with-agent')}
-                    >
-                        Avec agent ({profiles.filter(p => p.agent_config?.name).length})
-                    </button>
-                    <button 
-                        className={filter === 'without-agent' ? 'active' : ''}
-                        onClick={() => setFilter('without-agent')}
-                    >
-                        Sans agent ({profiles.filter(p => !p.agent_config?.name).length})
-                    </button>
-                </div>
-                <button className="btn-refresh" onClick={fetchAllProfiles} disabled={loading}>
+                {activeTab === 'users' && (
+                    <div className="filter-tabs">
+                        <button 
+                            className={filter === 'all' ? 'active' : ''}
+                            onClick={() => setFilter('all')}
+                        >
+                            Tous ({profiles.length})
+                        </button>
+                        <button 
+                            className={filter === 'with-agent' ? 'active' : ''}
+                            onClick={() => setFilter('with-agent')}
+                        >
+                            Avec agent ({profiles.filter(p => p.agent_config?.name).length})
+                        </button>
+                        <button 
+                            className={filter === 'without-agent' ? 'active' : ''}
+                            onClick={() => setFilter('without-agent')}
+                        >
+                            Sans agent ({profiles.filter(p => !p.agent_config?.name).length})
+                        </button>
+                    </div>
+                )}
+                <button className="btn-refresh" onClick={fetchAllData} disabled={loading}>
                     <RefreshCw size={18} className={loading ? 'spinning' : ''} />
                     Actualiser
                 </button>
             </div>
             
-            {/* Agents List */}
-            <div className="agents-list">
+            {/* Content */}
+            <div className="admin-content">
                 {loading ? (
                     <div className="loading-state">
                         <RefreshCw size={32} className="spinning" />
                         <p>Chargement des données...</p>
                     </div>
-                ) : filteredProfiles.length === 0 ? (
-                    <div className="empty-state">
-                        <Users size={48} />
-                        <p>Aucun utilisateur trouvé</p>
+                ) : activeTab === 'campaigns' ? (
+                    /* Campaigns List */
+                    <div className="campaigns-list">
+                        {campaigns.length === 0 ? (
+                            <div className="empty-state">
+                                <Megaphone size={48} />
+                                <p>Aucune campagne trouvée</p>
+                            </div>
+                        ) : (
+                            campaigns
+                                .filter(c => c.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+                                .map((campaign) => (
+                                    <div key={campaign.id} className="campaign-card">
+                                        <div className="campaign-header">
+                                            <div className="campaign-info">
+                                                <Megaphone size={20} />
+                                                <div>
+                                                    <span className="campaign-name">{campaign.name || 'Sans nom'}</span>
+                                                    <span className="campaign-agent">Agent: {campaign.agent_id?.substring(0, 8)}...</span>
+                                                </div>
+                                            </div>
+                                            <div className="campaign-stats">
+                                                <span className={`badge ${campaign.status || 'draft'}`}>
+                                                    {campaign.status || 'Brouillon'}
+                                                </span>
+                                                <span className="stat">
+                                                    <Send size={14} /> {campaign.sent_count || 0} envoyés
+                                                </span>
+                                                <span className="stat">
+                                                    <Users size={14} /> {campaign.total_contacts || 0} contacts
+                                                </span>
+                                                <span className="date">
+                                                    <Calendar size={14} /> {formatDate(campaign.created_at)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {campaign.first_message && (
+                                            <div className="campaign-message">
+                                                <strong>Message:</strong> {campaign.first_message.substring(0, 150)}...
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                        )}
                     </div>
                 ) : (
-                    filteredProfiles.map((profile) => (
+                    /* Users List */
+                    filteredProfiles.length === 0 ? (
+                        <div className="empty-state">
+                            <Users size={48} />
+                            <p>Aucun utilisateur trouvé</p>
+                        </div>
+                    ) : (
+                        <div className="agents-list">
+                            {filteredProfiles.map((profile) => (
                         <div 
                             key={profile.id} 
                             className={`agent-card ${expandedAgent === profile.id ? 'expanded' : ''}`}
@@ -389,7 +500,9 @@ const AdminDashboard = () => {
                                 </div>
                             )}
                         </div>
-                    ))
+                    ))}
+                        </div>
+                    )
                 )}
             </div>
         </div>
