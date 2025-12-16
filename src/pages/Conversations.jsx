@@ -86,39 +86,44 @@ const Conversations = () => {
         setLoading(false);
     };
 
+    // Normalize phone number to consistent format
+    const normalizePhone = (phone) => {
+        if (!phone) return '';
+        // Remove all non-digit characters except leading +
+        let cleaned = phone.replace(/[^\d+]/g, '');
+        // If starts with 33, add + prefix
+        if (cleaned.startsWith('33') && !cleaned.startsWith('+')) {
+            cleaned = '+' + cleaned;
+        }
+        // If starts with 0, convert to +33
+        if (cleaned.startsWith('0')) {
+            cleaned = '+33' + cleaned.substring(1);
+        }
+        return cleaned;
+    };
+
     const fetchConversations = async () => {
         if (!user) return;
 
         try {
-            // Fetch all messages for this user
-            // First try with agent_id, if empty try without filter
-            let { data, error } = await supabase
+            // Fetch messages only for this user's agent_id
+            const { data, error } = await supabase
                 .from('messages')
                 .select('*')
                 .eq('agent_id', user.id)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
-            
-            // If no messages found with agent_id filter, try fetching all messages
-            if (!data || data.length === 0) {
-                console.log('No messages with agent_id, fetching all messages...');
-                const allMessages = await supabase
-                    .from('messages')
-                    .select('*')
-                    .order('created_at', { ascending: true });
-                
-                if (!allMessages.error) {
-                    data = allMessages.data;
-                }
-            }
 
-            // Group by phone number
+            // Group by normalized phone number to avoid duplicates
             const grouped = {};
             (data || []).forEach(msg => {
-                if (!grouped[msg.phone_number]) {
-                    grouped[msg.phone_number] = {
-                        phone: msg.phone_number,
+                const normalizedPhone = normalizePhone(msg.phone_number);
+                if (!normalizedPhone) return;
+                
+                if (!grouped[normalizedPhone]) {
+                    grouped[normalizedPhone] = {
+                        phone: normalizedPhone,
                         messages: [],
                         lastMessage: '',
                         time: '',
@@ -126,9 +131,9 @@ const Conversations = () => {
                         status: 'pending'
                     };
                 }
-                grouped[msg.phone_number].messages.push(msg);
-                grouped[msg.phone_number].lastMessage = msg.content;
-                grouped[msg.phone_number].time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                grouped[normalizedPhone].messages.push(msg);
+                grouped[normalizedPhone].lastMessage = msg.content;
+                grouped[normalizedPhone].time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             });
 
             // Convert to array and sort by latest message
