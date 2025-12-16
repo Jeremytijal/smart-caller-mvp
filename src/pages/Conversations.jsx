@@ -90,14 +90,28 @@ const Conversations = () => {
         if (!user) return;
 
         try {
-            // Filter messages by agent_id (user's ID)
-            const { data, error } = await supabase
+            // Fetch all messages for this user
+            // First try with agent_id, if empty try without filter
+            let { data, error } = await supabase
                 .from('messages')
                 .select('*')
                 .eq('agent_id', user.id)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
+            
+            // If no messages found with agent_id filter, try fetching all messages
+            if (!data || data.length === 0) {
+                console.log('No messages with agent_id, fetching all messages...');
+                const allMessages = await supabase
+                    .from('messages')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+                
+                if (!allMessages.error) {
+                    data = allMessages.data;
+                }
+            }
 
             // Group by phone number
             const grouped = {};

@@ -413,7 +413,7 @@
 /* Campaign Stats */
 .campaign-stats {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
     padding: 16px 0;
     border-top: 1px solid #f3f4f6;
@@ -424,6 +424,10 @@
 .stat-item {
     flex: 1;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 12px;
 }
 
 .stat-item .stat-number {
@@ -431,13 +435,14 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: #1a1a1a;
+    line-height: 1.2;
 }
 
 .stat-item .stat-name {
     display: block;
     font-size: 0.75rem;
     color: #9ca3af;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 .stat-item.highlight .stat-number {
@@ -450,8 +455,9 @@
 
 .stat-divider {
     width: 1px;
-    height: 40px;
-    background: #f3f4f6;
+    align-self: stretch;
+    background: #e5e5e5;
+    flex-shrink: 0;
 }
 
 /* Campaign Footer */
