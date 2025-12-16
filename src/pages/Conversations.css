@@ -164,21 +164,21 @@
 }
 
 /* Chat Area */
-.chat-area {
+.conversations-page .chat-area {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #FFFFFF;
+    background: #FFFFFF !important;
     border-radius: 0 20px 20px 0;
 }
 
-.chat-header {
+.conversations-page .chat-header {
     padding: 16px 24px;
-    border-bottom: 1px solid var(--border-subtle, #e5e5e5);
+    border-bottom: 1px solid #e5e5e5;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
+    background: #FFFFFF !important;
     border-radius: 0 20px 0 0;
 }
 
@@ -242,14 +242,14 @@
 }
 
 /* Messages Container */
-.messages-container {
+.conversations-page .messages-container {
     flex: 1;
     padding: 24px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    background: #FFFFFF;
+    background: #FFFFFF !important;
 }
 
 .message-wrapper {
@@ -296,34 +296,35 @@
 }
 
 /* Chat Input Area */
-.chat-input-area {
+.conversations-page .chat-input-area {
     padding: 20px 24px;
-    border-top: 1px solid var(--border-subtle, #e5e5e5);
+    border-top: 1px solid #e5e5e5;
     display: flex;
     gap: 12px;
-    background: #fff;
+    background: #FFFFFF !important;
     border-radius: 0 0 20px 0;
+    position: relative !important;
 }
 
-.chat-input-area input {
+.conversations-page .chat-input-area input {
     flex: 1;
     padding: 14px 20px;
-    background: var(--bg-secondary, #f9fafb);
-    border: 1px solid var(--border-subtle, #e5e5e5);
+    background: #f9fafb !important;
+    border: 1px solid #e5e5e5;
     border-radius: 999px;
-    color: var(--text-primary, #1a1a1a);
+    color: #1a1a1a !important;
     font-size: 0.95rem;
     outline: none;
     transition: all 0.2s;
 }
 
-.chat-input-area input::placeholder {
-    color: var(--text-muted, #9ca3af);
+.conversations-page .chat-input-area input::placeholder {
+    color: #9ca3af;
 }
 
-.chat-input-area input:focus {
-    border-color: var(--accent-primary, #FF470F);
-    background: #fff;
+.conversations-page .chat-input-area input:focus {
+    border-color: #FF470F;
+    background: #FFFFFF !important;
     box-shadow: 0 0 0 3px rgba(255, 71, 15, 0.1);
 }
 
