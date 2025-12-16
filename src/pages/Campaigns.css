@@ -281,7 +281,7 @@
 
 /* Campaign Card */
 .campaign-card {
-    background: #fff;
+    background: #FFFFFF !important;
     border: 1px solid #e5e5e5;
     border-radius: 16px;
     padding: 24px;
@@ -289,6 +289,7 @@
 }
 
 .campaign-card:hover {
+    background: #FFFFFF !important;
     border-color: #d1d5db;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -416,9 +417,10 @@
     align-items: stretch;
     gap: 0;
     padding: 16px 0;
-    border-top: 1px solid #f3f4f6;
-    border-bottom: 1px solid #f3f4f6;
+    border-top: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
     margin-bottom: 16px;
+    background: #FFFFFF;
 }
 
 .stat-item {
@@ -428,29 +430,31 @@
     flex-direction: column;
     justify-content: center;
     padding: 0 12px;
+    background: #FFFFFF;
 }
 
 .stat-item .stat-number {
     display: block;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1a1a1a !important;
     line-height: 1.2;
+    background: transparent;
 }
 
 .stat-item .stat-name {
     display: block;
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: #6b7280;
     margin-top: 4px;
 }
 
 .stat-item.highlight .stat-number {
-    color: #FF470F;
+    color: #FF470F !important;
 }
 
 .stat-item.rate .stat-number {
-    color: #10B981;
+    color: #10B981 !important;
 }
 
 .stat-divider {
