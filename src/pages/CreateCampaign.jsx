@@ -191,9 +191,10 @@ const CreateCampaign = () => {
                 .from('profiles')
                 .select('agent_config, first_message_template')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
+            if (!data) return;
             
             if (data?.agent_config) {
                 setAgentConfig(data.agent_config);

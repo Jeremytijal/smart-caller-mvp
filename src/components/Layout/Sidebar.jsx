@@ -56,7 +56,7 @@ const Sidebar = () => {
         .from('profiles')
         .select('subscription_plan, subscription_status, trial_ends_at')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       // Set subscription info for account modal
       setSubscription({

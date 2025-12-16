@@ -84,9 +84,14 @@ const AgentSettings = () => {
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
+            if (!data) {
+                console.log('No profile found for user, using defaults');
+                setLoading(false);
+                return;
+            }
             if (data) {
                 // Set subscription info
                 setSubscription({

@@ -31,9 +31,10 @@ const Integrations = () => {
                 .from('profiles')
                 .select('webhook_url, agent_config')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
+            if (!data) return;
 
             if (data) {
                 setCrmWebhookUrl(data.webhook_url || '');
@@ -72,7 +73,7 @@ const Integrations = () => {
                 .from('profiles')
                 .select('agent_config')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             const updatedConfig = {
                 ...(currentData?.agent_config || {}),

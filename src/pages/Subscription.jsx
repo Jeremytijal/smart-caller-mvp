@@ -34,9 +34,10 @@ const Subscription = () => {
                 .from('profiles')
                 .select('subscription_plan, subscription_status, trial_ends_at')
                 .eq('id', user.id)
-                .single();
+                .maybeSingle();
 
             if (error) throw error;
+            if (!data) return;
             setCurrentSubscription(data);
         } catch (error) {
             console.error('Error fetching subscription:', error);
