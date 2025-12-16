@@ -291,7 +291,7 @@ const SandboxChat = ({ onConversationEnd }) => {
                             <Globe size={14} />
                             Voir le site
                         </a>
-                        <a href="https://agent.smart-caller.ai/subscription" target="_blank" rel="noopener noreferrer" className="notice-link primary">
+                        <a href="/pricing" className="notice-link primary">
                             <CreditCard size={14} />
                             Voir les tarifs
                         </a>

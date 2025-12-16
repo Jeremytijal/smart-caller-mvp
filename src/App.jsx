@@ -17,6 +17,7 @@ import Funnel from './pages/Funnel';
 import FunnelV2 from './pages/FunnelV2';
 import SandboxAnalytics from './pages/SandboxAnalytics';
 import Subscription from './pages/Subscription';
+import Pricing from './pages/Pricing';
 import Blacklist from './pages/Blacklist';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -40,6 +41,8 @@ function App() {
           <Route path="/funnel" element={<Funnel />} />
           <Route path="/demo" element={<FunnelV2 />} />
           <Route path="/sandbox-analytics" element={<SandboxAnalytics />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/tarifs" element={<Pricing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/terms" element={<Terms />} />
