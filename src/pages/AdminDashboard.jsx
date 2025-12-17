@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
     Users, Bot, Building2, Target, MessageSquare, 
     Calendar, Shield, ChevronDown, ChevronUp, 
     Search, Filter, RefreshCw, LogOut, Eye,
     Clock, CheckCircle, XCircle, AlertCircle, Send, Megaphone,
-    Edit3, Save, X, Mail, Hash, CreditCard, Copy
+    Edit3, Save, X, Mail, Hash, CreditCard, Copy,
+    Play, FileText, Download, Repeat, Zap
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { endpoints } from '../config';
+import { endpoints, API_URL } from '../config';
 import './AdminDashboard.css';
 
 /**
@@ -44,6 +45,14 @@ const AdminDashboard = () => {
     const [editData, setEditData] = useState({});
     const [saving, setSaving] = useState(false);
     const [copied, setCopied] = useState(null);
+    
+    // Sandbox states
+    const [testingAgent, setTestingAgent] = useState(null);
+    const [sandboxMessages, setSandboxMessages] = useState([]);
+    const [sandboxInput, setSandboxInput] = useState('');
+    const [sandboxLoading, setSandboxLoading] = useState(false);
+    const [triggerType, setTriggerType] = useState('demo_form');
+    const sandboxRef = useRef(null);
     
     // Vérifier si l'utilisateur est admin
     const isAdmin = user && ADMIN_EMAILS.includes(user.email);
@@ -186,6 +195,162 @@ const AdminDashboard = () => {
         navigator.clipboard.writeText(text);
         setCopied(field);
         setTimeout(() => setCopied(null), 2000);
+    };
+
+    // Sandbox functions
+    const TRIGGER_TYPES = {
+        demo_form: {
+            label: 'Formulaire Démo',
+            icon: FileText,
+            type: 'inbound',
+            description: 'Lead qui demande une démo via formulaire',
+            context: "Le prospect vient de remplir un formulaire de demande de démo sur le site web. Il a exprimé un intérêt actif pour le produit/service. C'est un lead INBOUND chaud qui attend un contact rapide.",
+            firstMessageContext: "réponse à sa demande de démonstration"
+        },
+        whitepaper_form: {
+            label: 'Téléchargement Livre Blanc',
+            icon: Download,
+            type: 'inbound',
+            description: 'Lead qui télécharge un contenu',
+            context: "Le prospect vient de télécharger un livre blanc ou un guide. Il s'intéresse au sujet mais n'a pas encore exprimé d'intention d'achat claire. C'est un lead INBOUND tiède à qualifier.",
+            firstMessageContext: "suite au téléchargement de son livre blanc"
+        },
+        reactivation_campaign: {
+            label: 'Campagne Réactivation',
+            icon: Repeat,
+            type: 'outbound',
+            description: 'Relance d\'un ancien lead/client',
+            context: "Ce contact fait partie d'une campagne de réactivation OUTBOUND. Il a déjà été en contact avec l'entreprise par le passé mais n'a pas donné suite. L'objectif est de raviver son intérêt sans être intrusif.",
+            firstMessageContext: "campagne de réactivation commerciale"
+        }
+    };
+
+    const startSandbox = (profile) => {
+        setTestingAgent(profile);
+        setTriggerType('demo_form');
+        setSandboxMessages([]);
+        setSandboxInput('');
+        
+        // Generate initial message based on trigger
+        setTimeout(() => {
+            generateInitialMessage(profile, 'demo_form');
+        }, 500);
+    };
+
+    const generateInitialMessage = async (profile, trigger) => {
+        const triggerConfig = TRIGGER_TYPES[trigger];
+        const agentConfig = profile.agent_config || {};
+        
+        // Create contextual first message
+        let firstMessage = profile.first_message_template || 
+            `Bonjour ! ${agentConfig.name || 'L\'agent'} de ${agentConfig.company || 'notre équipe'} vous contacte suite à ${triggerConfig.firstMessageContext}. Comment puis-je vous aider ?`;
+        
+        // Adapt message based on trigger type
+        if (trigger === 'demo_form') {
+            firstMessage = agentConfig.name ? 
+                `Bonjour ! 👋 Je suis ${agentConfig.name} de ${agentConfig.company || 'notre équipe'}. Merci pour votre demande de démo ! Je suis là pour répondre à vos questions et organiser une présentation personnalisée. Quel est votre principal besoin actuellement ?` :
+                `Bonjour ! 👋 Merci pour votre demande de démonstration ! Je suis là pour répondre à vos questions. Quel est votre principal besoin actuellement ?`;
+        } else if (trigger === 'whitepaper_form') {
+            firstMessage = agentConfig.name ?
+                `Bonjour ! Je suis ${agentConfig.name} de ${agentConfig.company || 'notre équipe'}. J'espère que le guide téléchargé vous a été utile ! Avez-vous des questions sur le sujet ou souhaitez-vous approfondir certains points ?` :
+                `Bonjour ! J'espère que notre guide vous a été utile ! Avez-vous des questions sur le sujet ?`;
+        } else if (trigger === 'reactivation_campaign') {
+            firstMessage = agentConfig.name ?
+                `Bonjour ! ${agentConfig.name} de ${agentConfig.company || 'notre équipe'} ici. Nous avons échangé il y a quelque temps et je voulais prendre de vos nouvelles. Votre situation a-t-elle évolué depuis ?` :
+                `Bonjour ! Nous avons échangé il y a quelque temps. Je voulais prendre de vos nouvelles concernant votre projet. Où en êtes-vous ?`;
+        }
+        
+        setSandboxMessages([{
+            role: 'assistant',
+            content: firstMessage,
+            timestamp: new Date().toISOString()
+        }]);
+    };
+
+    const handleTriggerChange = (newTrigger) => {
+        setTriggerType(newTrigger);
+        if (testingAgent) {
+            setSandboxMessages([]);
+            generateInitialMessage(testingAgent, newTrigger);
+        }
+    };
+
+    const sendSandboxMessage = async () => {
+        if (!sandboxInput.trim() || sandboxLoading || !testingAgent) return;
+        
+        const userMessage = sandboxInput.trim();
+        setSandboxInput('');
+        setSandboxMessages(prev => [...prev, {
+            role: 'user',
+            content: userMessage,
+            timestamp: new Date().toISOString()
+        }]);
+        
+        setSandboxLoading(true);
+        
+        try {
+            const triggerConfig = TRIGGER_TYPES[triggerType];
+            const agentConfig = testingAgent.agent_config || {};
+            
+            // Build conversation history for API
+            const conversationHistory = sandboxMessages.map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+            conversationHistory.push({ role: 'user', content: userMessage });
+            
+            const response = await fetch(`${API_URL}/api/admin/sandbox-chat`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Admin-Email': user.email
+                },
+                body: JSON.stringify({
+                    agentConfig: {
+                        ...agentConfig,
+                        triggerType: triggerType,
+                        triggerContext: triggerConfig.context,
+                        isInbound: triggerConfig.type === 'inbound'
+                    },
+                    conversationHistory,
+                    userMessage
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                setSandboxMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: data.response,
+                    timestamp: new Date().toISOString()
+                }]);
+            } else {
+                throw new Error(data.error || 'Erreur API');
+            }
+        } catch (error) {
+            console.error('Sandbox error:', error);
+            setSandboxMessages(prev => [...prev, {
+                role: 'assistant',
+                content: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+                timestamp: new Date().toISOString(),
+                isError: true
+            }]);
+        } finally {
+            setSandboxLoading(false);
+            // Scroll to bottom
+            setTimeout(() => {
+                if (sandboxRef.current) {
+                    sandboxRef.current.scrollTop = sandboxRef.current.scrollHeight;
+                }
+            }, 100);
+        }
+    };
+
+    const closeSandbox = () => {
+        setTestingAgent(null);
+        setSandboxMessages([]);
+        setSandboxInput('');
     };
 
     const filteredProfiles = profiles.filter(profile => {
@@ -517,10 +682,18 @@ const AdminDashboard = () => {
                                                 </button>
                                             </>
                                         ) : (
-                                            <button className="btn-edit" onClick={() => startEditing(profile)}>
-                                                <Edit3 size={16} />
-                                                Modifier
-                                            </button>
+                                            <>
+                                                <button className="btn-edit" onClick={() => startEditing(profile)}>
+                                                    <Edit3 size={16} />
+                                                    Modifier
+                                                </button>
+                                                {profile.agent_config?.name && (
+                                                    <button className="btn-test" onClick={() => startSandbox(profile)}>
+                                                        <Play size={16} />
+                                                        Tester l'agent
+                                                    </button>
+                                                )}
+                                            </>
                                         )}
                                     </div>
 
@@ -753,6 +926,121 @@ const AdminDashboard = () => {
                     )
                 )}
             </div>
+            
+            {/* Sandbox Modal */}
+            {testingAgent && (
+                <div className="sandbox-modal-overlay" onClick={closeSandbox}>
+                    <div className="sandbox-modal" onClick={e => e.stopPropagation()}>
+                        <div className="sandbox-header">
+                            <div className="sandbox-title">
+                                <Bot size={24} />
+                                <div>
+                                    <h3>Test Agent: {testingAgent.agent_config?.name || 'Agent'}</h3>
+                                    <span className="sandbox-company">{testingAgent.agent_config?.company || testingAgent.email}</span>
+                                </div>
+                            </div>
+                            <button className="btn-close-sandbox" onClick={closeSandbox}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        {/* Trigger Selection */}
+                        <div className="trigger-selector">
+                            <label>Déclenchement :</label>
+                            <div className="trigger-options">
+                                {Object.entries(TRIGGER_TYPES).map(([key, config]) => {
+                                    const Icon = config.icon;
+                                    return (
+                                        <button
+                                            key={key}
+                                            className={`trigger-option ${triggerType === key ? 'active' : ''} ${config.type}`}
+                                            onClick={() => handleTriggerChange(key)}
+                                        >
+                                            <Icon size={16} />
+                                            <span>{config.label}</span>
+                                            <span className={`trigger-type-badge ${config.type}`}>
+                                                {config.type === 'inbound' ? 'Inbound' : 'Outbound'}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <p className="trigger-description">
+                                <Zap size={14} />
+                                {TRIGGER_TYPES[triggerType].description}
+                            </p>
+                        </div>
+                        
+                        {/* Chat Messages */}
+                        <div className="sandbox-messages" ref={sandboxRef}>
+                            {sandboxMessages.map((msg, idx) => (
+                                <div key={idx} className={`sandbox-message ${msg.role} ${msg.isError ? 'error' : ''}`}>
+                                    {msg.role === 'assistant' && (
+                                        <div className="message-avatar">
+                                            <Bot size={16} />
+                                        </div>
+                                    )}
+                                    <div className="message-content">
+                                        <p>{msg.content}</p>
+                                        <span className="message-time">
+                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                            {sandboxLoading && (
+                                <div className="sandbox-message assistant loading">
+                                    <div className="message-avatar">
+                                        <Bot size={16} />
+                                    </div>
+                                    <div className="message-content">
+                                        <div className="typing-indicator">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Input Area */}
+                        <div className="sandbox-input-area">
+                            <input
+                                type="text"
+                                placeholder="Jouez le rôle du prospect... Tapez votre message"
+                                value={sandboxInput}
+                                onChange={(e) => setSandboxInput(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && sendSandboxMessage()}
+                                disabled={sandboxLoading}
+                            />
+                            <button 
+                                className="btn-send-sandbox" 
+                                onClick={sendSandboxMessage}
+                                disabled={!sandboxInput.trim() || sandboxLoading}
+                            >
+                                <Send size={18} />
+                            </button>
+                        </div>
+                        
+                        {/* Agent Config Preview */}
+                        <div className="sandbox-config-preview">
+                            <div className="config-item">
+                                <span className="config-label">Objectif</span>
+                                <span className="config-value">{testingAgent.agent_config?.goal || 'qualify'}</span>
+                            </div>
+                            <div className="config-item">
+                                <span className="config-label">Ton</span>
+                                <span className="config-value">{testingAgent.agent_config?.tone || 50}/100</span>
+                            </div>
+                            <div className="config-item">
+                                <span className="config-label">Style</span>
+                                <span className="config-value">{testingAgent.agent_config?.politeness || 'vous'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
