@@ -199,22 +199,39 @@ const AgentSettings = () => {
                     behaviorMode: config.behaviorMode,
                     responseDelay: config.responseDelay,
                     schedule: config.schedule
-                }
+                },
+                updated_at: new Date().toISOString()
             };
 
-            const { error } = await supabase
+            console.log('Saving agent config:', updates);
+
+            const { data, error } = await supabase
                 .from('profiles')
                 .update(updates)
-                .eq('id', user.id);
+                .eq('id', user.id)
+                .select();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase update error:', error);
+                throw error;
+            }
+
+            if (!data || data.length === 0) {
+                console.error('No rows updated - check RLS policies');
+                throw new Error('La mise à jour a échoué. Veuillez vous reconnecter.');
+            }
+
+            console.log('Agent config saved successfully:', data);
+
+            // Refresh the config from database to confirm save
+            await fetchConfig();
 
             setShowToast(true);
             setEditingSection(null);
             setTimeout(() => setShowToast(false), 3000);
         } catch (error) {
             console.error('Error saving settings:', error);
-            alert('Erreur lors de la sauvegarde.');
+            alert('Erreur lors de la sauvegarde: ' + (error.message || 'Erreur inconnue'));
         } finally {
             setSaving(false);
         }
