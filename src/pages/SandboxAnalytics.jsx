@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     BarChart3, Users, CheckCircle, Calendar, MessageSquare,
     TrendingUp, Smartphone, Monitor, RefreshCw, ChevronDown,
-    ChevronUp, Clock, Target, Zap, Filter
+    ChevronUp, Clock, Target, Zap, Filter, Link2, ExternalLink
 } from 'lucide-react';
 import { API_URL } from '../config';
 import './SandboxAnalytics.css';
@@ -208,6 +208,12 @@ const SandboxAnalytics = () => {
                                         <span className="conv-device">
                                             {conv.device_type === 'mobile' ? <Smartphone size={14} /> : <Monitor size={14} />}
                                         </span>
+                                        {conv.utm_source && (
+                                            <span className="utm-badge" title={`${conv.utm_source} / ${conv.utm_medium || '-'}`}>
+                                                <Link2 size={12} />
+                                                {conv.utm_source}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="conv-stats">
                                         <span className="score">Score: {conv.qualification_score}</span>
@@ -244,6 +250,63 @@ const SandboxAnalytics = () => {
                                                 {conv.qualification_reasons.map((reason, i) => (
                                                     <span key={i} className="reason-tag">{reason}</span>
                                                 ))}
+                                            </div>
+                                        )}
+
+                                        {/* UTM Parameters Section */}
+                                        {(conv.utm_source || conv.utm_medium || conv.utm_campaign || conv.gclid || conv.fbclid) && (
+                                            <div className="utm-section">
+                                                <span className="utm-label"><Link2 size={14} /> UTM / Tracking:</span>
+                                                <div className="utm-grid">
+                                                    {conv.utm_source && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">Source</span>
+                                                            <span className="utm-value">{conv.utm_source}</span>
+                                                        </div>
+                                                    )}
+                                                    {conv.utm_medium && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">Medium</span>
+                                                            <span className="utm-value">{conv.utm_medium}</span>
+                                                        </div>
+                                                    )}
+                                                    {conv.utm_campaign && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">Campaign</span>
+                                                            <span className="utm-value">{conv.utm_campaign}</span>
+                                                        </div>
+                                                    )}
+                                                    {conv.utm_content && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">Content</span>
+                                                            <span className="utm-value">{conv.utm_content}</span>
+                                                        </div>
+                                                    )}
+                                                    {conv.utm_term && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">Term</span>
+                                                            <span className="utm-value">{conv.utm_term}</span>
+                                                        </div>
+                                                    )}
+                                                    {conv.gclid && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">GCLID</span>
+                                                            <span className="utm-value truncate">{conv.gclid.substring(0, 20)}...</span>
+                                                        </div>
+                                                    )}
+                                                    {conv.fbclid && (
+                                                        <div className="utm-item">
+                                                            <span className="utm-key">FBCLID</span>
+                                                            <span className="utm-value truncate">{conv.fbclid.substring(0, 20)}...</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {conv.referrer && (
+                                                    <div className="referrer-info">
+                                                        <span className="referrer-label"><ExternalLink size={12} /> Referrer:</span>
+                                                        <span className="referrer-value">{conv.referrer}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
 

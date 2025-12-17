@@ -20,6 +20,20 @@ const SandboxChat = ({ onConversationEnd }) => {
     const [isTyping, setIsTyping] = useState(false);
     const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
     
+    // UTM tracking
+    const [utmParams] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            utm_source: params.get('utm_source') || null,
+            utm_medium: params.get('utm_medium') || null,
+            utm_campaign: params.get('utm_campaign') || null,
+            utm_content: params.get('utm_content') || null,
+            utm_term: params.get('utm_term') || null,
+            gclid: params.get('gclid') || null,
+            fbclid: params.get('fbclid') || null
+        };
+    });
+    
     // Qualification state
     const [qualificationData, setQualificationData] = useState({
         isQualified: false,
@@ -221,7 +235,9 @@ const SandboxChat = ({ onConversationEnd }) => {
                     rdvSlot: qualificationData.rdvSlot,
                     ended,
                     userAgent: navigator.userAgent,
-                    referrer: document.referrer
+                    referrer: document.referrer,
+                    // UTM parameters
+                    utm: utmParams
                 })
             });
         } catch (error) {
