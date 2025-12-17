@@ -674,6 +674,48 @@
     color: #818cf8 !important;
 }
 
+/* UTM Info Section */
+.utm-info-section {
+    background: rgba(245, 158, 11, 0.05);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+    padding: 16px !important;
+}
+
+.utm-info-section h4 {
+    color: #f59e0b !important;
+}
+
+.utm-value {
+    color: #f59e0b !important;
+    font-weight: 500;
+}
+
+.utm-value.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+/* UTM Badge in header */
+.agent-badges .utm-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
 .detail-item.copyable {
     cursor: pointer;
     transition: all 0.2s;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Rocket, Play } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -16,6 +16,25 @@ const SignUp = () => {
     const [error, setError] = useState('');
     const { signup, login } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    
+    // Capture UTM parameters
+    const [utmParams] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            utm_source: params.get('utm_source') || null,
+            utm_medium: params.get('utm_medium') || null,
+            utm_campaign: params.get('utm_campaign') || null,
+            utm_content: params.get('utm_content') || null,
+            utm_term: params.get('utm_term') || null,
+            gclid: params.get('gclid') || null,
+            fbclid: params.get('fbclid') || null,
+            referrer: document.referrer || null
+        };
+    });
+    
+    // Get plan from URL if coming from pricing page
+    const selectedPlan = searchParams.get('plan');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,7 +43,7 @@ const SignUp = () => {
         try {
             const { user } = await signup(name, email, password);
             
-            // Notify admin about new user (async, don't wait)
+            // Notify admin about new user with UTM data (async, don't wait)
             fetch(`${API_URL}/api/notify/new-user`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,9 +52,23 @@ const SignUp = () => {
                         id: user?.id, 
                         email, 
                         name 
-                    } 
+                    },
+                    utm: utmParams,
+                    selectedPlan
                 })
             }).catch(err => console.log('Notification error:', err));
+            
+            // Also save UTM to user profile
+            if (user?.id) {
+                fetch(`${API_URL}/api/users/save-utm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        utm: utmParams
+                    })
+                }).catch(err => console.log('UTM save error:', err));
+            }
             
             navigate('/onboarding');
         } catch (error) {

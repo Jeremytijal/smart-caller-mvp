@@ -631,6 +631,12 @@ const AdminDashboard = () => {
                                 </div>
                                 <div className="agent-badges">
                                     {getSubscriptionBadge(profile.subscription_status)}
+                                    {profile.utm_source && (
+                                        <span className="utm-badge" title={`${profile.utm_source} / ${profile.utm_campaign || '-'}`}>
+                                            <Zap size={12} />
+                                            {profile.utm_source}
+                                        </span>
+                                    )}
                                     <span className="date">
                                         <Calendar size={14} />
                                         {formatDate(profile.created_at)}
@@ -667,6 +673,63 @@ const AdminDashboard = () => {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* UTM Tracking Section */}
+                                    {(profile.utm_source || profile.utm_medium || profile.utm_campaign || profile.gclid || profile.fbclid) && (
+                                        <div className="details-section utm-info-section">
+                                            <h4><Zap size={16} /> Source d'acquisition (UTM)</h4>
+                                            <div className="details-grid">
+                                                {profile.utm_source && (
+                                                    <div className="detail-item">
+                                                        <span className="label">Source</span>
+                                                        <span className="value utm-value">{profile.utm_source}</span>
+                                                    </div>
+                                                )}
+                                                {profile.utm_medium && (
+                                                    <div className="detail-item">
+                                                        <span className="label">Medium</span>
+                                                        <span className="value utm-value">{profile.utm_medium}</span>
+                                                    </div>
+                                                )}
+                                                {profile.utm_campaign && (
+                                                    <div className="detail-item">
+                                                        <span className="label">Campaign</span>
+                                                        <span className="value utm-value">{profile.utm_campaign}</span>
+                                                    </div>
+                                                )}
+                                                {profile.utm_content && (
+                                                    <div className="detail-item">
+                                                        <span className="label">Content</span>
+                                                        <span className="value utm-value">{profile.utm_content}</span>
+                                                    </div>
+                                                )}
+                                                {profile.utm_term && (
+                                                    <div className="detail-item">
+                                                        <span className="label">Term</span>
+                                                        <span className="value utm-value">{profile.utm_term}</span>
+                                                    </div>
+                                                )}
+                                                {profile.gclid && (
+                                                    <div className="detail-item">
+                                                        <span className="label">GCLID (Google)</span>
+                                                        <span className="value utm-value truncate">{profile.gclid.substring(0, 25)}...</span>
+                                                    </div>
+                                                )}
+                                                {profile.fbclid && (
+                                                    <div className="detail-item">
+                                                        <span className="label">FBCLID (Meta)</span>
+                                                        <span className="value utm-value truncate">{profile.fbclid.substring(0, 25)}...</span>
+                                                    </div>
+                                                )}
+                                                {profile.referrer && (
+                                                    <div className="detail-item full-width">
+                                                        <span className="label">Referrer</span>
+                                                        <span className="value utm-value">{profile.referrer}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Edit/Save Buttons */}
                                     <div className="admin-actions">
