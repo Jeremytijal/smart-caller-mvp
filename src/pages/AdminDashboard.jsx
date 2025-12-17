@@ -57,17 +57,38 @@ const AdminDashboard = () => {
         fetchAllData();
     }, [user, isAdmin, navigate]);
     
+    const [error, setError] = useState(null);
+    
     const fetchAllData = async () => {
         setLoading(true);
+        setError(null);
+        
+        console.log('[ADMIN] Fetching data with email:', user.email);
+        console.log('[ADMIN] Endpoints:', endpoints.adminProfiles);
+        
         try {
             // Fetch profiles
             const profilesRes = await fetch(endpoints.adminProfiles, {
                 headers: { 'X-Admin-Email': user.email }
             });
+            
+            console.log('[ADMIN] Profiles response status:', profilesRes.status);
+            
+            if (!profilesRes.ok) {
+                const errorText = await profilesRes.text();
+                console.error('[ADMIN] Profiles error:', errorText);
+                setError(`Erreur API: ${profilesRes.status} - ${errorText}`);
+                setLoading(false);
+                return;
+            }
+            
             const profilesData = await profilesRes.json();
+            console.log('[ADMIN] Profiles data:', profilesData);
             
             if (profilesData.success) {
                 setProfiles(profilesData.profiles || []);
+            } else {
+                setError(profilesData.error || 'Erreur inconnue');
             }
             
             // Fetch campaigns
@@ -102,7 +123,8 @@ const AdminDashboard = () => {
             }
             
         } catch (error) {
-            console.error('Error fetching admin data:', error);
+            console.error('[ADMIN] Error fetching admin data:', error);
+            setError(`Erreur: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -287,6 +309,15 @@ const AdminDashboard = () => {
                 </button>
             </div>
             
+            {/* Error Display */}
+            {error && (
+                <div className="error-banner">
+                    <AlertCircle size={20} />
+                    <span>{error}</span>
+                    <button onClick={fetchAllData}>Réessayer</button>
+                </div>
+            )}
+
             {/* Content */}
             <div className="admin-content">
                 {loading ? (
