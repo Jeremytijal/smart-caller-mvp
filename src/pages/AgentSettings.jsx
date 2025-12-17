@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
     Save, Plus, Trash2, MessageSquare, Target, User, Sliders, Zap, 
     AlertTriangle, CheckCircle, Building2, Edit2, UserCircle, 
     MessageCircle, Smartphone, Mail, Shield, HelpCircle, Rocket,
     Phone, Check, ChevronDown, ChevronUp, ArrowRight, Clock, Calendar, Users, Info,
-    CreditCard, Gift, AlertCircle
+    CreditCard, Gift, AlertCircle, Play, X, Send, Bot, FileText, Download, Repeat
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import { SALES_CALL_URL } from '../config';
+import { SALES_CALL_URL, API_URL } from '../config';
 import './AgentSettings.css';
 
 const AgentSettings = () => {
@@ -18,6 +18,14 @@ const AgentSettings = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showToast, setShowToast] = useState(false);
+
+    // Sandbox states
+    const [showSandbox, setShowSandbox] = useState(false);
+    const [sandboxMessages, setSandboxMessages] = useState([]);
+    const [sandboxInput, setSandboxInput] = useState('');
+    const [sandboxLoading, setSandboxLoading] = useState(false);
+    const [triggerType, setTriggerType] = useState('demo_form');
+    const sandboxRef = useRef(null);
 
     // Edit modes for each section
     const [editingSection, setEditingSection] = useState(null);
@@ -212,6 +220,152 @@ const AgentSettings = () => {
         }
     };
 
+    // Sandbox trigger types
+    const TRIGGER_TYPES = {
+        demo_form: {
+            label: 'Formulaire Démo',
+            icon: FileText,
+            type: 'inbound',
+            description: 'Simulez un lead qui demande une démo',
+            firstMessageContext: "demande de démonstration"
+        },
+        whitepaper_form: {
+            label: 'Téléchargement Contenu',
+            icon: Download,
+            type: 'inbound',
+            description: 'Simulez un lead qui télécharge un contenu',
+            firstMessageContext: "téléchargement de contenu"
+        },
+        reactivation_campaign: {
+            label: 'Campagne Réactivation',
+            icon: Repeat,
+            type: 'outbound',
+            description: 'Simulez une relance d\'ancien lead',
+            firstMessageContext: "campagne de réactivation"
+        }
+    };
+
+    const openSandbox = () => {
+        setShowSandbox(true);
+        setSandboxMessages([]);
+        setTriggerType('demo_form');
+        setTimeout(() => generateInitialMessage('demo_form'), 500);
+    };
+
+    const closeSandbox = () => {
+        setShowSandbox(false);
+        setSandboxMessages([]);
+        setSandboxInput('');
+    };
+
+    const generateInitialMessage = (trigger) => {
+        const triggerConfig = TRIGGER_TYPES[trigger];
+        let firstMessage = '';
+        
+        if (trigger === 'demo_form') {
+            firstMessage = config.name ? 
+                `Bonjour ! 👋 Je suis ${config.name} de ${config.company || 'notre équipe'}. Merci pour votre demande de démo ! Je suis là pour répondre à vos questions. Quel est votre principal besoin actuellement ?` :
+                `Bonjour ! 👋 Merci pour votre demande de démonstration ! Quel est votre principal besoin actuellement ?`;
+        } else if (trigger === 'whitepaper_form') {
+            firstMessage = config.name ?
+                `Bonjour ! Je suis ${config.name} de ${config.company || 'notre équipe'}. J'espère que le guide vous a été utile ! Avez-vous des questions sur le sujet ?` :
+                `Bonjour ! J'espère que notre guide vous a été utile ! Avez-vous des questions ?`;
+        } else if (trigger === 'reactivation_campaign') {
+            firstMessage = config.name ?
+                `Bonjour ! ${config.name} de ${config.company || 'notre équipe'} ici. Nous avons échangé il y a quelque temps. Votre situation a-t-elle évolué depuis ?` :
+                `Bonjour ! Nous avons échangé il y a quelque temps. Où en êtes-vous dans votre projet ?`;
+        }
+        
+        setSandboxMessages([{
+            role: 'assistant',
+            content: firstMessage,
+            timestamp: new Date().toISOString()
+        }]);
+    };
+
+    const handleTriggerChange = (newTrigger) => {
+        setTriggerType(newTrigger);
+        setSandboxMessages([]);
+        generateInitialMessage(newTrigger);
+    };
+
+    const sendSandboxMessage = async () => {
+        if (!sandboxInput.trim() || sandboxLoading) return;
+        
+        const userMessage = sandboxInput.trim();
+        setSandboxInput('');
+        setSandboxMessages(prev => [...prev, {
+            role: 'user',
+            content: userMessage,
+            timestamp: new Date().toISOString()
+        }]);
+        
+        setSandboxLoading(true);
+        
+        try {
+            const triggerConfig = TRIGGER_TYPES[triggerType];
+            const conversationHistory = sandboxMessages.map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+            conversationHistory.push({ role: 'user', content: userMessage });
+            
+            const response = await fetch(`${API_URL}/api/sandbox/test-agent`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    agentConfig: {
+                        name: config.name,
+                        company: config.company,
+                        role: config.role,
+                        goal: config.goal,
+                        tone: config.tone,
+                        politeness: config.politeness,
+                        language: config.language,
+                        context: config.context,
+                        icp: {
+                            sector: config.icpSector,
+                            size: config.icpSize,
+                            decider: config.icpDecider,
+                            budget: config.icpBudget
+                        },
+                        triggerType: triggerType,
+                        isInbound: triggerConfig.type === 'inbound'
+                    },
+                    conversationHistory,
+                    userMessage
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                setSandboxMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: data.response,
+                    timestamp: new Date().toISOString()
+                }]);
+            } else {
+                throw new Error(data.error || 'Erreur API');
+            }
+        } catch (error) {
+            console.error('Sandbox error:', error);
+            setSandboxMessages(prev => [...prev, {
+                role: 'assistant',
+                content: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+                timestamp: new Date().toISOString(),
+                isError: true
+            }]);
+        } finally {
+            setSandboxLoading(false);
+            setTimeout(() => {
+                if (sandboxRef.current) {
+                    sandboxRef.current.scrollTop = sandboxRef.current.scrollHeight;
+                }
+            }, 100);
+        }
+    };
+
     const getToneLabel = (value) => {
         if (value < 30) return "Empathique & conseiller";
         if (value < 70) return "Professionnel & équilibré";
@@ -259,9 +413,16 @@ const AgentSettings = () => {
                         </p>
                     </div>
                         </div>
-                <button className="btn-primary" onClick={handleSave} disabled={saving}>
-                    {saving ? 'Sauvegarde...' : <><Save size={18} /> Sauvegarder</>}
-                </button>
+                <div className="config-header-buttons">
+                    {config.name && (
+                        <button className="btn-test-agent" onClick={openSandbox}>
+                            <Play size={18} /> Tester mon agent
+                        </button>
+                    )}
+                    <button className="btn-primary" onClick={handleSave} disabled={saving}>
+                        {saving ? 'Sauvegarde...' : <><Save size={18} /> Sauvegarder</>}
+                    </button>
+                </div>
             </div>
 
             {/* Subscription Status Banner */}
@@ -1059,6 +1220,121 @@ const AgentSettings = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Sandbox Modal */}
+            {showSandbox && (
+                <div className="sandbox-modal-overlay" onClick={closeSandbox}>
+                    <div className="sandbox-modal" onClick={e => e.stopPropagation()}>
+                        <div className="sandbox-header">
+                            <div className="sandbox-title">
+                                <Bot size={24} />
+                                <div>
+                                    <h3>Tester mon agent : {config.name || 'Agent'}</h3>
+                                    <span className="sandbox-company">{config.company || 'Mon entreprise'}</span>
+                                </div>
+                            </div>
+                            <button className="btn-close-sandbox" onClick={closeSandbox}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        {/* Trigger Selection */}
+                        <div className="trigger-selector">
+                            <label>Type de déclenchement :</label>
+                            <div className="trigger-options">
+                                {Object.entries(TRIGGER_TYPES).map(([key, triggerConfig]) => {
+                                    const Icon = triggerConfig.icon;
+                                    return (
+                                        <button
+                                            key={key}
+                                            className={`trigger-option ${triggerType === key ? 'active' : ''} ${triggerConfig.type}`}
+                                            onClick={() => handleTriggerChange(key)}
+                                        >
+                                            <Icon size={16} />
+                                            <span>{triggerConfig.label}</span>
+                                            <span className={`trigger-type-badge ${triggerConfig.type}`}>
+                                                {triggerConfig.type === 'inbound' ? 'Inbound' : 'Outbound'}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <p className="trigger-description">
+                                <Zap size={14} />
+                                {TRIGGER_TYPES[triggerType].description}
+                            </p>
+                        </div>
+                        
+                        {/* Chat Messages */}
+                        <div className="sandbox-messages" ref={sandboxRef}>
+                            {sandboxMessages.map((msg, idx) => (
+                                <div key={idx} className={`sandbox-message ${msg.role} ${msg.isError ? 'error' : ''}`}>
+                                    {msg.role === 'assistant' && (
+                                        <div className="message-avatar">
+                                            <Bot size={16} />
+                                        </div>
+                                    )}
+                                    <div className="message-content">
+                                        <p>{msg.content}</p>
+                                        <span className="message-time">
+                                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                            {sandboxLoading && (
+                                <div className="sandbox-message assistant loading">
+                                    <div className="message-avatar">
+                                        <Bot size={16} />
+                                    </div>
+                                    <div className="message-content">
+                                        <div className="typing-indicator">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Input Area */}
+                        <div className="sandbox-input-area">
+                            <input
+                                type="text"
+                                placeholder="Jouez le rôle du prospect... Tapez votre réponse"
+                                value={sandboxInput}
+                                onChange={(e) => setSandboxInput(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && sendSandboxMessage()}
+                                disabled={sandboxLoading}
+                            />
+                            <button 
+                                className="btn-send-sandbox" 
+                                onClick={sendSandboxMessage}
+                                disabled={!sandboxInput.trim() || sandboxLoading}
+                            >
+                                <Send size={18} />
+                            </button>
+                        </div>
+                        
+                        {/* Agent Config Preview */}
+                        <div className="sandbox-config-preview">
+                            <div className="config-item">
+                                <span className="config-label">Objectif</span>
+                                <span className="config-value">{config.goal || 'qualify'}</span>
+                            </div>
+                            <div className="config-item">
+                                <span className="config-label">Ton</span>
+                                <span className="config-value">{config.tone || 50}/100</span>
+                            </div>
+                            <div className="config-item">
+                                <span className="config-label">Style</span>
+                                <span className="config-value">{config.politeness || 'vous'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Toast Notification */}
             <div className={`toast-notification ${showToast ? 'show' : ''}`}>
