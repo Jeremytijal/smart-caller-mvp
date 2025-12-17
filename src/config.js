@@ -67,6 +67,7 @@ export const endpoints = {
     
     // Admin
     adminProfiles: `${API_URL}/api/admin/profiles`,
+    adminUpdateProfile: (userId) => `${API_URL}/api/admin/profiles/${userId}`,
     adminCampaigns: `${API_URL}/api/admin/campaigns`,
     adminMessages: `${API_URL}/api/admin/messages`,
     adminStats: `${API_URL}/api/admin/stats`,

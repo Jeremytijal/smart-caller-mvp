@@ -4,7 +4,8 @@ import {
     Users, Bot, Building2, Target, MessageSquare, 
     Calendar, Shield, ChevronDown, ChevronUp, 
     Search, Filter, RefreshCw, LogOut, Eye,
-    Clock, CheckCircle, XCircle, AlertCircle, Send, Megaphone
+    Clock, CheckCircle, XCircle, AlertCircle, Send, Megaphone,
+    Edit3, Save, X, Mail, Hash, CreditCard, Copy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { endpoints } from '../config';
@@ -39,6 +40,10 @@ const AdminDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all'); // all, with-agent, without-agent
     const [activeTab, setActiveTab] = useState('users'); // users, campaigns
+    const [editingProfile, setEditingProfile] = useState(null);
+    const [editData, setEditData] = useState({});
+    const [saving, setSaving] = useState(false);
+    const [copied, setCopied] = useState(null);
     
     // Vérifier si l'utilisateur est admin
     const isAdmin = user && ADMIN_EMAILS.includes(user.email);
@@ -130,6 +135,59 @@ const AdminDashboard = () => {
         }
     };
     
+    const startEditing = (profile) => {
+        setEditingProfile(profile.id);
+        setEditData({
+            agent_config: { ...profile.agent_config },
+            first_message_template: profile.first_message_template || '',
+            subscription_status: profile.subscription_status || '',
+            subscription_plan: profile.subscription_plan || ''
+        });
+    };
+
+    const cancelEditing = () => {
+        setEditingProfile(null);
+        setEditData({});
+    };
+
+    const saveProfile = async (profileId) => {
+        setSaving(true);
+        try {
+            const response = await fetch(endpoints.adminUpdateProfile(profileId), {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Admin-Email': user.email 
+                },
+                body: JSON.stringify(editData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Update local state
+                setProfiles(prev => prev.map(p => 
+                    p.id === profileId ? { ...p, ...editData } : p
+                ));
+                setEditingProfile(null);
+                setEditData({});
+            } else {
+                alert('Erreur: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            alert('Erreur lors de la sauvegarde');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const copyToClipboard = (text, field) => {
+        navigator.clipboard.writeText(text);
+        setCopied(field);
+        setTimeout(() => setCopied(null), 2000);
+    };
+
     const filteredProfiles = profiles.filter(profile => {
         // Filtre par recherche
         const matchesSearch = 
@@ -418,47 +476,170 @@ const AdminDashboard = () => {
                             
                             {expandedAgent === profile.id && (
                                 <div className="agent-details">
+                                    {/* User Info Section */}
+                                    <div className="details-section user-info-section">
+                                        <h4><Users size={16} /> Informations Utilisateur</h4>
+                                        <div className="details-grid">
+                                            <div className="detail-item copyable" onClick={() => copyToClipboard(profile.id, `id-${profile.id}`)}>
+                                                <span className="label">ID Utilisateur</span>
+                                                <span className="value id-value">
+                                                    <Hash size={12} />
+                                                    {profile.id}
+                                                    <Copy size={12} className={copied === `id-${profile.id}` ? 'copied' : ''} />
+                                                </span>
+                                            </div>
+                                            <div className="detail-item copyable" onClick={() => copyToClipboard(profile.email, `email-${profile.id}`)}>
+                                                <span className="label">Email</span>
+                                                <span className="value">
+                                                    <Mail size={12} />
+                                                    {profile.email}
+                                                    <Copy size={12} className={copied === `email-${profile.id}` ? 'copied' : ''} />
+                                                </span>
+                                            </div>
+                                            <div className="detail-item">
+                                                <span className="label">Dernière activité</span>
+                                                <span className="value">{formatDate(profile.updated_at)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Edit/Save Buttons */}
+                                    <div className="admin-actions">
+                                        {editingProfile === profile.id ? (
+                                            <>
+                                                <button className="btn-save" onClick={() => saveProfile(profile.id)} disabled={saving}>
+                                                    <Save size={16} />
+                                                    {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+                                                </button>
+                                                <button className="btn-cancel" onClick={cancelEditing}>
+                                                    <X size={16} />
+                                                    Annuler
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button className="btn-edit" onClick={() => startEditing(profile)}>
+                                                <Edit3 size={16} />
+                                                Modifier
+                                            </button>
+                                        )}
+                                    </div>
+
                                     {profile.agent_config && profile.agent_config.name ? (
                                         <>
                                             <div className="details-section">
                                                 <h4><Bot size={16} /> Configuration Agent</h4>
-                                                <div className="details-grid">
-                                                    <div className="detail-item">
-                                                        <span className="label">Nom</span>
-                                                        <span className="value">{profile.agent_config.name || 'N/A'}</span>
+                                                {editingProfile === profile.id ? (
+                                                    <div className="edit-grid">
+                                                        <div className="edit-field">
+                                                            <label>Nom de l'agent</label>
+                                                            <input 
+                                                                type="text" 
+                                                                value={editData.agent_config?.name || ''} 
+                                                                onChange={(e) => setEditData({
+                                                                    ...editData,
+                                                                    agent_config: { ...editData.agent_config, name: e.target.value }
+                                                                })}
+                                                            />
+                                                        </div>
+                                                        <div className="edit-field">
+                                                            <label>Rôle</label>
+                                                            <input 
+                                                                type="text" 
+                                                                value={editData.agent_config?.role || ''} 
+                                                                onChange={(e) => setEditData({
+                                                                    ...editData,
+                                                                    agent_config: { ...editData.agent_config, role: e.target.value }
+                                                                })}
+                                                            />
+                                                        </div>
+                                                        <div className="edit-field">
+                                                            <label>Entreprise</label>
+                                                            <input 
+                                                                type="text" 
+                                                                value={editData.agent_config?.company || ''} 
+                                                                onChange={(e) => setEditData({
+                                                                    ...editData,
+                                                                    agent_config: { ...editData.agent_config, company: e.target.value }
+                                                                })}
+                                                            />
+                                                        </div>
+                                                        <div className="edit-field">
+                                                            <label>Objectif</label>
+                                                            <select 
+                                                                value={editData.agent_config?.goal || 'qualify'} 
+                                                                onChange={(e) => setEditData({
+                                                                    ...editData,
+                                                                    agent_config: { ...editData.agent_config, goal: e.target.value }
+                                                                })}
+                                                            >
+                                                                <option value="qualify">Qualifier</option>
+                                                                <option value="book">Prendre RDV</option>
+                                                                <option value="qualify_and_book">Qualifier + RDV</option>
+                                                                <option value="nurture">Nurturing</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="edit-field full-width">
+                                                            <label>Contexte</label>
+                                                            <textarea 
+                                                                value={editData.agent_config?.context || ''} 
+                                                                onChange={(e) => setEditData({
+                                                                    ...editData,
+                                                                    agent_config: { ...editData.agent_config, context: e.target.value }
+                                                                })}
+                                                                rows={4}
+                                                            />
+                                                        </div>
+                                                        <div className="edit-field full-width">
+                                                            <label>Premier message</label>
+                                                            <textarea 
+                                                                value={editData.first_message_template || ''} 
+                                                                onChange={(e) => setEditData({
+                                                                    ...editData,
+                                                                    first_message_template: e.target.value
+                                                                })}
+                                                                rows={3}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Rôle</span>
-                                                        <span className="value">{profile.agent_config.role || 'N/A'}</span>
+                                                ) : (
+                                                    <div className="details-grid">
+                                                        <div className="detail-item">
+                                                            <span className="label">Nom</span>
+                                                            <span className="value">{profile.agent_config.name || 'N/A'}</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Rôle</span>
+                                                            <span className="value">{profile.agent_config.role || 'N/A'}</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Entreprise</span>
+                                                            <span className="value">{profile.agent_config.company || 'N/A'}</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Objectif</span>
+                                                            <span className="value">{profile.agent_config.goal || 'N/A'}</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Ton</span>
+                                                            <span className="value">{profile.agent_config.tone || 50}/100</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Vouvoiement</span>
+                                                            <span className="value">{profile.agent_config.politeness || 'vous'}</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Langue</span>
+                                                            <span className="value">{profile.agent_config.language || 'Français'}</span>
+                                                        </div>
+                                                        <div className="detail-item">
+                                                            <span className="label">Industrie</span>
+                                                            <span className="value">{profile.agent_config.industry || 'N/A'}</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Entreprise</span>
-                                                        <span className="value">{profile.agent_config.company || 'N/A'}</span>
-                                                    </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Objectif</span>
-                                                        <span className="value">{profile.agent_config.goal || 'N/A'}</span>
-                                                    </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Ton</span>
-                                                        <span className="value">{profile.agent_config.tone || 50}/100</span>
-                                                    </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Vouvoiement</span>
-                                                        <span className="value">{profile.agent_config.politeness || 'vous'}</span>
-                                                    </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Langue</span>
-                                                        <span className="value">{profile.agent_config.language || 'Français'}</span>
-                                                    </div>
-                                                    <div className="detail-item">
-                                                        <span className="label">Industrie</span>
-                                                        <span className="value">{profile.agent_config.industry || 'N/A'}</span>
-                                                    </div>
-                                                </div>
+                                                )}
                                             </div>
                                             
-                                            {profile.agent_config.icp && (
+                                            {profile.agent_config.icp && !editingProfile && (
                                                 <div className="details-section">
                                                     <h4><Target size={16} /> ICP (Profil Client Idéal)</h4>
                                                     <div className="details-grid">
@@ -482,7 +663,7 @@ const AdminDashboard = () => {
                                                 </div>
                                             )}
                                             
-                                            {profile.first_message_template && (
+                                            {profile.first_message_template && !editingProfile && (
                                                 <div className="details-section">
                                                     <h4><MessageSquare size={16} /> Premier message</h4>
                                                     <div className="message-preview">
@@ -491,7 +672,7 @@ const AdminDashboard = () => {
                                                 </div>
                                             )}
                                             
-                                            {profile.agent_config.context && (
+                                            {profile.agent_config.context && !editingProfile && (
                                                 <div className="details-section">
                                                     <h4><Eye size={16} /> Contexte</h4>
                                                     <div className="context-preview">
@@ -508,25 +689,61 @@ const AdminDashboard = () => {
                                     )}
                                     
                                     <div className="details-section subscription-section">
-                                        <h4><Shield size={16} /> Abonnement</h4>
-                                        <div className="details-grid">
-                                            <div className="detail-item">
-                                                <span className="label">Plan</span>
-                                                <span className="value">{profile.subscription_plan || 'Aucun'}</span>
+                                        <h4><CreditCard size={16} /> Abonnement</h4>
+                                        {editingProfile === profile.id ? (
+                                            <div className="edit-grid">
+                                                <div className="edit-field">
+                                                    <label>Plan</label>
+                                                    <select 
+                                                        value={editData.subscription_plan || ''} 
+                                                        onChange={(e) => setEditData({
+                                                            ...editData,
+                                                            subscription_plan: e.target.value
+                                                        })}
+                                                    >
+                                                        <option value="">Aucun</option>
+                                                        <option value="starter">Starter</option>
+                                                        <option value="growth">Growth</option>
+                                                        <option value="scale">Scale</option>
+                                                    </select>
+                                                </div>
+                                                <div className="edit-field">
+                                                    <label>Statut</label>
+                                                    <select 
+                                                        value={editData.subscription_status || ''} 
+                                                        onChange={(e) => setEditData({
+                                                            ...editData,
+                                                            subscription_status: e.target.value
+                                                        })}
+                                                    >
+                                                        <option value="">Inactif</option>
+                                                        <option value="trial">Essai</option>
+                                                        <option value="active">Actif</option>
+                                                        <option value="canceled">Annulé</option>
+                                                        <option value="past_due">Impayé</option>
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <div className="detail-item">
-                                                <span className="label">Statut</span>
-                                                <span className="value">{profile.subscription_status || 'Inactif'}</span>
+                                        ) : (
+                                            <div className="details-grid">
+                                                <div className="detail-item">
+                                                    <span className="label">Plan</span>
+                                                    <span className="value">{profile.subscription_plan || 'Aucun'}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="label">Statut</span>
+                                                    <span className="value">{profile.subscription_status || 'Inactif'}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="label">Fin d'essai</span>
+                                                    <span className="value">{formatDate(profile.trial_ends_at)}</span>
+                                                </div>
+                                                <div className="detail-item">
+                                                    <span className="label">Dernière mise à jour</span>
+                                                    <span className="value">{formatDate(profile.updated_at)}</span>
+                                                </div>
                                             </div>
-                                            <div className="detail-item">
-                                                <span className="label">Fin d'essai</span>
-                                                <span className="value">{formatDate(profile.trial_ends_at)}</span>
-                                            </div>
-                                            <div className="detail-item">
-                                                <span className="label">Dernière mise à jour</span>
-                                                <span className="value">{formatDate(profile.updated_at)}</span>
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
