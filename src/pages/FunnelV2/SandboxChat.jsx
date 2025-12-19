@@ -150,6 +150,9 @@ const SandboxChat = ({ onConversationEnd }) => {
         }
     };
 
+    // Calendly URL for real appointments
+    const CALENDLY_URL = 'https://calendly.com/jeremy-music/30min';
+
     // Handle response to RDV proposal
     const handleRdvResponse = async (response) => {
         const lowerResponse = response.toLowerCase();
@@ -160,13 +163,21 @@ const SandboxChat = ({ onConversationEnd }) => {
 
         if (isPositive) {
             setTimeout(() => {
-                addMessage('assistant', "Parfait ! Voici les créneaux disponibles cette semaine. Lequel vous conviendrait le mieux ?");
+                addMessage('assistant', "Super ! 🎉\n\n✨ **Fin de la démo** - Vous venez de voir comment Smart Caller qualifie vos leads et propose des RDV.\n\n👉 Pour **réserver un vrai RDV** avec notre équipe et voir Smart Caller sur vos propres leads, cliquez ci-dessous :", { 
+                    isRealRdvProposal: true 
+                });
                 setIsTyping(false);
-                setShowCalendar(true);
+                setShowRealCalendar(true);
+                
+                setQualificationData(prev => ({
+                    ...prev,
+                    rdvProposed: true,
+                    isQualified: true
+                }));
             }, 1000);
         } else if (isNegative) {
             setTimeout(() => {
-                addMessage('assistant', "Je comprends. N'hésitez pas à revenir vers nous si vous changez d'avis. Bonne continuation !");
+                addMessage('assistant', "Je comprends ! 👋\n\n✨ **Fin de la démo** - Vous venez de voir comment Smart Caller qualifie vos leads.\n\nSi vous changez d'avis, vous pouvez réserver un appel sur notre site.");
                 setIsTyping(false);
                 setTimeout(() => endConversation(true), 2000);
             }, 1000);
@@ -180,37 +191,45 @@ const SandboxChat = ({ onConversationEnd }) => {
         }
     };
 
-    // Handle calendar slot selection
+    // State for real calendar CTA
+    const [showRealCalendar, setShowRealCalendar] = useState(false);
+
+    // Handle real calendar click
+    const handleRealCalendarClick = () => {
+        window.open(CALENDLY_URL, '_blank');
+        
+        setQualificationData(prev => ({
+            ...prev,
+            rdvAccepted: true,
+            rdvSlot: { type: 'calendly_redirect' }
+        }));
+        
+        setTimeout(() => endConversation(true), 1000);
+    };
+
+    // Handle calendar slot selection (legacy - now redirects to Calendly)
     const handleSlotSelect = (slot) => {
         setShowCalendar(false);
+        window.open(CALENDLY_URL, '_blank');
         
-        const slotText = `${slot.day} à ${slot.time}`;
-        addMessage('user', `Je choisis ${slotText}`, { isSlotSelection: true });
+        setQualificationData(prev => ({
+            ...prev,
+            rdvAccepted: true,
+            rdvSlot: slot
+        }));
         
-        setIsTyping(true);
-        
-        setTimeout(() => {
-            addMessage('assistant', `Parfait ! Votre rendez-vous est confirmé pour ${slotText}. 📅\n\nVous recevrez un rappel par SMS. À très bientôt !`, { isConfirmation: true });
-            setIsTyping(false);
-            
-            setQualificationData(prev => ({
-                ...prev,
-                rdvAccepted: true,
-                rdvSlot: slot
-            }));
-            
-            setTimeout(() => endConversation(true), 2000);
-        }, 1500);
+        setTimeout(() => endConversation(true), 1000);
     };
 
     // Handle calendar dismiss
     const handleCalendarDismiss = () => {
         setShowCalendar(false);
-        addMessage('user', "Aucun créneau ne me convient");
+        setShowRealCalendar(false);
+        addMessage('user', "Je préfère voir d'abord");
         
         setIsTyping(true);
         setTimeout(() => {
-            addMessage('assistant', "Je comprends. Nous vous recontacterons pour trouver un meilleur moment. Merci pour cet échange !");
+            addMessage('assistant', "Pas de souci ! Vous pouvez explorer notre site et revenir quand vous êtes prêt. 🚀");
             setIsTyping(false);
             setTimeout(() => endConversation(true), 2000);
         }, 1000);
@@ -354,13 +373,32 @@ const SandboxChat = ({ onConversationEnd }) => {
                     </div>
                 )}
 
-                {/* Calendar Picker */}
+                {/* Legacy Calendar Picker (sandbox simulation) */}
                 {showCalendar && (
                     <div className="calendar-container">
                         <CalendarPicker 
                             onSelect={handleSlotSelect}
                             onDismiss={handleCalendarDismiss}
                         />
+                    </div>
+                )}
+
+                {/* Real Calendly CTA */}
+                {showRealCalendar && (
+                    <div className="real-calendar-cta">
+                        <button 
+                            className="btn-calendly"
+                            onClick={handleRealCalendarClick}
+                        >
+                            <Calendar size={20} />
+                            Réserver mon vrai RDV (15 min)
+                        </button>
+                        <button 
+                            className="btn-skip"
+                            onClick={handleCalendarDismiss}
+                        >
+                            Continuer à explorer
+                        </button>
                     </div>
                 )}
 

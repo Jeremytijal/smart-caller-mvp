@@ -605,6 +605,68 @@
     width: 100%;
 }
 
+/* Real Calendly CTA */
+.real-calendar-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(255, 71, 15, 0.15) 0%, rgba(255, 71, 15, 0.05) 100%);
+    border: 2px solid var(--fv2-primary);
+    border-radius: 16px;
+    margin: 8px 0;
+}
+
+.btn-calendly {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--fv2-primary) 0%, #e03e0d 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 71, 15, 0.4);
+    animation: pulse-cta 2s infinite;
+}
+
+@keyframes pulse-cta {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 71, 15, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 6px 25px rgba(255, 71, 15, 0.5);
+    }
+}
+
+.btn-calendly:hover {
+    background: linear-gradient(135deg, #e03e0d 0%, #c4350b 100%);
+    transform: scale(1.02);
+}
+
+.btn-skip {
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid var(--fv2-border);
+    border-radius: 10px;
+    color: var(--fv2-text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-skip:hover {
+    border-color: var(--fv2-text-muted);
+    color: var(--fv2-text);
+}
+
 .calendar-picker {
     background: var(--fv2-bg);
     border: 1px solid var(--fv2-border);
