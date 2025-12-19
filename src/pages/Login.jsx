@@ -21,6 +21,12 @@ const Login = () => {
         setError('');
         try {
             await login(email, password);
+            
+            // Auto-enable demo mode for demo account
+            if (email.toLowerCase() === 'demo@smartcaller.ai') {
+                enableDemoMode();
+            }
+            
             navigate('/');
         } catch (error) {
             console.error('Login failed', error);
