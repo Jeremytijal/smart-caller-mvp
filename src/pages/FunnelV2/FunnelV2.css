@@ -605,52 +605,182 @@
     width: 100%;
 }
 
-/* Calendly Inline Embed */
-.calendly-embed-container {
+/* Demo End CTA */
+.demo-end-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 20px;
+    background: linear-gradient(135deg, rgba(255, 71, 15, 0.15) 0%, rgba(26, 26, 26, 0.98) 100%);
+    border: 2px solid var(--fv2-primary);
+    border-radius: 20px;
+    margin: 12px 0;
+}
+
+.demo-end-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+}
+
+.demo-end-icon {
+    font-size: 2rem;
+}
+
+.demo-end-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--fv2-text);
+}
+
+.demo-end-text {
+    text-align: center;
+    color: var(--fv2-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.demo-end-text strong {
+    color: var(--fv2-primary);
+    font-weight: 600;
+}
+
+.demo-end-actions {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, rgba(255, 71, 15, 0.1) 0%, rgba(26, 26, 26, 0.95) 100%);
-    border: 2px solid var(--fv2-primary);
-    border-radius: 16px;
-    margin: 8px 0;
-    overflow: hidden;
+    margin-top: 8px;
 }
 
-.calendly-header {
+.btn-book-demo {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    padding: 12px 16px;
-    background: rgba(255, 71, 15, 0.2);
-    border-radius: 10px;
-    color: var(--fv2-primary);
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--fv2-primary) 0%, #e03e0d 100%);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 1rem;
     font-weight: 600;
-    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(255, 71, 15, 0.4);
+    animation: pulse-cta 2s infinite;
 }
 
-.calendly-inline-widget {
-    border-radius: 12px;
-    overflow: hidden;
-    background: #1a1a1a;
+@keyframes pulse-cta {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(255, 71, 15, 0.4);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 6px 30px rgba(255, 71, 15, 0.5);
+    }
 }
 
-.btn-skip-calendly {
-    padding: 12px 20px;
+.btn-book-demo:hover {
+    background: linear-gradient(135deg, #e03e0d 0%, #c4350b 100%);
+    transform: scale(1.02);
+}
+
+.btn-later {
+    padding: 14px 20px;
     background: transparent;
     border: 1px solid var(--fv2-border);
-    border-radius: 10px;
+    border-radius: 12px;
     color: var(--fv2-text-muted);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
 }
 
-.btn-skip-calendly:hover {
+.btn-later:hover {
     border-color: var(--fv2-text-muted);
     color: var(--fv2-text);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Email Form */
+.email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.email-form-text {
+    text-align: center;
+    color: var(--fv2-text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.email-input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.email-input {
+    flex: 1;
+    padding: 14px 18px;
+    background: var(--fv2-bg);
+    border: 1px solid var(--fv2-border);
+    border-radius: 12px;
+    color: var(--fv2-text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.email-input:focus {
+    border-color: var(--fv2-primary);
+}
+
+.email-input::placeholder {
+    color: var(--fv2-text-muted);
+}
+
+.btn-send-email {
+    padding: 14px 18px;
+    background: var(--fv2-primary);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-send-email:hover:not(:disabled) {
+    background: #e03e0d;
+}
+
+.btn-send-email:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-back-to-demo {
+    padding: 12px;
+    background: transparent;
+    border: none;
+    color: var(--fv2-text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.2s;
+}
+
+.btn-back-to-demo:hover {
+    color: var(--fv2-primary);
 }
 
 .calendar-picker {

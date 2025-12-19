@@ -150,8 +150,8 @@ const SandboxChat = ({ onConversationEnd }) => {
         }
     };
 
-    // Calendly URL for real appointments
-    const CALENDLY_URL = 'https://calendly.com/jeremy-music/30min';
+    // ZCal URL for real appointments
+    const ZCAL_URL = 'https://zcal.co/i/jLib9_dS';
 
     // Handle response to RDV proposal
     const handleRdvResponse = async (response) => {
@@ -161,27 +161,18 @@ const SandboxChat = ({ onConversationEnd }) => {
 
         setWaitingForRdvResponse(false);
 
-        if (isPositive) {
+        if (isPositive || isNegative) {
+            // Both responses lead to the demo end CTA
             setTimeout(() => {
-                addMessage('assistant', "Super ! 🎉 Voici mon calendrier, choisis le créneau qui t'arrange le mieux :", { 
-                    isRealRdvProposal: true,
-                    showCalendlyEmbed: true
-                });
                 setIsTyping(false);
-                setShowCalendlyEmbed(true);
+                setShowDemoEndCTA(true);
                 
                 setQualificationData(prev => ({
                     ...prev,
                     rdvProposed: true,
                     isQualified: true
                 }));
-            }, 1000);
-        } else if (isNegative) {
-            setTimeout(() => {
-                addMessage('assistant', "Je comprends ! 👋\n\n✨ **Fin de la démo** - Vous venez de voir comment Smart Caller qualifie vos leads.\n\nSi vous changez d'avis, vous pouvez réserver un appel sur notre site.");
-                setIsTyping(false);
-                setTimeout(() => endConversation(true), 2000);
-            }, 1000);
+            }, 500);
         } else {
             // Unclear response, ask again
             setTimeout(() => {
@@ -192,31 +183,54 @@ const SandboxChat = ({ onConversationEnd }) => {
         }
     };
 
-    // State for Calendly embed
-    const [showCalendlyEmbed, setShowCalendlyEmbed] = useState(false);
+    // State for Demo End CTA
+    const [showDemoEndCTA, setShowDemoEndCTA] = useState(false);
+    const [showEmailForm, setShowEmailForm] = useState(false);
+    const [emailValue, setEmailValue] = useState('');
+    const [emailSubmitted, setEmailSubmitted] = useState(false);
 
-    // Load Calendly widget script
-    useEffect(() => {
-        if (showCalendlyEmbed) {
-            // Load Calendly script if not already loaded
-            if (!window.Calendly) {
-                const script = document.createElement('script');
-                script.src = 'https://assets.calendly.com/assets/external/widget.js';
-                script.async = true;
-                document.head.appendChild(script);
-            }
-        }
-    }, [showCalendlyEmbed]);
-
-    // Handle when user books on Calendly
-    const handleCalendlyBooked = () => {
+    // Handle RDV button click
+    const handleBookDemo = () => {
+        window.open(ZCAL_URL, '_blank');
+        
         setQualificationData(prev => ({
             ...prev,
             rdvAccepted: true,
-            rdvSlot: { type: 'calendly_booked' }
+            rdvSlot: { type: 'zcal_redirect' }
         }));
         
-        addMessage('assistant', "Parfait ! 🎉 Ton RDV est confirmé. On se parle très bientôt !");
+        addMessage('assistant', "Super ! 🎉 La page de réservation s'est ouverte. À très bientôt !");
+        setShowDemoEndCTA(false);
+        setTimeout(() => endConversation(true), 2000);
+    };
+
+    // Handle "Plus tard" click
+    const handleLater = () => {
+        setShowEmailForm(true);
+    };
+
+    // Handle email submit
+    const handleEmailSubmit = async () => {
+        if (!emailValue.trim() || !emailValue.includes('@')) return;
+        
+        // Save email to backend
+        try {
+            await fetch(`${API_URL}/api/sandbox/save-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sessionId,
+                    email: emailValue,
+                    qualification: qualificationData
+                })
+            });
+        } catch (err) {
+            console.log('Email save error:', err);
+        }
+        
+        setEmailSubmitted(true);
+        setShowDemoEndCTA(false);
+        addMessage('assistant', `Parfait ! 📧 On t'envoie plus d'infos à ${emailValue}. À bientôt !`);
         setTimeout(() => endConversation(true), 2000);
     };
 
@@ -396,28 +410,54 @@ const SandboxChat = ({ onConversationEnd }) => {
                     </div>
                 )}
 
-                {/* Calendly Inline Widget */}
-                {showCalendlyEmbed && (
-                    <div className="calendly-embed-container">
-                        <div className="calendly-header">
-                            <Calendar size={18} />
-                            <span>Réserve ton créneau</span>
+                {/* Demo End CTA */}
+                {showDemoEndCTA && (
+                    <div className="demo-end-cta">
+                        <div className="demo-end-header">
+                            <div className="demo-end-icon">✨</div>
+                            <h3>Fin de la démo !</h3>
                         </div>
-                        <div 
-                            className="calendly-inline-widget" 
-                            data-url={`${CALENDLY_URL}?hide_gdpr_banner=1&background_color=1a1a1a&text_color=ffffff&primary_color=ff470f`}
-                            style={{ minWidth: '280px', height: '450px' }}
-                        />
-                        <button 
-                            className="btn-skip-calendly"
-                            onClick={() => {
-                                setShowCalendlyEmbed(false);
-                                addMessage('assistant', "Pas de souci ! Tu peux toujours réserver plus tard sur notre site. 🚀");
-                                setTimeout(() => endConversation(true), 2000);
-                            }}
-                        >
-                            Plus tard
-                        </button>
+                        
+                        <p className="demo-end-text">
+                            Tu viens de tester un <strong>agent Smart Caller</strong> en conditions réelles.
+                            <br /><br />
+                            Envie de voir comment ça marcherait sur <strong>tes leads</strong> ?
+                        </p>
+
+                        {!showEmailForm ? (
+                            <div className="demo-end-actions">
+                                <button className="btn-book-demo" onClick={handleBookDemo}>
+                                    <Calendar size={20} />
+                                    Réserver une démo avec un expert
+                                </button>
+                                <button className="btn-later" onClick={handleLater}>
+                                    Plus tard, je veux d'abord recevoir des infos par mail
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="email-form">
+                                <p className="email-form-text">📧 Laisse ton email, on t'envoie plus d'infos :</p>
+                                <div className="email-input-row">
+                                    <input
+                                        type="email"
+                                        value={emailValue}
+                                        onChange={(e) => setEmailValue(e.target.value)}
+                                        placeholder="ton@email.com"
+                                        className="email-input"
+                                    />
+                                    <button 
+                                        className="btn-send-email"
+                                        onClick={handleEmailSubmit}
+                                        disabled={!emailValue.includes('@')}
+                                    >
+                                        <Send size={18} />
+                                    </button>
+                                </div>
+                                <button className="btn-back-to-demo" onClick={() => setShowEmailForm(false)}>
+                                    ← Finalement, je préfère réserver une démo
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
 
