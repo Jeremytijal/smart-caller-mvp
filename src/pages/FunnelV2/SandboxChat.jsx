@@ -163,11 +163,12 @@ const SandboxChat = ({ onConversationEnd }) => {
 
         if (isPositive) {
             setTimeout(() => {
-                addMessage('assistant', "Super ! 🎉\n\n✨ **Fin de la démo** - Vous venez de voir comment Smart Caller qualifie vos leads et propose des RDV.\n\n👉 Pour **réserver un vrai RDV** avec notre équipe et voir Smart Caller sur vos propres leads, cliquez ci-dessous :", { 
-                    isRealRdvProposal: true 
+                addMessage('assistant', "Super ! 🎉 Voici mon calendrier, choisis le créneau qui t'arrange le mieux :", { 
+                    isRealRdvProposal: true,
+                    showCalendlyEmbed: true
                 });
                 setIsTyping(false);
-                setShowRealCalendar(true);
+                setShowCalendlyEmbed(true);
                 
                 setQualificationData(prev => ({
                     ...prev,
@@ -191,20 +192,32 @@ const SandboxChat = ({ onConversationEnd }) => {
         }
     };
 
-    // State for real calendar CTA
-    const [showRealCalendar, setShowRealCalendar] = useState(false);
+    // State for Calendly embed
+    const [showCalendlyEmbed, setShowCalendlyEmbed] = useState(false);
 
-    // Handle real calendar click
-    const handleRealCalendarClick = () => {
-        window.open(CALENDLY_URL, '_blank');
-        
+    // Load Calendly widget script
+    useEffect(() => {
+        if (showCalendlyEmbed) {
+            // Load Calendly script if not already loaded
+            if (!window.Calendly) {
+                const script = document.createElement('script');
+                script.src = 'https://assets.calendly.com/assets/external/widget.js';
+                script.async = true;
+                document.head.appendChild(script);
+            }
+        }
+    }, [showCalendlyEmbed]);
+
+    // Handle when user books on Calendly
+    const handleCalendlyBooked = () => {
         setQualificationData(prev => ({
             ...prev,
             rdvAccepted: true,
-            rdvSlot: { type: 'calendly_redirect' }
+            rdvSlot: { type: 'calendly_booked' }
         }));
         
-        setTimeout(() => endConversation(true), 1000);
+        addMessage('assistant', "Parfait ! 🎉 Ton RDV est confirmé. On se parle très bientôt !");
+        setTimeout(() => endConversation(true), 2000);
     };
 
     // Handle calendar slot selection (legacy - now redirects to Calendly)
@@ -383,21 +396,27 @@ const SandboxChat = ({ onConversationEnd }) => {
                     </div>
                 )}
 
-                {/* Real Calendly CTA */}
-                {showRealCalendar && (
-                    <div className="real-calendar-cta">
+                {/* Calendly Inline Widget */}
+                {showCalendlyEmbed && (
+                    <div className="calendly-embed-container">
+                        <div className="calendly-header">
+                            <Calendar size={18} />
+                            <span>Réserve ton créneau</span>
+                        </div>
+                        <div 
+                            className="calendly-inline-widget" 
+                            data-url={`${CALENDLY_URL}?hide_gdpr_banner=1&background_color=1a1a1a&text_color=ffffff&primary_color=ff470f`}
+                            style={{ minWidth: '280px', height: '450px' }}
+                        />
                         <button 
-                            className="btn-calendly"
-                            onClick={handleRealCalendarClick}
+                            className="btn-skip-calendly"
+                            onClick={() => {
+                                setShowCalendlyEmbed(false);
+                                addMessage('assistant', "Pas de souci ! Tu peux toujours réserver plus tard sur notre site. 🚀");
+                                setTimeout(() => endConversation(true), 2000);
+                            }}
                         >
-                            <Calendar size={20} />
-                            Réserver mon vrai RDV (15 min)
-                        </button>
-                        <button 
-                            className="btn-skip"
-                            onClick={handleCalendarDismiss}
-                        >
-                            Continuer à explorer
+                            Plus tard
                         </button>
                     </div>
                 )}
