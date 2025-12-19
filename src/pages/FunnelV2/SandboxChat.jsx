@@ -189,6 +189,23 @@ const SandboxChat = ({ onConversationEnd }) => {
     const [emailValue, setEmailValue] = useState('');
     const [emailSubmitted, setEmailSubmitted] = useState(false);
 
+    // Scroll to bottom when Demo End CTA appears
+    useEffect(() => {
+        if (showDemoEndCTA || showEmailForm) {
+            // Multiple scrolls to ensure visibility after render
+            const timer1 = setTimeout(() => {
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
+            const timer2 = setTimeout(() => {
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 300);
+            return () => {
+                clearTimeout(timer1);
+                clearTimeout(timer2);
+            };
+        }
+    }, [showDemoEndCTA, showEmailForm]);
+
     // Handle RDV button click
     const handleBookDemo = () => {
         window.open(ZCAL_URL, '_blank');
