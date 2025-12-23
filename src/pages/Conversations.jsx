@@ -162,7 +162,18 @@ const Conversations = () => {
         if (selectedPhone) {
             const currentConv = conversations.find(c => c.phone === selectedPhone);
             if (currentConv) {
-                setMessages(currentConv.messages);
+                // Deduplicate messages based on content + role + similar timestamp (within 60 seconds)
+                const dedupedMessages = currentConv.messages.filter((msg, index, arr) => {
+                    // Check if this message is a duplicate of a previous one
+                    const isDuplicate = arr.findIndex((m, i) => 
+                        i < index && 
+                        m.content === msg.content && 
+                        m.role === msg.role &&
+                        Math.abs(new Date(m.created_at) - new Date(msg.created_at)) < 60000 // Within 60 seconds
+                    ) !== -1;
+                    return !isDuplicate;
+                });
+                setMessages(dedupedMessages);
             }
         }
     }, [selectedPhone, conversations]);
