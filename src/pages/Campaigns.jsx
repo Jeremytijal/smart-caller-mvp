@@ -18,60 +18,51 @@ const Campaigns = () => {
     const [filter, setFilter] = useState('all'); // all, active, paused, completed
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Mock campaigns data (in real app, this would come from database)
+    // Fetch real campaigns from Supabase
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            setCampaigns([
-                {
-                    id: 1,
-                    name: 'Réactivation Q4 2025',
-                    status: 'active',
-                    objectives: ['reactivation', 'booking'],
-                    channel: 'sms',
-                    stats: {
-                        sent: 245,
-                        delivered: 238,
-                        replied: 67,
-                        qualified: 23
-                    },
-                    startDate: '2025-12-01',
-                    lastActivity: '2025-12-02T14:30:00'
+        if (user) {
+            fetchCampaigns();
+        }
+    }, [user]);
+
+    const fetchCampaigns = async () => {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('campaigns')
+                .select('*')
+                .eq('agent_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            // Transform data to match expected format
+            const transformedCampaigns = (data || []).map(campaign => ({
+                id: campaign.id,
+                name: campaign.name || 'Campagne sans nom',
+                status: campaign.status || 'draft',
+                objectives: campaign.objectives || ['qualification'],
+                channel: campaign.channel || 'sms',
+                stats: {
+                    sent: campaign.sent_count || 0,
+                    delivered: campaign.delivered_count || campaign.sent_count || 0,
+                    replied: campaign.replied_count || 0,
+                    qualified: campaign.qualified_count || 0
                 },
-                {
-                    id: 2,
-                    name: 'Nurturing Leads Froids',
-                    status: 'paused',
-                    objectives: ['nurturing'],
-                    channel: 'whatsapp',
-                    stats: {
-                        sent: 120,
-                        delivered: 118,
-                        replied: 34,
-                        qualified: 8
-                    },
-                    startDate: '2025-11-15',
-                    lastActivity: '2025-11-28T09:15:00'
-                },
-                {
-                    id: 3,
-                    name: 'Qualification Nouveaux Leads',
-                    status: 'completed',
-                    objectives: ['qualification'],
-                    channel: 'sms',
-                    stats: {
-                        sent: 500,
-                        delivered: 492,
-                        replied: 156,
-                        qualified: 89
-                    },
-                    startDate: '2025-10-01',
-                    lastActivity: '2025-10-31T18:00:00'
-                }
-            ]);
+                totalContacts: campaign.total_contacts || 0,
+                startDate: campaign.created_at,
+                lastActivity: campaign.updated_at || campaign.created_at,
+                firstMessage: campaign.first_message
+            }));
+
+            setCampaigns(transformedCampaigns);
+        } catch (error) {
+            console.error('Error fetching campaigns:', error);
+            setCampaigns([]);
+        } finally {
             setLoading(false);
-        }, 500);
-    }, []);
+        }
+    };
 
     const objectiveIcons = {
         reactivation: { icon: RefreshCw, color: '#3B82F6', label: 'Réactivation' },
