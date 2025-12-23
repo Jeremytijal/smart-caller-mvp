@@ -4,6 +4,10 @@
     background: #F5F3EF;
 }
 
+.app-layout.impersonating {
+    padding-top: 54px;
+}
+
 .main-content {
     flex: 1;
     margin-left: 280px;
@@ -12,6 +16,10 @@
     min-height: 100vh;
     position: relative;
     background: #F5F3EF;
+}
+
+.main-content.impersonating {
+    min-height: calc(100vh - 54px);
 }
 
 @media (max-width: 768px) {

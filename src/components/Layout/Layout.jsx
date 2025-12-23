@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import OnboardingTour from '../OnboardingTour/OnboardingTour';
+import { useAuth } from '../../context/AuthContext';
 import './Layout.css';
 
 const Layout = () => {
     const location = useLocation();
+    const { isImpersonating } = useAuth();
     const [showTour, setShowTour] = useState(false);
 
     useEffect(() => {
@@ -18,9 +20,9 @@ const Layout = () => {
     }, [location.pathname]);
 
     return (
-        <div className="app-layout">
+        <div className={`app-layout ${isImpersonating ? 'impersonating' : ''}`}>
             <Sidebar />
-            <main className="main-content">
+            <main className={`main-content ${isImpersonating ? 'impersonating' : ''}`}>
                 <Outlet />
             </main>
             {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}

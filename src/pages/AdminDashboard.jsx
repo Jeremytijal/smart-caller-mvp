@@ -6,7 +6,7 @@ import {
     Search, Filter, RefreshCw, LogOut, Eye,
     Clock, CheckCircle, XCircle, AlertCircle, Send, Megaphone,
     Edit3, Save, X, Mail, Hash, CreditCard, Copy,
-    Play, FileText, Download, Repeat, Zap
+    Play, FileText, Download, Repeat, Zap, UserCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { endpoints, API_URL } from '../config';
@@ -21,7 +21,7 @@ import './AdminDashboard.css';
 const ADMIN_EMAILS = ['jeremyleplu@gmail.com'];
 
 const AdminDashboard = () => {
-    const { user, signOut } = useAuth();
+    const { user, signOut, startImpersonation } = useAuth();
     const navigate = useNavigate();
     
     const [loading, setLoading] = useState(true);
@@ -223,6 +223,23 @@ const AdminDashboard = () => {
             context: "Ce contact fait partie d'une campagne de réactivation OUTBOUND. Il a déjà été en contact avec l'entreprise par le passé mais n'a pas donné suite. L'objectif est de raviver son intérêt sans être intrusif.",
             firstMessageContext: "campagne de réactivation commerciale"
         }
+    };
+
+    // Handle impersonation - login as another user
+    const handleImpersonate = (profile) => {
+        if (!profile || !profile.id) return;
+        
+        // Create a user object similar to what Supabase returns
+        const targetUser = {
+            id: profile.id,
+            email: profile.email,
+            user_metadata: {
+                full_name: profile.full_name || profile.email?.split('@')[0]
+            }
+        };
+        
+        startImpersonation(targetUser);
+        navigate('/');
     };
 
     const startSandbox = (profile) => {
@@ -756,6 +773,10 @@ const AdminDashboard = () => {
                                                         Tester l'agent
                                                     </button>
                                                 )}
+                                                <button className="btn-impersonate" onClick={() => handleImpersonate(profile)}>
+                                                    <UserCheck size={16} />
+                                                    Se connecter en tant que
+                                                </button>
                                             </>
                                         )}
                                     </div>

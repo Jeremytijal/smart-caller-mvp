@@ -19,14 +19,16 @@ import {
   TrendingUp,
   HelpCircle,
   CreditCard,
-  Clock
+  Clock,
+  AlertTriangle,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../supabaseClient';
 import './Sidebar.css';
 
 const Sidebar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isImpersonating, impersonatedUser, stopImpersonation, realUser } = useAuth();
   const navigate = useNavigate();
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [usage, setUsage] = useState({ current: 0, limit: 10, plan: 'Essai gratuit', isTrial: true });
@@ -123,9 +125,34 @@ const Sidebar = () => {
     });
   };
 
+  // Handle exit impersonation
+  const handleExitImpersonation = () => {
+    stopImpersonation();
+    navigate('/admin');
+  };
+
   return (
     <>
-      <aside className="sidebar glass-panel">
+      {/* Impersonation Banner */}
+      {isImpersonating && (
+        <div className="impersonation-banner">
+          <div className="impersonation-content">
+            <AlertTriangle size={18} />
+            <div className="impersonation-info">
+              <span className="impersonation-label">Mode Admin</span>
+              <span className="impersonation-user">
+                Connecté en tant que : <strong>{impersonatedUser?.email}</strong>
+              </span>
+            </div>
+          </div>
+          <button className="btn-exit-impersonation" onClick={handleExitImpersonation}>
+            <ArrowLeft size={16} />
+            Retour Admin
+          </button>
+        </div>
+      )}
+
+      <aside className={`sidebar glass-panel ${isImpersonating ? 'impersonating' : ''}`}>
         <div className="sidebar-header">
           <div className="logo-container">
             <img src="/smart-caller-icon.png" alt="Smart Caller" className="logo-img" />
