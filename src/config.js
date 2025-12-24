@@ -72,6 +72,7 @@ export const endpoints = {
     adminMessages: `${API_URL}/api/admin/messages`,
     adminStats: `${API_URL}/api/admin/stats`,
     adminContacts: `${API_URL}/api/admin/contacts`,
+    adminContactsByAgent: (agentId) => `${API_URL}/api/admin/contacts/${agentId}`,
 };
 
 // Feature flags

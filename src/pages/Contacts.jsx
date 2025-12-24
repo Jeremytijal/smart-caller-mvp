@@ -8,7 +8,7 @@ import { endpoints } from '../config';
 import './Contacts.css';
 
 const Contacts = () => {
-    const { user } = useAuth();
+    const { user, isImpersonating, realUser } = useAuth();
     const navigate = useNavigate();
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ const Contacts = () => {
                 fetchContacts();
             }
         }
-    }, [user]);
+    }, [user, isImpersonating]);
 
     const loadDemoContacts = () => {
         // Transform demo contacts to match expected format
@@ -47,15 +47,33 @@ const Contacts = () => {
         if (!user) return;
         
         try {
-            // Filter contacts by agent_id (user's ID)
-            const { data, error } = await supabase
-                .from('contacts')
-                .select('*')
-                .eq('agent_id', user.id)
-                .order('created_at', { ascending: false });
+            let data = [];
+            
+            // If impersonating, use backend API to bypass RLS
+            if (isImpersonating && realUser) {
+                const response = await fetch(endpoints.adminContactsByAgent(user.id), {
+                    headers: {
+                        'X-Admin-Email': realUser.email
+                    }
+                });
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    console.error('Error fetching contacts via admin API:', await response.text());
+                }
+            } else {
+                // Normal mode: use Supabase directly
+                const { data: supabaseData, error } = await supabase
+                    .from('contacts')
+                    .select('*')
+                    .eq('agent_id', user.id)
+                    .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            setContacts(data || []);
+                if (error) throw error;
+                data = supabaseData || [];
+            }
+            
+            setContacts(data);
         } catch (error) {
             console.error('Error fetching contacts:', error);
         } finally {
