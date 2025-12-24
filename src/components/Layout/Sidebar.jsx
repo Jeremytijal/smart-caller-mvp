@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../supabaseClient';
+import { endpoints } from '../../config';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -38,27 +39,49 @@ const Sidebar = () => {
     if (user) {
       fetchUsage();
     }
-  }, [user]);
+  }, [user, isImpersonating]);
 
   const fetchUsage = async () => {
     try {
-      // Get contacts count this month
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
+      let count = 0;
+      let profile = null;
 
-      const { count } = await supabase
-        .from('contacts')
-        .select('*', { count: 'exact', head: true })
-        .eq('agent_id', user.id)
-        .gte('created_at', startOfMonth.toISOString());
+      // If impersonating, use admin API to bypass RLS
+      if (isImpersonating && realUser) {
+        // Fetch contacts count via admin API
+        const contactsResponse = await fetch(endpoints.adminContactsByAgent(user.id), {
+          headers: { 'X-Admin-Email': realUser.email }
+        });
+        if (contactsResponse.ok) {
+          const contacts = await contactsResponse.json();
+          count = contacts.length;
+        }
 
-      // Get user's subscription plan
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('subscription_plan, subscription_status, trial_ends_at')
-        .eq('id', user.id)
-        .maybeSingle();
+        // Fetch profile via admin API
+        const profilesResponse = await fetch(endpoints.adminProfiles, {
+          headers: { 'X-Admin-Email': realUser.email }
+        });
+        if (profilesResponse.ok) {
+          const data = await profilesResponse.json();
+          profile = data.profiles?.find(p => p.id === user.id);
+        }
+      } else {
+        // Normal mode: use Supabase directly
+        // Count ALL contacts (not just this month)
+        const { count: contactCount } = await supabase
+          .from('contacts')
+          .select('*', { count: 'exact', head: true })
+          .eq('agent_id', user.id);
+        count = contactCount || 0;
+
+        // Get user's subscription plan
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('subscription_plan, subscription_status, trial_ends_at')
+          .eq('id', user.id)
+          .maybeSingle();
+        profile = profileData;
+      }
 
       // Set subscription info for account modal
       setSubscription({
