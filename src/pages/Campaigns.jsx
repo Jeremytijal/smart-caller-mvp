@@ -4,7 +4,7 @@ import {
     Plus, Rocket, Target, Calendar, UserCheck, RefreshCw, 
     MessageSquare, Play, Pause, MoreVertical, Users, Clock,
     TrendingUp, CheckCircle, AlertCircle, Search, Filter,
-    ChevronRight, Zap, BarChart3
+    ChevronRight, Zap, BarChart3, X, Send, Phone, Mail
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,7 @@ const Campaigns = () => {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // all, active, paused, completed
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCampaign, setSelectedCampaign] = useState(null); // For details modal
 
     // Fetch real campaigns from Supabase
     useEffect(() => {
@@ -324,7 +325,10 @@ const Campaigns = () => {
                                     <span className="start-date">
                                         Démarrée le {formatDate(campaign.startDate)}
                                     </span>
-                                    <button className="btn-details">
+                                    <button 
+                                        className="btn-details"
+                                        onClick={() => setSelectedCampaign(campaign)}
+                                    >
                                         Voir les détails
                                         <ChevronRight size={16} />
                                     </button>
@@ -334,6 +338,148 @@ const Campaigns = () => {
                     })
                 )}
             </div>
+
+            {/* Campaign Details Modal */}
+            {selectedCampaign && (
+                <div className="campaign-modal-overlay" onClick={() => setSelectedCampaign(null)}>
+                    <div className="campaign-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title">
+                                <Rocket size={24} />
+                                <div>
+                                    <h2>{selectedCampaign.name}</h2>
+                                    <span 
+                                        className="modal-status"
+                                        style={{ 
+                                            background: statusConfig[selectedCampaign.status]?.bg,
+                                            color: statusConfig[selectedCampaign.status]?.color
+                                        }}
+                                    >
+                                        {statusConfig[selectedCampaign.status]?.label}
+                                    </span>
+                                </div>
+                            </div>
+                            <button className="modal-close" onClick={() => setSelectedCampaign(null)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="modal-body">
+                            {/* Stats Grid */}
+                            <div className="modal-stats-grid">
+                                <div className="modal-stat">
+                                    <Send size={20} />
+                                    <div className="modal-stat-content">
+                                        <span className="modal-stat-value">{selectedCampaign.stats?.sent || 0}</span>
+                                        <span className="modal-stat-label">Messages envoyés</span>
+                                    </div>
+                                </div>
+                                <div className="modal-stat">
+                                    <MessageSquare size={20} />
+                                    <div className="modal-stat-content">
+                                        <span className="modal-stat-value">{selectedCampaign.stats?.replied || 0}</span>
+                                        <span className="modal-stat-label">Réponses reçues</span>
+                                    </div>
+                                </div>
+                                <div className="modal-stat highlight">
+                                    <UserCheck size={20} />
+                                    <div className="modal-stat-content">
+                                        <span className="modal-stat-value">{selectedCampaign.stats?.qualified || 0}</span>
+                                        <span className="modal-stat-label">Leads qualifiés</span>
+                                    </div>
+                                </div>
+                                <div className="modal-stat">
+                                    <TrendingUp size={20} />
+                                    <div className="modal-stat-content">
+                                        <span className="modal-stat-value">
+                                            {selectedCampaign.stats?.sent > 0 
+                                                ? Math.round((selectedCampaign.stats.replied / selectedCampaign.stats.sent) * 100) 
+                                                : 0}%
+                                        </span>
+                                        <span className="modal-stat-label">Taux de réponse</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Campaign Info */}
+                            <div className="modal-section">
+                                <h3>Informations</h3>
+                                <div className="modal-info-grid">
+                                    <div className="modal-info-item">
+                                        <span className="info-label">Canal</span>
+                                        <span className="info-value">
+                                            {selectedCampaign.channel === 'sms' ? '📱 SMS' : '💬 WhatsApp'}
+                                        </span>
+                                    </div>
+                                    <div className="modal-info-item">
+                                        <span className="info-label">Contacts ciblés</span>
+                                        <span className="info-value">{selectedCampaign.totalContacts || selectedCampaign.stats?.sent || 0}</span>
+                                    </div>
+                                    <div className="modal-info-item">
+                                        <span className="info-label">Date de création</span>
+                                        <span className="info-value">{formatDate(selectedCampaign.startDate)}</span>
+                                    </div>
+                                    <div className="modal-info-item">
+                                        <span className="info-label">Dernière activité</span>
+                                        <span className="info-value">{formatDate(selectedCampaign.lastActivity)}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* First Message */}
+                            {selectedCampaign.firstMessage && (
+                                <div className="modal-section">
+                                    <h3>Message envoyé</h3>
+                                    <div className="modal-message-preview">
+                                        {selectedCampaign.firstMessage}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Objectives */}
+                            <div className="modal-section">
+                                <h3>Objectifs</h3>
+                                <div className="modal-objectives">
+                                    {selectedCampaign.objectives?.map(objId => {
+                                        const obj = objectiveIcons[objId];
+                                        if (!obj) return null;
+                                        const Icon = obj.icon;
+                                        return (
+                                            <span 
+                                                key={objId} 
+                                                className="objective-tag large"
+                                                style={{ background: `${obj.color}15`, color: obj.color }}
+                                            >
+                                                <Icon size={16} />
+                                                {obj.label}
+                                            </span>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button 
+                                className="btn-secondary"
+                                onClick={() => setSelectedCampaign(null)}
+                            >
+                                Fermer
+                            </button>
+                            <button 
+                                className="btn-primary"
+                                onClick={() => {
+                                    setSelectedCampaign(null);
+                                    navigate('/conversations');
+                                }}
+                            >
+                                <MessageSquare size={18} />
+                                Voir les conversations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
