@@ -38,6 +38,9 @@ export const endpoints = {
     importLeads: `${API_URL}/import-leads`,
     webhook: (agentId) => `${WEBHOOK_BASE_URL}/${agentId}/leads`,
     
+    // Messages
+    sendManualMessage: `${API_URL}/api/messages/send`,
+    
     // Campaigns
     launchCampaign: `${API_URL}/api/campaigns/launch`,
     

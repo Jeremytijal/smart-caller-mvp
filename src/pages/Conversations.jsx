@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User, Download, FileText } from 'lucide-react';
+import { Search, MoreVertical, Phone, Video, Send, Edit2, Check, Power, User, Download, FileText, Loader } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isDemoMode, demoConversations } from '../data/demoData';
+import { endpoints } from '../config';
 import './Conversations.css';
 
 const Conversations = () => {
@@ -17,6 +18,8 @@ const Conversations = () => {
     const [loading, setLoading] = useState(true);
     const [isAutoPilot, setIsAutoPilot] = useState(true);
     const [isDemo, setIsDemo] = useState(false);
+    const [messageInput, setMessageInput] = useState('');
+    const [sending, setSending] = useState(false);
 
     // Set phone from URL parameter when it changes
     useEffect(() => {
@@ -178,12 +181,50 @@ const Conversations = () => {
         }
     }, [selectedPhone, conversations]);
 
-    const handleSendMessage = async (text) => {
+    const handleSendMessage = async () => {
         if (isDemo) {
             alert("Mode démo : l'envoi de messages est désactivé.");
             return;
         }
-        alert("L'envoi manuel n'est pas encore connecté au backend.");
+        
+        if (!messageInput.trim() || !selectedPhone) return;
+        
+        setSending(true);
+        try {
+            const response = await fetch(endpoints.sendManualMessage, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    agentId: user.id,
+                    to: selectedPhone,
+                    message: messageInput.trim(),
+                    channel: 'sms' // or 'whatsapp' based on preference
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Erreur lors de l\'envoi');
+            }
+            
+            // Clear input and refresh conversations
+            setMessageInput('');
+            fetchConversations();
+            
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert(`Erreur: ${error.message}`);
+        } finally {
+            setSending(false);
+        }
+    };
+    
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !isAutoPilot && !sending) {
+            e.preventDefault();
+            handleSendMessage();
+        }
     };
 
     const getContactName = (phone) => {
@@ -338,14 +379,17 @@ const Conversations = () => {
                                 <input 
                                     type="text" 
                                     placeholder={isAutoPilot ? "L'IA gère cette conversation..." : "Écrivez un message..."} 
-                                    disabled={isAutoPilot} 
+                                    disabled={isAutoPilot || sending}
+                                    value={messageInput}
+                                    onChange={(e) => setMessageInput(e.target.value)}
+                                    onKeyPress={handleKeyPress}
                                 />
                                 <button 
                                     className="btn-primary send-btn" 
-                                    disabled={isAutoPilot} 
-                                    onClick={() => handleSendMessage("Test")}
+                                    disabled={isAutoPilot || sending || !messageInput.trim()} 
+                                    onClick={handleSendMessage}
                                 >
-                                    <Send size={20} />
+                                    {sending ? <Loader size={20} className="spin" /> : <Send size={20} />}
                                 </button>
                             </div>
                         </>

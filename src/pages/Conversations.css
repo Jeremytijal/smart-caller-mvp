@@ -571,3 +571,33 @@
         margin: 0 16px 16px;
     }
 }
+
+/* Spin animation for loading */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Send button states */
+.conversations-page .send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.conversations-page .chat-input-area.manual-mode input {
+    background: #fff;
+    color: #1a1a1a;
+}
+
+.conversations-page .chat-input-area.manual-mode input:focus {
+    border-color: #FF470F;
+    box-shadow: 0 0 0 3px rgba(255, 71, 15, 0.1);
+}
