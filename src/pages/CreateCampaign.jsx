@@ -15,7 +15,7 @@ import './CreateCampaign.css';
 
 const CreateCampaign = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, isImpersonating, realUser } = useAuth();
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [loadingAgent, setLoadingAgent] = useState(true);
@@ -187,13 +187,29 @@ const CreateCampaign = () => {
     const fetchAgentConfig = async () => {
         setLoadingAgent(true);
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('agent_config, first_message_template')
-                .eq('id', user.id)
-                .maybeSingle();
+            let data = null;
+            
+            // If impersonating, use admin API to bypass RLS
+            if (isImpersonating && realUser) {
+                const response = await fetch(endpoints.adminProfiles, {
+                    headers: { 'X-Admin-Email': realUser.email }
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    data = result.profiles?.find(p => p.id === user.id);
+                }
+            } else {
+                // Normal mode: use Supabase directly
+                const { data: supabaseData, error } = await supabase
+                    .from('profiles')
+                    .select('agent_config, first_message_template')
+                    .eq('id', user.id)
+                    .maybeSingle();
 
-            if (error) throw error;
+                if (error) throw error;
+                data = supabaseData;
+            }
+
             if (!data) return;
             
             if (data?.agent_config) {
@@ -217,14 +233,29 @@ const CreateCampaign = () => {
     const fetchContacts = async () => {
         setLoadingContacts(true);
         try {
-            const { data, error } = await supabase
-                .from('contacts')
-                .select('*')
-                .eq('agent_id', user.id)
-                .order('created_at', { ascending: false });
+            let data = [];
+            
+            // If impersonating, use admin API to bypass RLS
+            if (isImpersonating && realUser) {
+                const response = await fetch(endpoints.adminContactsByAgent(user.id), {
+                    headers: { 'X-Admin-Email': realUser.email }
+                });
+                if (response.ok) {
+                    data = await response.json();
+                }
+            } else {
+                // Normal mode: use Supabase directly
+                const { data: supabaseData, error } = await supabase
+                    .from('contacts')
+                    .select('*')
+                    .eq('agent_id', user.id)
+                    .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            setContacts(data || []);
+                if (error) throw error;
+                data = supabaseData || [];
+            }
+            
+            setContacts(data);
             
             // Auto-select all if there are contacts
             if (data && data.length > 0) {
