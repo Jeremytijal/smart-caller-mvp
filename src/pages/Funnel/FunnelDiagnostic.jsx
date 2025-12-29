@@ -173,3 +173,5 @@ const FunnelDiagnostic = ({ data, onUpdate, onComplete, onBack }) => {
 
 export default FunnelDiagnostic;
 
+
+

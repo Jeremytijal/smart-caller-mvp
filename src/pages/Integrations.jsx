@@ -22,6 +22,10 @@ const Integrations = () => {
     const [whatsappQR, setWhatsappQR] = useState(null);
     const [whatsappConnecting, setWhatsappConnecting] = useState(false);
     const [whatsappError, setWhatsappError] = useState(null);
+    
+    // WhatsApp Business API states
+    const [whatsappBusinessNumber, setWhatsappBusinessNumber] = useState('');
+    const [whatsappBusinessEnabled, setWhatsappBusinessEnabled] = useState(false);
 
     // Inbound webhook URL (read-only, based on user ID)
     const inboundWebhookUrl = `${WEBHOOK_BASE_URL}/${user?.id}/leads`;
@@ -114,6 +118,8 @@ const Integrations = () => {
             if (data) {
                 setCrmWebhookUrl(data.webhook_url || '');
                 setCalendarUrl(data.agent_config?.calendarUrl || '');
+                setWhatsappBusinessNumber(data.agent_config?.whatsappBusinessNumber || '');
+                setWhatsappBusinessEnabled(data.agent_config?.whatsappBusinessEnabled || false);
             }
         } catch (error) {
             console.error('Error fetching config:', error);
@@ -170,6 +176,37 @@ const Integrations = () => {
         }
     };
 
+    const saveWhatsAppBusiness = async () => {
+        setSaving('whatsapp-business');
+        try {
+            // Fetch current agent_config first
+            const { data: currentData } = await supabase
+                .from('profiles')
+                .select('agent_config')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            const updatedConfig = {
+                ...(currentData?.agent_config || {}),
+                whatsappBusinessNumber: whatsappBusinessNumber,
+                whatsappBusinessEnabled: whatsappBusinessEnabled
+            };
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ agent_config: updatedConfig })
+                .eq('id', user.id);
+
+            if (error) throw error;
+            alert('Configuration WhatsApp Business sauvegardée !');
+        } catch (error) {
+            console.error('Error saving WhatsApp Business config:', error);
+            alert('Erreur lors de la sauvegarde.');
+        } finally {
+            setSaving(null);
+        }
+    };
+
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
         setCopied(true);
@@ -212,69 +249,142 @@ const Integrations = () => {
                         )}
                     </div>
 
-                    {whatsappStatus.connected ? (
-                        <div className="whatsapp-connected-info">
-                            <div className="connected-details">
-                                <div className="connected-avatar">
-                                    <MessageCircle size={20} />
+                    <div className="whatsapp-options-grid">
+                        {/* Option 1: WhatsApp Web (QR Code) */}
+                        <div className={`whatsapp-option ${whatsappStatus.connected ? 'option-active' : ''}`}>
+                            <div className="option-header">
+                                <span className="option-icon">📱</span>
+                                <div>
+                                    <h4>WhatsApp Web</h4>
+                                    <p>Connexion rapide via QR code</p>
                                 </div>
-                                <div className="connected-text">
-                                    <span className="connected-name">{whatsappStatus.pushname || 'WhatsApp'}</span>
-                                    <span className="connected-phone">+{whatsappStatus.phoneNumber}</span>
-                                </div>
+                                <span className="option-badge starter">Starter</span>
                             </div>
-                            <button 
-                                className="btn-disconnect"
-                                onClick={disconnectWhatsApp}
-                            >
-                                Déconnecter
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="whatsapp-options">
-                            <div className="whatsapp-option">
-                                <div className="option-header">
-                                    <span className="option-icon">📱</span>
-                                    <div>
-                                        <h4>WhatsApp Web</h4>
-                                        <p>Connexion rapide via QR code</p>
+                            
+                            {whatsappStatus.connected ? (
+                                <div className="whatsapp-connected-info">
+                                    <div className="connected-details">
+                                        <div className="connected-avatar">
+                                            <MessageCircle size={20} />
+                                        </div>
+                                        <div className="connected-text">
+                                            <span className="connected-name">{whatsappStatus.pushname || 'WhatsApp'}</span>
+                                            <span className="connected-phone">+{whatsappStatus.phoneNumber}</span>
+                                        </div>
                                     </div>
+                                    <button 
+                                        className="btn-disconnect"
+                                        onClick={disconnectWhatsApp}
+                                    >
+                                        Déconnecter
+                                    </button>
                                 </div>
-                                <ul className="option-features">
-                                    <li className="feature-good">
-                                        <CheckCircle size={14} />
-                                        Connexion en quelques secondes via QR code
-                                    </li>
-                                    <li className="feature-good">
-                                        <CheckCircle size={14} />
-                                        Utilisez votre WhatsApp existant
-                                    </li>
-                                    <li className="feature-good">
-                                        <CheckCircle size={14} />
-                                        Jusqu'à 25 nouveaux contacts/jour
-                                    </li>
-                                    <li className="feature-warning">
-                                        <AlertTriangle size={14} />
-                                        Limites quotidiennes pour la sécurité
-                                    </li>
-                                    <li className="feature-warning">
-                                        <AlertTriangle size={14} />
-                                        Idéal pour {"<"}500 contacts/mois
-                                    </li>
-                                </ul>
+                            ) : (
+                                <>
+                                    <ul className="option-features">
+                                        <li className="feature-good">
+                                            <CheckCircle size={14} />
+                                            Connexion en quelques secondes
+                                        </li>
+                                        <li className="feature-good">
+                                            <CheckCircle size={14} />
+                                            Utilisez votre WhatsApp existant
+                                        </li>
+                                        <li className="feature-good">
+                                            <CheckCircle size={14} />
+                                            Gratuit
+                                        </li>
+                                        <li className="feature-warning">
+                                            <AlertTriangle size={14} />
+                                            Max 25 nouveaux contacts/jour
+                                        </li>
+                                    </ul>
+                                    <button 
+                                        className="btn-whatsapp-connect"
+                                        onClick={() => {
+                                            setShowWhatsAppModal(true);
+                                            startWhatsAppConnection();
+                                        }}
+                                    >
+                                        <span className="qr-icon">⏻</span>
+                                        Connecter via QR Code
+                                    </button>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Option 2: WhatsApp Business API */}
+                        <div className={`whatsapp-option ${whatsappBusinessEnabled ? 'option-active' : ''}`}>
+                            <div className="option-header">
+                                <span className="option-icon">🏢</span>
+                                <div>
+                                    <h4>WhatsApp Business API</h4>
+                                    <p>Volume illimité via Twilio</p>
+                                </div>
+                                <span className="option-badge pro">Pro</span>
+                            </div>
+                            
+                            <ul className="option-features">
+                                <li className="feature-good">
+                                    <CheckCircle size={14} />
+                                    Messages illimités
+                                </li>
+                                <li className="feature-good">
+                                    <CheckCircle size={14} />
+                                    Vérification Meta officielle
+                                </li>
+                                <li className="feature-good">
+                                    <CheckCircle size={14} />
+                                    100% fiable, pas de ban
+                                </li>
+                                <li className="feature-warning">
+                                    <AlertTriangle size={14} />
+                                    Nécessite un compte Twilio
+                                </li>
+                            </ul>
+                            
+                            <div className="business-config">
+                                <label>NUMÉRO WHATSAPP TWILIO</label>
+                                <input
+                                    type="tel"
+                                    placeholder="+33612345678"
+                                    value={whatsappBusinessNumber}
+                                    onChange={(e) => setWhatsappBusinessNumber(e.target.value)}
+                                    className="input-field"
+                                />
+                                
+                                <div className="toggle-row">
+                                    <span>Activer WhatsApp Business</span>
+                                    <label className="toggle-switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={whatsappBusinessEnabled}
+                                            onChange={(e) => setWhatsappBusinessEnabled(e.target.checked)}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
                                 <button 
-                                    className="btn-whatsapp-connect"
-                                    onClick={() => {
-                                        setShowWhatsAppModal(true);
-                                        startWhatsAppConnection();
-                                    }}
+                                    className="btn-whatsapp-business"
+                                    onClick={saveWhatsAppBusiness}
+                                    disabled={saving === 'whatsapp-business'}
                                 >
-                                    <span className="qr-icon">⏻</span>
-                                    Connecter via QR Code
+                                    {saving === 'whatsapp-business' ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
                                 </button>
                             </div>
+                            
+                            <a 
+                                href="https://www.twilio.com/docs/whatsapp/quickstart" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="external-link"
+                            >
+                                <ExternalLink size={14} />
+                                Comment configurer Twilio WhatsApp ?
+                            </a>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
 

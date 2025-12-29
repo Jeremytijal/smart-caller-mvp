@@ -204,3 +204,5 @@ const FunnelResult = ({ data, estimatedLoss, onTestSms, onBack }) => {
 
 export default FunnelResult;
 
+
+
