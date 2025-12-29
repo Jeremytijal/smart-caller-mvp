@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Webhook, Calendar, CheckCircle, Copy, Check, Save, ExternalLink, Link2, MessageCircle, Smartphone, Phone } from 'lucide-react';
+import { Webhook, Calendar, CheckCircle, Copy, Check, Save, ExternalLink, Link2, MessageCircle, Smartphone, Phone, X, AlertTriangle, Loader2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { WEBHOOK_BASE_URL, API_URL } from '../config';
@@ -16,14 +16,89 @@ const Integrations = () => {
     const [crmWebhookUrl, setCrmWebhookUrl] = useState('');
     const [calendarUrl, setCalendarUrl] = useState('');
 
+    // WhatsApp states
+    const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+    const [whatsappStatus, setWhatsappStatus] = useState({ connected: false });
+    const [whatsappQR, setWhatsappQR] = useState(null);
+    const [whatsappConnecting, setWhatsappConnecting] = useState(false);
+    const [whatsappError, setWhatsappError] = useState(null);
+
     // Inbound webhook URL (read-only, based on user ID)
     const inboundWebhookUrl = `${WEBHOOK_BASE_URL}/${user?.id}/leads`;
 
     useEffect(() => {
         if (user) {
             fetchConfig();
+            fetchWhatsAppStatus();
         }
     }, [user]);
+
+    // Fetch WhatsApp connection status
+    const fetchWhatsAppStatus = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/whatsapp/status/${user.id}`);
+            const data = await response.json();
+            setWhatsappStatus(data);
+        } catch (error) {
+            console.error('Error fetching WhatsApp status:', error);
+        }
+    };
+
+    // Start WhatsApp connection via SSE
+    const startWhatsAppConnection = () => {
+        setWhatsappConnecting(true);
+        setWhatsappQR(null);
+        setWhatsappError(null);
+
+        const eventSource = new EventSource(`${API_URL}/api/whatsapp/connect/${user.id}`);
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('[WhatsApp SSE]', data);
+
+            if (data.type === 'qr') {
+                setWhatsappQR(data.qr);
+                setWhatsappConnecting(false);
+            } else if (data.type === 'ready') {
+                setWhatsappStatus({
+                    connected: true,
+                    phoneNumber: data.phoneNumber,
+                    pushname: data.pushname
+                });
+                setShowWhatsAppModal(false);
+                setWhatsappQR(null);
+                setWhatsappConnecting(false);
+                eventSource.close();
+            } else if (data.type === 'error') {
+                setWhatsappError(data.message);
+                setWhatsappConnecting(false);
+                eventSource.close();
+            } else if (data.type === 'disconnected') {
+                setWhatsappStatus({ connected: false });
+                setWhatsappConnecting(false);
+                eventSource.close();
+            }
+        };
+
+        eventSource.onerror = (error) => {
+            console.error('[WhatsApp SSE] Error:', error);
+            setWhatsappError('Erreur de connexion au serveur');
+            setWhatsappConnecting(false);
+            eventSource.close();
+        };
+    };
+
+    // Disconnect WhatsApp
+    const disconnectWhatsApp = async () => {
+        try {
+            await fetch(`${API_URL}/api/whatsapp/disconnect/${user.id}`, {
+                method: 'POST'
+            });
+            setWhatsappStatus({ connected: false });
+        } catch (error) {
+            console.error('Error disconnecting WhatsApp:', error);
+        }
+    };
 
     const fetchConfig = async () => {
         try {
@@ -113,6 +188,154 @@ const Integrations = () => {
                     <p className="text-muted">Connectez vos outils préférés</p>
                 </div>
             </header>
+
+            {/* WhatsApp Section */}
+            <h2 className="section-title">
+                <MessageCircle size={20} />
+                Canal de messagerie
+            </h2>
+
+            <div className="whatsapp-section">
+                <div className="integration-card whatsapp-card">
+                    <div className="card-header-row">
+                        <div className="card-icon-wrapper whatsapp-green">
+                            <MessageCircle size={24} />
+                        </div>
+                        <div className="card-title-group">
+                            <h3>WhatsApp</h3>
+                            <p className="card-subtitle">Connectez votre WhatsApp pour contacter vos prospects</p>
+                        </div>
+                        {whatsappStatus.connected && (
+                            <span className="status-badge connected">
+                                <CheckCircle size={12} /> Connecté
+                            </span>
+                        )}
+                    </div>
+
+                    {whatsappStatus.connected ? (
+                        <div className="whatsapp-connected-info">
+                            <div className="connected-details">
+                                <div className="connected-avatar">
+                                    <MessageCircle size={20} />
+                                </div>
+                                <div className="connected-text">
+                                    <span className="connected-name">{whatsappStatus.pushname || 'WhatsApp'}</span>
+                                    <span className="connected-phone">+{whatsappStatus.phoneNumber}</span>
+                                </div>
+                            </div>
+                            <button 
+                                className="btn-disconnect"
+                                onClick={disconnectWhatsApp}
+                            >
+                                Déconnecter
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="whatsapp-options">
+                            <div className="whatsapp-option">
+                                <div className="option-header">
+                                    <span className="option-icon">📱</span>
+                                    <div>
+                                        <h4>WhatsApp Web</h4>
+                                        <p>Connexion rapide via QR code</p>
+                                    </div>
+                                </div>
+                                <ul className="option-features">
+                                    <li className="feature-good">
+                                        <CheckCircle size={14} />
+                                        Connexion en quelques secondes via QR code
+                                    </li>
+                                    <li className="feature-good">
+                                        <CheckCircle size={14} />
+                                        Utilisez votre WhatsApp existant
+                                    </li>
+                                    <li className="feature-good">
+                                        <CheckCircle size={14} />
+                                        Jusqu'à 25 nouveaux contacts/jour
+                                    </li>
+                                    <li className="feature-warning">
+                                        <AlertTriangle size={14} />
+                                        Limites quotidiennes pour la sécurité
+                                    </li>
+                                    <li className="feature-warning">
+                                        <AlertTriangle size={14} />
+                                        Idéal pour {"<"}500 contacts/mois
+                                    </li>
+                                </ul>
+                                <button 
+                                    className="btn-whatsapp-connect"
+                                    onClick={() => {
+                                        setShowWhatsAppModal(true);
+                                        startWhatsAppConnection();
+                                    }}
+                                >
+                                    <span className="qr-icon">⏻</span>
+                                    Connecter via QR Code
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* WhatsApp Connection Modal */}
+            {showWhatsAppModal && (
+                <div className="modal-overlay" onClick={() => setShowWhatsAppModal(false)}>
+                    <div className="whatsapp-modal" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={() => setShowWhatsAppModal(false)}>
+                            <X size={20} />
+                        </button>
+                        
+                        <h2>Connecter WhatsApp</h2>
+                        <p className="modal-subtitle">Scannez le QR code avec votre téléphone</p>
+
+                        <div className="qr-container">
+                            {whatsappConnecting && !whatsappQR && (
+                                <div className="qr-loading">
+                                    <Loader2 size={40} className="spin" />
+                                    <p>Génération du QR code...</p>
+                                </div>
+                            )}
+                            
+                            {whatsappQR && (
+                                <img 
+                                    src={whatsappQR} 
+                                    alt="WhatsApp QR Code" 
+                                    className="qr-image"
+                                />
+                            )}
+
+                            {whatsappError && (
+                                <div className="qr-error">
+                                    <AlertTriangle size={40} />
+                                    <p>{whatsappError}</p>
+                                    <button 
+                                        className="btn-retry"
+                                        onClick={startWhatsAppConnection}
+                                    >
+                                        Réessayer
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="modal-instructions">
+                            <h4>Comment scanner ?</h4>
+                            <ol>
+                                <li>Ouvrez WhatsApp sur votre téléphone</li>
+                                <li>Allez dans <strong>Paramètres → Appareils liés</strong></li>
+                                <li>Appuyez sur <strong>Lier un appareil</strong></li>
+                                <li>Scannez le QR code ci-dessus</li>
+                            </ol>
+                        </div>
+
+                        <div className="modal-warning">
+                            <AlertTriangle size={16} />
+                            <span>Votre téléphone doit rester connecté à Internet</span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <h2 className="section-title">
                 <Link2 size={20} />
