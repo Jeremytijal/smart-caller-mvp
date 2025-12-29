@@ -23,9 +23,17 @@ const Integrations = () => {
     const [whatsappConnecting, setWhatsappConnecting] = useState(false);
     const [whatsappError, setWhatsappError] = useState(null);
     
-    // WhatsApp Business API states
+    // WhatsApp Business API states (Twilio)
     const [whatsappBusinessNumber, setWhatsappBusinessNumber] = useState('');
     const [whatsappBusinessEnabled, setWhatsappBusinessEnabled] = useState(false);
+    
+    // Meta Cloud API states
+    const [metaPhoneNumberId, setMetaPhoneNumberId] = useState('');
+    const [metaAccessToken, setMetaAccessToken] = useState('');
+    const [metaBusinessId, setMetaBusinessId] = useState('');
+    const [metaEnabled, setMetaEnabled] = useState(false);
+    const [metaVerified, setMetaVerified] = useState(null);
+    const [metaVerifying, setMetaVerifying] = useState(false);
 
     // Inbound webhook URL (read-only, based on user ID)
     const inboundWebhookUrl = `${WEBHOOK_BASE_URL}/${user?.id}/leads`;
@@ -120,6 +128,21 @@ const Integrations = () => {
                 setCalendarUrl(data.agent_config?.calendarUrl || '');
                 setWhatsappBusinessNumber(data.agent_config?.whatsappBusinessNumber || '');
                 setWhatsappBusinessEnabled(data.agent_config?.whatsappBusinessEnabled || false);
+                
+                // Meta Cloud API config
+                const metaConfig = data.agent_config?.metaWhatsApp;
+                if (metaConfig) {
+                    setMetaPhoneNumberId(metaConfig.phoneNumberId || '');
+                    setMetaAccessToken(metaConfig.accessToken || '');
+                    setMetaBusinessId(metaConfig.businessId || '');
+                    setMetaEnabled(metaConfig.enabled || false);
+                    if (metaConfig.verifiedName) {
+                        setMetaVerified({ 
+                            verifiedName: metaConfig.verifiedName,
+                            phoneNumber: metaConfig.phoneNumber 
+                        });
+                    }
+                }
             }
         } catch (error) {
             console.error('Error fetching config:', error);
@@ -202,6 +225,73 @@ const Integrations = () => {
         } catch (error) {
             console.error('Error saving WhatsApp Business config:', error);
             alert('Erreur lors de la sauvegarde.');
+        } finally {
+            setSaving(null);
+        }
+    };
+
+    // Verify Meta Cloud API credentials
+    const verifyMetaCredentials = async () => {
+        if (!metaPhoneNumberId || !metaAccessToken) {
+            alert('Veuillez entrer le Phone Number ID et l\'Access Token');
+            return;
+        }
+        
+        setMetaVerifying(true);
+        setMetaVerified(null);
+        
+        try {
+            const response = await fetch(`${API_URL}/api/whatsapp-meta/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phoneNumberId: metaPhoneNumberId,
+                    accessToken: metaAccessToken
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.valid) {
+                setMetaVerified({
+                    verifiedName: data.verifiedName,
+                    phoneNumber: data.phoneNumber,
+                    qualityRating: data.qualityRating
+                });
+            } else {
+                alert('Erreur: ' + (data.error || 'Credentials invalides'));
+            }
+        } catch (error) {
+            console.error('Error verifying Meta credentials:', error);
+            alert('Erreur lors de la vérification');
+        } finally {
+            setMetaVerifying(false);
+        }
+    };
+
+    // Save Meta Cloud API configuration
+    const saveMetaConfig = async () => {
+        setSaving('meta');
+        try {
+            const response = await fetch(`${API_URL}/api/whatsapp-meta/config/${user.id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phoneNumberId: metaPhoneNumberId,
+                    accessToken: metaAccessToken,
+                    businessId: metaBusinessId,
+                    verifiedName: metaVerified?.verifiedName,
+                    phoneNumber: metaVerified?.phoneNumber,
+                    enabled: metaEnabled
+                })
+            });
+            
+            if (!response.ok) throw new Error('Failed to save config');
+            
+            alert('Configuration Meta WhatsApp sauvegardée !');
+        } catch (error) {
+            console.error('Error saving Meta config:', error);
+            alert('Erreur lors de la sauvegarde');
         } finally {
             setSaving(null);
         }
@@ -382,6 +472,115 @@ const Integrations = () => {
                             >
                                 <ExternalLink size={14} />
                                 Comment configurer Twilio WhatsApp ?
+                            </a>
+                        </div>
+
+                        {/* Option 3: Meta Cloud API */}
+                        <div className={`whatsapp-option ${metaEnabled && metaVerified ? 'option-active' : ''}`}>
+                            <div className="option-header">
+                                <span className="option-icon">🌐</span>
+                                <div>
+                                    <h4>Meta Cloud API</h4>
+                                    <p>Connexion directe à Meta</p>
+                                </div>
+                                <span className="option-badge enterprise">Enterprise</span>
+                            </div>
+                            
+                            <ul className="option-features">
+                                <li className="feature-good">
+                                    <CheckCircle size={14} />
+                                    Messages illimités
+                                </li>
+                                <li className="feature-good">
+                                    <CheckCircle size={14} />
+                                    Moins cher que Twilio (~0.04€/msg)
+                                </li>
+                                <li className="feature-good">
+                                    <CheckCircle size={14} />
+                                    API officielle Meta
+                                </li>
+                                <li className="feature-warning">
+                                    <AlertTriangle size={14} />
+                                    Nécessite vérification Business Meta
+                                </li>
+                            </ul>
+                            
+                            {metaVerified ? (
+                                <div className="meta-verified-info">
+                                    <div className="verified-badge">
+                                        <CheckCircle size={16} />
+                                        <span>Vérifié : {metaVerified.verifiedName}</span>
+                                    </div>
+                                    <span className="verified-phone">{metaVerified.phoneNumber}</span>
+                                </div>
+                            ) : null}
+                            
+                            <div className="business-config">
+                                <label>PHONE NUMBER ID</label>
+                                <input
+                                    type="text"
+                                    placeholder="123456789012345"
+                                    value={metaPhoneNumberId}
+                                    onChange={(e) => setMetaPhoneNumberId(e.target.value)}
+                                    className="input-field"
+                                />
+                                
+                                <label>ACCESS TOKEN</label>
+                                <input
+                                    type="password"
+                                    placeholder="EAAxxxxxxx..."
+                                    value={metaAccessToken}
+                                    onChange={(e) => setMetaAccessToken(e.target.value)}
+                                    className="input-field"
+                                />
+                                
+                                <label>BUSINESS ID (WABA ID) - Optionnel</label>
+                                <input
+                                    type="text"
+                                    placeholder="123456789012345"
+                                    value={metaBusinessId}
+                                    onChange={(e) => setMetaBusinessId(e.target.value)}
+                                    className="input-field"
+                                />
+                                
+                                <button 
+                                    className="btn-verify"
+                                    onClick={verifyMetaCredentials}
+                                    disabled={metaVerifying}
+                                >
+                                    {metaVerifying ? 'Vérification...' : 'Vérifier les credentials'}
+                                </button>
+                                
+                                <div className="toggle-row">
+                                    <span>Activer Meta Cloud API</span>
+                                    <label className="toggle-switch">
+                                        <input
+                                            type="checkbox"
+                                            checked={metaEnabled}
+                                            onChange={(e) => setMetaEnabled(e.target.checked)}
+                                            disabled={!metaVerified}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <button 
+                                    className="btn-whatsapp-business btn-meta"
+                                    onClick={saveMetaConfig}
+                                    disabled={saving === 'meta' || !metaVerified}
+                                >
+                                    {saving === 'meta' ? 'Sauvegarde...' : <><Save size={16} /> Sauvegarder</>}
+                                </button>
+                            </div>
+                            
+                            <a 
+                                href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="external-link"
+                            >
+                                <ExternalLink size={14} />
+                                Guide de configuration Meta Cloud API
                             </a>
                         </div>
                     </div>
