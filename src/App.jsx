@@ -23,6 +23,7 @@ import Blacklist from './pages/Blacklist';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import WebhookDocs from './pages/WebhookDocs';
+import WidgetIntegration from './pages/WidgetIntegration';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -64,6 +65,7 @@ function App() {
               <Route path="blacklist" element={<Blacklist />} />
               <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />
+              <Route path="widget" element={<WidgetIntegration />} />
             </Route>
           </Route>
         </Routes>

@@ -21,7 +21,8 @@ import {
   CreditCard,
   Clock,
   AlertTriangle,
-  ArrowLeft
+  ArrowLeft,
+  MessageCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../supabaseClient';
@@ -136,6 +137,7 @@ const Sidebar = () => {
     { icon: Megaphone, label: 'Campagnes', path: '/campaigns' },
     { icon: Ban, label: 'Liste noire', path: '/blacklist' },
     { icon: Link2, label: 'Intégrations', path: '/integrations' },
+    { icon: MessageCircle, label: 'Widget Chat', path: '/widget' },
     { icon: Settings, label: 'Configuration', path: '/settings' },
   ];
 
