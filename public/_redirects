@@ -1,2 +1,6 @@
+# Exclude widget files from SPA redirect
+/widget/*  200
+
+# SPA redirect for all other routes
 /*    /index.html   200
 
