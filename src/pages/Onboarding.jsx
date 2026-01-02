@@ -838,6 +838,7 @@ const Onboarding = () => {
                         agent_config: fullAgentConfig,
                         first_message_template: firstMessageTemplate,
                         scoring_criteria: scoringCriteria,
+                        agent_active: true,  // Auto-activate agent after onboarding
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', user.id);
