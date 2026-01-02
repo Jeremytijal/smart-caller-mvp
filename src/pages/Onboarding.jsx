@@ -2946,8 +2946,9 @@ const Onboarding = () => {
                                     <p className="skip-text">
                                         Vous pouvez aussi configurer cela plus tard depuis le dashboard.
                                     </p>
-                                    <button className="btn-text" onClick={() => {
-                                        finishOnboarding();
+                                    <button className="btn-text" onClick={async () => {
+                                        await finishOnboarding();
+                                        navigate('/');  // Navigate to dashboard after finishing
                                     }}>
                                         Passer et aller au dashboard <ArrowRight size={16} />
                                     </button>
