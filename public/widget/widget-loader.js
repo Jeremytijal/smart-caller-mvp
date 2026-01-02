@@ -16,7 +16,7 @@
     'use strict';
 
     // Configuration
-    const WIDGET_URL = 'https://app.smart-caller.ai/widget';
+    const WIDGET_URL = 'https://agent.smart-caller.ai/widget';
     const API_URL = 'https://webhook.smart-caller.ai';
 
     // Get script attributes

@@ -21,7 +21,7 @@ import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config';
 import './WidgetIntegration.css';
 
-const APP_URL = 'https://app.smart-caller.ai';
+const APP_URL = 'https://agent.smart-caller.ai';
 
 /**
  * PAGE D'INTÉGRATION DU WIDGET
