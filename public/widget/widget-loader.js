@@ -46,6 +46,28 @@
     let hasInteracted = false;
     let messages = [];
     let isTyping = false;
+    let agentConfig = null;
+
+    // Load agent configuration from API
+    async function loadAgentConfig() {
+        try {
+            const response = await fetch(API_URL + '/api/widget/config/' + config.agentId);
+            const data = await response.json();
+            if (data.success && data.config) {
+                agentConfig = data.config;
+                // Update config with agent's settings
+                config.name = agentConfig.name || config.name;
+                config.greeting = agentConfig.greeting || config.greeting || 'Bonjour ! 👋 Comment puis-je vous aider ?';
+                config.color = agentConfig.color || config.color;
+                // Update UI with agent name
+                const nameEl = document.getElementById('sc-agent-name');
+                if (nameEl) nameEl.textContent = config.name;
+                console.log('[Smart Caller Widget] Agent config loaded:', config.name);
+            }
+        } catch (error) {
+            console.error('[Smart Caller Widget] Failed to load agent config:', error);
+        }
+    }
 
     // Create widget container
     const container = document.createElement('div');
@@ -434,7 +456,7 @@
                         `}
                     </div>
                     <div class="sc-header-text">
-                        <span class="sc-name">${config.name}</span>
+                        <span class="sc-name" id="sc-agent-name">${config.name}</span>
                         <span class="sc-status" id="sc-status">En ligne</span>
                     </div>
                 </div>
@@ -506,6 +528,11 @@
         if (isOpen && messages.length === 0) {
             const greeting = config.greeting || `Bonjour ! 👋 Comment puis-je vous aider ?`;
             addMessage('assistant', greeting);
+            
+            // Load agent config on first open
+            if (!agentConfig) {
+                loadAgentConfig();
+            }
         }
         
         if (isOpen) {
@@ -632,6 +659,9 @@
             }
         }, config.delay);
     }
+
+    // Preload agent config in background
+    loadAgentConfig();
 
     // Helper functions
     function escapeHtml(text) {
