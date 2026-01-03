@@ -1865,3 +1865,184 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   CAMPAIGN TYPE SELECTION - Inbound/Outbound
+   ========================================================================== */
+
+.campaign-type-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.campaign-type-card {
+    background: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.campaign-type-card:hover {
+    border-color: #d1d5db;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.campaign-type-card.selected {
+    border-color: #FF470F;
+    background: linear-gradient(135deg, #fff8f5 0%, #fff 100%);
+}
+
+.type-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.type-icon.outbound {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: white;
+}
+
+.type-icon.inbound {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+}
+
+.type-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+}
+
+.type-content p {
+    font-size: 0.9rem;
+    color: #10B981;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.campaign-type-card.selected .type-content p {
+    color: #FF470F;
+}
+
+.type-description {
+    font-size: 0.9rem;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.type-channels {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: auto;
+}
+
+.channel-tag {
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.channel-tag.disabled {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.type-check {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: #FF470F;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+/* ==========================================================================
+   ROUTING RULES (INBOUND)
+   ========================================================================== */
+
+.routing-toggle,
+.notification-toggle {
+    margin-bottom: 16px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    accent-color: #FF470F;
+}
+
+.toggle-text {
+    font-size: 1rem;
+    color: #1a1a1a;
+    font-weight: 500;
+}
+
+.threshold-slider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.threshold-slider input[type="range"] {
+    flex: 1;
+    height: 8px;
+    -webkit-appearance: none;
+    background: #e5e5e5;
+    border-radius: 4px;
+    outline: none;
+}
+
+.threshold-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #FF470F;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(255, 71, 15, 0.3);
+}
+
+.threshold-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #FF470F;
+    min-width: 50px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .campaign-type-grid {
+        grid-template-columns: 1fr;
+    }
+}

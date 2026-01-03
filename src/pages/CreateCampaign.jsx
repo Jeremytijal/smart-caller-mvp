@@ -34,8 +34,9 @@ const CreateCampaign = () => {
     // Campaign State
     const [campaign, setCampaign] = useState({
         name: '',
+        type: '', // 'outbound' or 'inbound' - NEW
         objectives: [],
-        channel: 'sms',
+        channel: '',
         firstMessage: '',
         // A/B Testing
         abTestEnabled: false,
@@ -52,6 +53,16 @@ const CreateCampaign = () => {
             maxMessagesPerDay: 100,
             delayBetweenMessages: 30,
             stopOnReply: true
+        },
+        // Inbound routing - NEW
+        routingRules: {
+            qualificationThreshold: 70,
+            routeToHuman: true,
+            humanNotification: {
+                enabled: true,
+                method: 'email',
+                recipient: ''
+            }
         }
     });
     
@@ -103,12 +114,22 @@ const CreateCampaign = () => {
         }
     ];
 
-    // Channel options
-    const channels = [
+    // Channel options - OUTBOUND
+    const outboundChannels = [
         { id: 'sms', label: 'SMS', icon: Phone, available: true },
         { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle, available: true },
         { id: 'email', label: 'Email', icon: Mail, available: false }
     ];
+
+    // Channel options - INBOUND
+    const inboundChannels = [
+        { id: 'widget', label: 'Widget Chat', icon: MessageSquare, available: true },
+        { id: 'instagram', label: 'Instagram DM', icon: MessageCircle, available: true },
+        { id: 'messenger', label: 'Messenger', icon: MessageCircle, available: true }
+    ];
+
+    // Get channels based on campaign type
+    const channels = campaign.type === 'inbound' ? inboundChannels : outboundChannels;
 
     // Days options
     const daysOptions = [
@@ -166,15 +187,26 @@ const CreateCampaign = () => {
         return templates.slice(0, 6); // Max 6 templates
     };
 
-    // Steps configuration - Added "Leads" step
-    const steps = [
-        { num: 1, label: 'Objectifs' },
-        { num: 2, label: 'Leads' },
-        { num: 3, label: 'Canal' },
-        { num: 4, label: 'Message' },
-        { num: 5, label: 'Planning' },
-        { num: 6, label: 'Récap' }
+    // Steps configuration - Different steps for outbound vs inbound
+    const outboundSteps = [
+        { num: 1, label: 'Type' },
+        { num: 2, label: 'Objectifs' },
+        { num: 3, label: 'Leads' },
+        { num: 4, label: 'Canal' },
+        { num: 5, label: 'Message' },
+        { num: 6, label: 'Planning' },
+        { num: 7, label: 'Récap' }
     ];
+
+    const inboundSteps = [
+        { num: 1, label: 'Type' },
+        { num: 2, label: 'Canal' },
+        { num: 3, label: 'Config' },
+        { num: 4, label: 'Routage' },
+        { num: 5, label: 'Récap' }
+    ];
+
+    const steps = campaign.type === 'inbound' ? inboundSteps : outboundSteps;
 
     // Fetch agent config and contacts on mount
     useEffect(() => {
@@ -253,14 +285,14 @@ const CreateCampaign = () => {
                     .maybeSingle();
 
                 if (agents) {
-                    const { data: supabaseData, error } = await supabase
-                        .from('contacts')
-                        .select('*')
+                const { data: supabaseData, error } = await supabase
+                    .from('contacts')
+                    .select('*')
                         .eq('agent_id', agents.id)
-                        .order('created_at', { ascending: false });
+                    .order('created_at', { ascending: false });
 
-                    if (error) throw error;
-                    data = supabaseData || [];
+                if (error) throw error;
+                data = supabaseData || [];
                 }
             }
             
@@ -453,47 +485,112 @@ const CreateCampaign = () => {
     };
 
     const handleLaunchCampaign = async () => {
+        // Validation based on campaign type
+        if (campaign.type === 'outbound') {
         if (!campaign.name || campaign.objectives.length === 0 || !campaign.firstMessage || selectedContacts.length === 0) {
             alert('Veuillez remplir tous les champs obligatoires et sélectionner des contacts');
             return;
         }
-
-        if (!agentConfig) {
-            alert('Aucun agent configuré. Veuillez d\'abord créer votre agent.');
+        } else if (campaign.type === 'inbound') {
+            if (!campaign.name || !campaign.channel) {
+                alert('Veuillez remplir tous les champs obligatoires');
             return;
+            }
         }
 
         setLoading(true);
         try {
-            console.log('🚀 Launching campaign:', campaign.name);
-            console.log('Contacts:', selectedContacts.length);
-            console.log('Channel:', campaign.channel);
+            console.log('🚀 Launching campaign:', campaign.name, 'Type:', campaign.type);
 
-            // Call backend to send messages
-            const response = await fetch(endpoints.launchCampaign, {
+            // Get default agent first
+            const { data: agents } = await supabase
+                .from('agents')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('is_default', true)
+                .maybeSingle();
+
+            if (!agents) {
+                throw new Error('Agent non trouvé. Veuillez d\'abord créer votre agent.');
+            }
+
+            const agentId = agents.id;
+
+            // Create campaign via API
+            const campaignData = {
+                name: campaign.name,
+                type: campaign.type,
+                channel: campaign.channel,
+                objective: campaign.objectives[0] || null,
+                messages: campaign.type === 'outbound' ? {
+                    messageA: campaign.firstMessage,
+                    messageB: campaign.messageB || null,
+                    abTestEnabled: campaign.abTestEnabled,
+                    abSplit: campaign.abSplit
+                } : {
+                    greeting: campaign.firstMessage || 'Bonjour ! Comment puis-je vous aider ?',
+                    fallbackMessage: 'Je n\'ai pas compris, pouvez-vous reformuler ?'
+                },
+                target_contacts: campaign.type === 'outbound' ? { contact_ids: selectedContacts } : null,
+                schedule: campaign.type === 'outbound' ? campaign.schedule : null,
+                routing_rules: campaign.type === 'inbound' ? campaign.routingRules : null,
+                settings: campaign.settings
+            };
+
+            const response = await fetch(endpoints.campaigns, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    agentId: user.id,
-                    contactIds: selectedContacts,
-                    channel: campaign.channel,
-                    firstMessage: campaign.firstMessage,
-                    messageB: campaign.messageB,
-                    abTestEnabled: campaign.abTestEnabled,
-                    abSplit: campaign.abSplit,
-                    campaignName: campaign.name
+                    userId: user.id,
+                    agentId: agentId,
+                    campaign: campaignData
                 })
             });
 
             const result = await response.json();
             
             if (!response.ok) {
-                throw new Error(result.error || 'Erreur lors du lancement');
+                throw new Error(result.error || 'Erreur lors de la création');
             }
 
-            console.log('Campaign result:', result);
+            console.log('Campaign created:', result);
+
+            // For outbound campaigns, also launch the messages
+            if (campaign.type === 'outbound') {
+                const launchResponse = await fetch(endpoints.launchCampaign, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agentId: agentId,
+                    contactIds: selectedContacts,
+                    channel: campaign.channel,
+                    firstMessage: campaign.firstMessage,
+                    messageB: campaign.messageB,
+                    abTestEnabled: campaign.abTestEnabled,
+                    abSplit: campaign.abSplit,
+                        campaignName: campaign.name,
+                        campaignId: result.id
+                })
+            });
+
+                const launchResult = await launchResponse.json();
+                
+                if (!launchResponse.ok) {
+                    throw new Error(launchResult.error || 'Erreur lors du lancement');
+                }
+                
+                alert(`✅ Campagne lancée avec succès !\n\n${launchResult.sent}/${launchResult.totalContacts} messages envoyés.${launchResult.failed > 0 ? `\n⚠️ ${launchResult.failed} échecs` : ''}`);
+            } else {
+                // For inbound campaigns, just start them
+                await fetch(`${endpoints.campaigns}/${result.id}/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id })
+                });
+                
+                alert(`✅ Campagne inbound "${campaign.name}" créée et activée !\n\nLes conversations entrantes sur ${campaign.channel} seront maintenant gérées par votre agent.`);
+            }
             
-            alert(`✅ Campagne lancée avec succès !\n\n${result.sent}/${result.totalContacts} messages envoyés.\n${result.failed > 0 ? `⚠️ ${result.failed} échecs` : ''}`);
             navigate('/campaigns');
         } catch (error) {
             console.error('Error launching campaign:', error);
@@ -504,15 +601,32 @@ const CreateCampaign = () => {
     };
 
     const canProceed = () => {
+        // Different validation based on campaign type
+        if (campaign.type === 'inbound') {
         switch (currentStep) {
-            case 1: return campaign.name && campaign.objectives.length > 0;
-            case 2: return selectedContacts.length > 0;
-            case 3: return campaign.channel;
-            case 4: return campaign.firstMessage.length > 10;
-            case 5: return campaign.schedule.startDate && campaign.schedule.days.length > 0;
+                case 1: return campaign.name && campaign.type;
+                case 2: return campaign.channel;
+                case 3: return true; // Config is optional
+                case 4: return true; // Routing rules have defaults
             default: return true;
+            }
+        } else {
+            // Outbound
+            switch (currentStep) {
+                case 1: return campaign.name && campaign.type;
+                case 2: return campaign.objectives.length > 0;
+                case 3: return selectedContacts.length > 0;
+                case 4: return campaign.channel;
+                case 5: return campaign.firstMessage.length > 10;
+                case 6: return campaign.schedule.startDate && campaign.schedule.days.length > 0;
+                default: return true;
+            }
         }
     };
+
+    // Get the final step number based on campaign type
+    const getFinalStep = () => campaign.type === 'inbound' ? 5 : 7;
+    const isLastStep = currentStep === getFinalStep();
 
     return (
         <div className="campaign-page">
@@ -534,7 +648,7 @@ const CreateCampaign = () => {
                     <button 
                         className="btn-primary"
                         onClick={handleLaunchCampaign}
-                        disabled={loading || currentStep !== 6}
+                        disabled={loading || !isLastStep}
                     >
                         <Rocket size={18} />
                         {loading ? 'Création...' : 'Lancer la campagne'}
@@ -562,8 +676,90 @@ const CreateCampaign = () => {
 
             {/* Main Content */}
             <div className="campaign-content">
-                {/* Step 1: Objectives */}
+                {/* Step 1: Campaign Type Selection (NEW) */}
                 {currentStep === 1 && (
+                    <div className="step-content">
+                        <div className="step-header">
+                            <h2>Quel type de campagne ?</h2>
+                            <p>Choisissez le type de campagne que vous souhaitez créer</p>
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">Nom de la campagne *</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Ex: Réactivation Q4 2025"
+                                value={campaign.name}
+                                onChange={(e) => setCampaign({ ...campaign, name: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="campaign-type-grid">
+                            {/* Outbound Card */}
+                            <div 
+                                className={`campaign-type-card ${campaign.type === 'outbound' ? 'selected' : ''}`}
+                                onClick={() => setCampaign({ ...campaign, type: 'outbound', channel: 'sms' })}
+                            >
+                                <div className="type-icon outbound">
+                                    <Rocket size={32} />
+                                </div>
+                                <div className="type-content">
+                                    <h3>Outbound</h3>
+                                    <p>Campagne proactive</p>
+                                    <span className="type-description">
+                                        Envoyez des messages à vos contacts existants (SMS, WhatsApp, Email)
+                                    </span>
+                                </div>
+                                <div className="type-channels">
+                                    <span className="channel-tag">SMS</span>
+                                    <span className="channel-tag">WhatsApp</span>
+                                    <span className="channel-tag disabled">Email</span>
+                                </div>
+                                {campaign.type === 'outbound' && (
+                                    <div className="type-check"><Check size={20} /></div>
+                                )}
+                            </div>
+
+                            {/* Inbound Card */}
+                            <div 
+                                className={`campaign-type-card ${campaign.type === 'inbound' ? 'selected' : ''}`}
+                                onClick={() => setCampaign({ ...campaign, type: 'inbound', channel: 'widget' })}
+                            >
+                                <div className="type-icon inbound">
+                                    <MessageSquare size={32} />
+                                </div>
+                                <div className="type-content">
+                                    <h3>Inbound</h3>
+                                    <p>Campagne réactive</p>
+                                    <span className="type-description">
+                                        Gérez les conversations entrantes de vos prospects (Widget, Instagram, Messenger)
+                                    </span>
+                                </div>
+                                <div className="type-channels">
+                                    <span className="channel-tag">Widget</span>
+                                    <span className="channel-tag">Instagram</span>
+                                    <span className="channel-tag">Messenger</span>
+                                </div>
+                                {campaign.type === 'inbound' && (
+                                    <div className="type-check"><Check size={20} /></div>
+                                )}
+                            </div>
+                        </div>
+
+                        {campaign.type && (
+                            <div className="selected-summary">
+                                <Zap size={16} />
+                                <span>
+                                    Campagne <strong>{campaign.type === 'outbound' ? 'Outbound (proactive)' : 'Inbound (réactive)'}</strong> sélectionnée
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Step 2: Objectives (OUTBOUND ONLY) */}
+                {currentStep === 2 && campaign.type === 'outbound' && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Définissez vos objectifs</h2>
@@ -624,8 +820,8 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 2: Leads Selection */}
-                {currentStep === 2 && (
+                {/* Step 3: Leads Selection (OUTBOUND ONLY) */}
+                {currentStep === 3 && campaign.type === 'outbound' && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Sélectionnez vos leads</h2>
@@ -833,7 +1029,8 @@ const CreateCampaign = () => {
                 )}
 
                 {/* Step 3: Channel */}
-                {currentStep === 3 && (
+                {/* Step 4: Channel Selection (OUTBOUND) OR Step 2 (INBOUND) */}
+                {((currentStep === 4 && campaign.type === 'outbound') || (currentStep === 2 && campaign.type === 'inbound')) && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Canal de communication</h2>
@@ -920,7 +1117,8 @@ const CreateCampaign = () => {
                 )}
 
                 {/* Step 4: First Message */}
-                {currentStep === 4 && (
+                {/* Step 5: Message (OUTBOUND) OR Step 3: Config (INBOUND) */}
+                {((currentStep === 5 && campaign.type === 'outbound') || (currentStep === 3 && campaign.type === 'inbound')) && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Premier message</h2>
@@ -1125,7 +1323,8 @@ const CreateCampaign = () => {
                 )}
 
                 {/* Step 5: Schedule */}
-                {currentStep === 5 && (
+                {/* Step 6: Planning (OUTBOUND ONLY) */}
+                {currentStep === 6 && campaign.type === 'outbound' && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Planning d'envoi</h2>
@@ -1250,8 +1449,95 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 6: Summary */}
-                {currentStep === 6 && (
+                {/* Step 4: Routing Rules (INBOUND ONLY) */}
+                {currentStep === 4 && campaign.type === 'inbound' && (
+                    <div className="step-content">
+                        <div className="step-header">
+                            <h2>Règles de routage</h2>
+                            <p>Configurez le transfert vers un humain pour les leads qualifiés</p>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="routing-toggle">
+                                <label className="toggle-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={campaign.routingRules.routeToHuman}
+                                        onChange={(e) => setCampaign({
+                                            ...campaign,
+                                            routingRules: { ...campaign.routingRules, routeToHuman: e.target.checked }
+                                        })}
+                                    />
+                                    <span className="toggle-text">Transférer vers un humain si le lead est qualifié</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {campaign.routingRules.routeToHuman && (
+                            <>
+                                <div className="form-section">
+                                    <label className="form-label">Seuil de qualification (score minimum)</label>
+                                    <div className="threshold-slider">
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={campaign.routingRules.qualificationThreshold}
+                                            onChange={(e) => setCampaign({
+                                                ...campaign,
+                                                routingRules: { ...campaign.routingRules, qualificationThreshold: parseInt(e.target.value) }
+                                            })}
+                                        />
+                                        <span className="threshold-value">{campaign.routingRules.qualificationThreshold}%</span>
+                                    </div>
+                                    <p className="form-hint">Le lead sera transféré si son score de qualification atteint ce seuil</p>
+                                </div>
+
+                                <div className="form-section">
+                                    <label className="form-label">Notification</label>
+                                    <div className="notification-toggle">
+                                        <label className="toggle-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={campaign.routingRules.humanNotification.enabled}
+                                                onChange={(e) => setCampaign({
+                                                    ...campaign,
+                                                    routingRules: {
+                                                        ...campaign.routingRules,
+                                                        humanNotification: { ...campaign.routingRules.humanNotification, enabled: e.target.checked }
+                                                    }
+                                                })}
+                                            />
+                                            <span className="toggle-text">Envoyer une notification par email</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {campaign.routingRules.humanNotification.enabled && (
+                                    <div className="form-section">
+                                        <label className="form-label">Email de notification</label>
+                                        <input
+                                            type="email"
+                                            className="form-input"
+                                            placeholder="votre@email.com"
+                                            value={campaign.routingRules.humanNotification.recipient}
+                                            onChange={(e) => setCampaign({
+                                                ...campaign,
+                                                routingRules: {
+                                                    ...campaign.routingRules,
+                                                    humanNotification: { ...campaign.routingRules.humanNotification, recipient: e.target.value }
+                                                }
+                                            })}
+                                        />
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
+
+                {/* Step 7: Summary (OUTBOUND) OR Step 5 (INBOUND) */}
+                {((currentStep === 7 && campaign.type === 'outbound') || (currentStep === 5 && campaign.type === 'inbound')) && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Récapitulatif</h2>

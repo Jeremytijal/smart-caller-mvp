@@ -42,6 +42,9 @@ export const endpoints = {
     sendManualMessage: `${API_URL}/api/messages/send`,
     
     // Campaigns
+    campaigns: `${API_URL}/api/campaigns`,
+    campaignById: (campaignId) => `${API_URL}/api/campaigns/${campaignId}`,
+    campaignStats: (campaignId) => `${API_URL}/api/campaigns/${campaignId}/stats`,
     launchCampaign: `${API_URL}/api/campaigns/launch`,
     
     // Notifications & Analytics
