@@ -1865,6 +1865,13 @@ const CreateCampaign = () => {
                                     <strong>{campaign.name}</strong>
                                 </div>
                                 <div className="summary-row">
+                                    <span>Type</span>
+                                    <strong style={{ color: campaign.type === 'inbound' ? '#10B981' : '#3B82F6' }}>
+                                        {campaign.type === 'inbound' ? '📥 Inbound' : '📤 Outbound'}
+                                    </strong>
+                                </div>
+                                {campaign.objectives.length > 0 && (
+                                <div className="summary-row">
                                     <span>Objectifs</span>
                                     <div className="summary-tags">
                                         {campaign.objectives.map(id => {
@@ -1877,8 +1884,11 @@ const CreateCampaign = () => {
                                         })}
                                     </div>
                                 </div>
+                                )}
                             </div>
 
+                            {/* Audience - Only for Outbound */}
+                            {campaign.type === 'outbound' && (
                             <div className="summary-section">
                                 <h4><Users size={18} /> Audience</h4>
                                 <div className="summary-row">
@@ -1886,6 +1896,7 @@ const CreateCampaign = () => {
                                     <strong>{selectedContacts.length} contacts</strong>
                                 </div>
                             </div>
+                            )}
 
                             <div className="summary-section">
                                 <h4><Bot size={18} /> Agent & Canal</h4>
@@ -1899,13 +1910,47 @@ const CreateCampaign = () => {
                                 </div>
                             </div>
 
+                            {/* Message - Only for Outbound */}
+                            {campaign.type === 'outbound' && campaign.firstMessage && (
                             <div className="summary-section">
                                 <h4><MessageSquare size={18} /> Message</h4>
                                 <div className="summary-message">
                                     "{campaign.firstMessage.substring(0, 150)}{campaign.firstMessage.length > 150 ? '...' : ''}"
                                 </div>
                             </div>
+                            )}
 
+                            {/* Routing Rules - Only for Inbound */}
+                            {campaign.type === 'inbound' && (
+                                <div className="summary-section">
+                                    <h4><UserCheck size={18} /> Routage</h4>
+                                    <div className="summary-row">
+                                        <span>Transfert humain</span>
+                                        <strong style={{ color: campaign.routingRules.routeToHuman ? '#10B981' : '#9ca3af' }}>
+                                            {campaign.routingRules.routeToHuman ? '✓ Activé' : '✗ Désactivé'}
+                                        </strong>
+                                    </div>
+                                    {campaign.routingRules.routeToHuman && (
+                                        <>
+                                            <div className="summary-row">
+                                                <span>Seuil de qualification</span>
+                                                <strong>{campaign.routingRules.qualificationThreshold}%</strong>
+                                            </div>
+                                            <div className="summary-row">
+                                                <span>Notification email</span>
+                                                <strong>
+                                                    {campaign.routingRules.humanNotification.enabled 
+                                                        ? campaign.routingRules.humanNotification.recipient || 'Non configuré'
+                                                        : 'Désactivée'}
+                                                </strong>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Planning - Only for Outbound */}
+                            {campaign.type === 'outbound' && (
                             <div className="summary-section">
                                 <h4><Clock size={18} /> Planning</h4>
                                 <div className="summary-row">
@@ -1925,13 +1970,18 @@ const CreateCampaign = () => {
                                     <strong>{campaign.settings.maxMessagesPerDay} messages</strong>
                                 </div>
                             </div>
+                            )}
                         </div>
 
                         <div className="launch-info">
                             <Rocket size={20} />
                             <div>
                                 <strong>Prêt à lancer ?</strong>
+                                {campaign.type === 'outbound' ? (
                                 <p>Votre campagne enverra des messages à {selectedContacts.length} contacts selon le planning défini. Vous pourrez la mettre en pause à tout moment.</p>
+                                ) : (
+                                    <p>Votre agent IA répondra automatiquement aux conversations entrantes sur {channels.find(c => c.id === campaign.channel)?.label}. Vous pourrez désactiver la campagne à tout moment.</p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1949,7 +1999,7 @@ const CreateCampaign = () => {
                     Précédent
                 </button>
 
-                {currentStep < 6 ? (
+                {!isLastStep ? (
                     <button 
                         className="btn-primary"
                         onClick={() => setCurrentStep(prev => prev + 1)}
