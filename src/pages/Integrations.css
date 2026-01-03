@@ -112,6 +112,192 @@
 }
 
 /* ============================================
+   Channels Tab - New Organization
+   ============================================ */
+.channels-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.channels-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.section-title svg {
+    width: 16px;
+    height: 16px;
+    color: #6b7280;
+}
+
+/* Channel Card Header */
+.channel-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.channel-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.channel-icon.sms {
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+}
+
+.channel-icon.whatsapp {
+    background: #25D366;
+}
+
+.channel-icon.messenger {
+    background: linear-gradient(135deg, #00B2FF, #006AFF);
+}
+
+.channel-icon.instagram {
+    background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF);
+}
+
+.channel-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Status Badge */
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status-badge.inactive {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Connect Buttons */
+.btn-connect.whatsapp {
+    background: #25D366;
+    color: white;
+}
+
+.btn-connect.whatsapp:hover {
+    background: #1fba59;
+}
+
+.btn-connect.messenger {
+    background: linear-gradient(135deg, #00B2FF, #006AFF);
+    color: white;
+}
+
+.btn-connect.instagram {
+    background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF);
+    color: white;
+}
+
+/* Widget Redirect Card */
+.widget-redirect-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff7f5, #fff);
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.widget-redirect-card:hover {
+    border-color: #FF470F;
+    box-shadow: 0 4px 12px rgba(255, 71, 15, 0.1);
+    transform: translateY(-1px);
+}
+
+.widget-redirect-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #FF470F, #ea580c);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.widget-redirect-content {
+    flex: 1;
+}
+
+.widget-redirect-content h3 {
+    margin: 0 0 4px 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.widget-redirect-content p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.widget-redirect-arrow {
+    color: #FF470F;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.widget-redirect-card:hover .widget-redirect-arrow {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+/* ============================================
    WhatsApp Status Card
    ============================================ */
 .whatsapp-status-card {
