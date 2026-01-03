@@ -162,8 +162,8 @@
 }
 
 body {
-    background-color: var(--bg-root);
-    color: var(--text-primary);
+    background-color: #F5F3EF;
+    color: #1A1A1A;
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -175,7 +175,7 @@ body {
     flex-direction: column;
     align-items: center;
     padding: var(--space-lg);
-    background: var(--bg-root);
+    background: #F5F3EF;
     background-image:
         linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
@@ -231,6 +231,7 @@ body {
     display: flex;
     justify-content: center;
     animation: fadeIn 0.4s ease-out;
+    background: transparent;
 }
 
 .step-wrapper.wide {
@@ -3800,6 +3801,7 @@ textarea:focus {
     padding: 20px;
     border-top: 1px solid #E5E7EB;
     background: #FFFFFF;
+    text-align: left;
 }
 
 /* Config Fields */
@@ -3857,10 +3859,24 @@ textarea:focus {
     display: inline-block;
     width: calc(50% - 10px);
     vertical-align: top;
+    text-align: left;
 }
 
 .config-card-body .config-field:nth-child(2) {
     margin-left: 20px;
+}
+
+/* Override pour mobile */
+@media (max-width: 768px) {
+    .config-card-body .config-field:nth-child(1),
+    .config-card-body .config-field:nth-child(2) {
+        display: block;
+        width: 100%;
+    }
+    
+    .config-card-body .config-field:nth-child(2) {
+        margin-left: 0;
+    }
 }
 
 /* Objectives List */
