@@ -67,13 +67,22 @@ const Sidebar = () => {
           profile = data.profiles?.find(p => p.id === user.id);
         }
       } else {
-        // Normal mode: use Supabase directly
-        // Count ALL contacts (not just this month)
-        const { count: contactCount } = await supabase
-          .from('contacts')
-          .select('*', { count: 'exact', head: true })
-          .eq('agent_id', user.id);
-        count = contactCount || 0;
+        // Normal mode: Get default agent first
+        const { data: agents } = await supabase
+          .from('agents')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('is_default', true)
+          .maybeSingle();
+
+        if (agents) {
+          // Count ALL contacts (not just this month)
+          const { count: contactCount } = await supabase
+            .from('contacts')
+            .select('*', { count: 'exact', head: true })
+            .eq('agent_id', agents.id);
+          count = contactCount || 0;
+        }
 
         // Get user's subscription plan
         const { data: profileData } = await supabase

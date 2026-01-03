@@ -244,15 +244,24 @@ const CreateCampaign = () => {
                     data = await response.json();
                 }
             } else {
-                // Normal mode: use Supabase directly
-                const { data: supabaseData, error } = await supabase
-                    .from('contacts')
-                    .select('*')
-                    .eq('agent_id', user.id)
-                    .order('created_at', { ascending: false });
+                // Normal mode: Get default agent first
+                const { data: agents } = await supabase
+                    .from('agents')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('is_default', true)
+                    .maybeSingle();
 
-                if (error) throw error;
-                data = supabaseData || [];
+                if (agents) {
+                    const { data: supabaseData, error } = await supabase
+                        .from('contacts')
+                        .select('*')
+                        .eq('agent_id', agents.id)
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+                    data = supabaseData || [];
+                }
             }
             
             setContacts(data);

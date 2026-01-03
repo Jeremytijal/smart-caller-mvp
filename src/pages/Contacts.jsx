@@ -62,15 +62,32 @@ const Contacts = () => {
                     console.error('Error fetching contacts via admin API:', await response.text());
                 }
             } else {
-                // Normal mode: use Supabase directly
-                const { data: supabaseData, error } = await supabase
-                    .from('contacts')
-                    .select('*')
-                    .eq('agent_id', user.id)
-                    .order('created_at', { ascending: false });
+                // Normal mode: Get default agent first, then fetch contacts
+                const { data: agents, error: agentError } = await supabase
+                    .from('agents')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('is_default', true)
+                    .maybeSingle();
 
-                if (error) throw error;
-                data = supabaseData || [];
+                if (agentError) {
+                    console.error('Error fetching agent:', agentError);
+                    throw agentError;
+                }
+
+                if (!agents) {
+                    console.warn('No default agent found for user');
+                    data = [];
+                } else {
+                    const { data: supabaseData, error } = await supabase
+                        .from('contacts')
+                        .select('*')
+                        .eq('agent_id', agents.id)
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+                    data = supabaseData || [];
+                }
             }
             
             setContacts(data);

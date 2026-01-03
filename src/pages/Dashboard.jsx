@@ -148,10 +148,30 @@ const Dashboard = () => {
         if (!user) return;
         
         try {
+            // Get default agent first
+            const { data: agents, error: agentError } = await supabase
+                .from('agents')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('is_default', true)
+                .maybeSingle();
+
+            if (agentError) {
+                console.error('Error fetching agent:', agentError);
+                return;
+            }
+
+            if (!agents) {
+                console.warn('No default agent found for user');
+                return;
+            }
+
+            const agentId = agents.id;
+
             const { data: contacts, error } = await supabase
                 .from('contacts')
                 .select('*')
-                .eq('agent_id', user.id)
+                .eq('agent_id', agentId)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -159,7 +179,7 @@ const Dashboard = () => {
             const { data: messages } = await supabase
                 .from('messages')
                 .select('*')
-                .eq('agent_id', user.id);
+                .eq('agent_id', agentId);
 
             const total = contacts?.length || 0;
             const qualified = contacts?.filter(c => c.score >= 70).length || 0;
@@ -260,10 +280,23 @@ const Dashboard = () => {
 
     const exportToCSV = async () => {
         try {
+            // Get default agent first
+            const { data: agents } = await supabase
+                .from('agents')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('is_default', true)
+                .maybeSingle();
+
+            if (!agents) {
+                alert('Agent non trouvé');
+                return;
+            }
+
             const { data: contacts } = await supabase
                 .from('contacts')
                 .select('*')
-                .eq('agent_id', user.id);
+                .eq('agent_id', agents.id);
 
             if (!contacts || contacts.length === 0) {
                 alert('Aucun contact à exporter');
