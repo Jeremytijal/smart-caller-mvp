@@ -666,12 +666,6 @@
     color: #888888;
 }
 
-.glass-panel {
-    background: rgba(26, 26, 26, 0.8);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
-}
-
 .btn-primary {
     background: #FE6D10;
     color: white;
