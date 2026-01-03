@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     Webhook, Calendar, CheckCircle, Copy, Check, Save, ExternalLink, Link2, 
     MessageCircle, X, AlertTriangle, Loader2, Code, Globe, Instagram, 
-    Facebook, Clock, Plus, Trash2, Settings
+    Facebook, Clock, Plus, Trash2, Settings, Palette, Eye, Zap, Info, RefreshCw
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -60,19 +60,106 @@ const Integrations = () => {
     const [instagramUsername, setInstagramUsername] = useState('');
 
     // Widget states
-    const [widgetColor, setWidgetColor] = useState('#FF470F');
-    const [widgetPosition, setWidgetPosition] = useState('right');
+    const [widgetConfig, setWidgetConfig] = useState({
+        color: '#FF470F',
+        position: 'right',
+        greeting: 'Bonjour ! 👋 Comment puis-je vous aider ?',
+        placeholder: 'Votre message...',
+        name: 'Assistant',
+        autoOpen: false,
+        delay: 3000
+    });
+    const [widgetCopied, setWidgetCopied] = useState(false);
+    const [widgetTab, setWidgetTab] = useState('setup');
+    const [widgetAnalytics, setWidgetAnalytics] = useState(null);
 
     // Inbound webhook URL
     const inboundWebhookUrl = `${WEBHOOK_BASE_URL}/${user?.id}/leads`;
     const widgetBaseUrl = 'https://agent.smart-caller.ai';
+    const agentId = user?.id;
+
+    // Color presets for widget
+    const colorPresets = [
+        { color: '#FF470F', name: 'Orange' },
+        { color: '#3B82F6', name: 'Bleu' },
+        { color: '#10B981', name: 'Vert' },
+        { color: '#8B5CF6', name: 'Violet' },
+        { color: '#EC4899', name: 'Rose' },
+        { color: '#1A1A1A', name: 'Noir' }
+    ];
 
     useEffect(() => {
         if (user) {
             fetchConfig();
             fetchWhatsAppStatus();
+            fetchWidgetConfig();
+            fetchWidgetAnalytics();
         }
     }, [user]);
+
+    // Widget functions
+    const fetchWidgetConfig = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/widget/config/${agentId}`);
+            const data = await response.json();
+            if (data.success && data.config) {
+                setWidgetConfig(prev => ({
+                    ...prev,
+                    color: data.config.color || prev.color,
+                    greeting: data.config.greeting || prev.greeting,
+                    name: data.config.name || prev.name,
+                    position: data.config.position || prev.position
+                }));
+            }
+        } catch (error) {
+            console.error('Error fetching widget config:', error);
+        }
+    };
+
+    const fetchWidgetAnalytics = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/widget/analytics/${agentId}`);
+            const data = await response.json();
+            if (data.success) {
+                setWidgetAnalytics(data.analytics);
+            }
+        } catch (error) {
+            console.error('Error fetching widget analytics:', error);
+        }
+    };
+
+    const saveWidgetConfig = async () => {
+        setSaving('widget');
+        try {
+            await fetch(`${API_URL}/api/widget/config/${agentId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(widgetConfig)
+            });
+        } catch (error) {
+            console.error('Error saving widget config:', error);
+        }
+        setSaving(null);
+    };
+
+    const generateWidgetCode = () => {
+        return `<!-- Smart Caller Chat Widget -->
+<script src="${widgetBaseUrl}/widget/widget-loader.js"
+    data-agent-id="${agentId}"
+    data-color="${widgetConfig.color}"
+    data-position="${widgetConfig.position}">
+</script>`;
+    };
+
+    const copyWidgetCode = async () => {
+        try {
+            await navigator.clipboard.writeText(generateWidgetCode());
+            setWidgetCopied(true);
+            setTimeout(() => setWidgetCopied(false), 2000);
+        } catch (error) {
+            console.error('Copy failed:', error);
+        }
+    };
 
     const fetchWhatsAppStatus = async () => {
         try {
@@ -144,8 +231,6 @@ const Integrations = () => {
                 setCalendarUrl(data.agent_config?.calendarUrl || '');
                 setWhatsappBusinessNumber(data.agent_config?.whatsappBusinessNumber || '');
                 setWhatsappBusinessEnabled(data.agent_config?.whatsappBusinessEnabled || false);
-                setWidgetColor(data.agent_config?.widgetColor || '#FF470F');
-                setWidgetPosition(data.agent_config?.widgetPosition || 'right');
                 
                 if (data.agent_config?.availability) {
                     setAvailability(data.agent_config.availability);
@@ -229,7 +314,6 @@ const Integrations = () => {
 
     const saveCalendarUrl = () => saveConfig('calendar', { calendarUrl }, 'URL de l\'agenda sauvegardée !');
     const saveAvailability = () => saveConfig('availability', { availability }, 'Disponibilités sauvegardées !');
-    const saveWidgetConfig = () => saveConfig('widget', { widgetColor, widgetPosition }, 'Configuration du widget sauvegardée !');
 
     const saveWhatsAppBusiness = () => saveConfig('whatsapp-business', {
         whatsappBusinessNumber,
@@ -303,16 +387,6 @@ const Integrations = () => {
         setTimeout(() => setCopied(null), 2000);
     };
 
-    const getWidgetCode = () => {
-        return `<!-- Smart Caller Chat Widget -->
-<script 
-    src="${widgetBaseUrl}/widget/widget-loader.js"
-    data-agent-id="${user?.id}"
-    data-color="${widgetColor}"
-    data-position="${widgetPosition}">
-</script>`;
-    };
-
     const tabs = [
         { id: 'channels', label: 'Canaux', icon: MessageCircle },
         { id: 'widget', label: 'Widget Chat', icon: Code },
@@ -365,8 +439,8 @@ const Integrations = () => {
                                         <div className="status-info">
                                             <div className="status-icon connected">
                                                 <CheckCircle size={24} />
-                                        </div>
-                                            <div>
+                        </div>
+                                <div>
                                                 <h3>WhatsApp Connecté</h3>
                                                 <p>
                                                     {whatsappStatus.connected 
@@ -374,8 +448,8 @@ const Integrations = () => {
                                                         : `Business API • ${whatsappBusinessNumber}`
                                                     }
                                                 </p>
-                                        </div>
-                                    </div>
+                                </div>
+                            </div>
                                         <button className="btn-disconnect" onClick={whatsappStatus.connected ? disconnectWhatsApp : () => setWhatsappBusinessEnabled(false)}>
                                         Déconnecter
                                     </button>
@@ -384,20 +458,20 @@ const Integrations = () => {
                                     <div className="status-disconnected">
                                         <div className="status-info">
                                             <div className="status-icon">
-                                                <MessageCircle size={24} />
-                                            </div>
-                                            <div>
+                            <MessageCircle size={24} />
+                        </div>
+                                <div>
                                                 <h3>Connecter WhatsApp</h3>
                                                 <p>Choisissez comment connecter votre numéro WhatsApp</p>
-                                            </div>
+                        </div>
                                         </div>
                                         <button className="btn-connect-wa" onClick={() => setShowWhatsAppModal(true)}>
                                             <MessageCircle size={18} />
                                             Connecter WhatsApp
                                     </button>
                                     </div>
-                            )}
-                        </div>
+                        )}
+                    </div>
 
                         {/* Facebook & Instagram */}
                         <div className="cards-grid two">
@@ -433,9 +507,9 @@ const Integrations = () => {
                                             <div className="connected-badge">
                                         <CheckCircle size={16} />
                                                 <span>Connecté: @{instagramUsername}</span>
-                        </div>
+                                        </div>
                                             <button className="btn-disconnect">Déconnecter</button>
-                        </div>
+                                        </div>
                                     ) : (
                                         <button className="btn-connect instagram" onClick={handleFacebookConnect}>
                                             <Instagram size={18} /> Connecter Instagram
@@ -445,8 +519,8 @@ const Integrations = () => {
                                     <p className="card-note">
                                         <AlertTriangle size={14} /> Nécessite un compte Instagram Business lié à une page Facebook
                                     </p>
+                                    </div>
                                 </div>
-                            </div>
                                     </div>
                 )}
 
@@ -454,82 +528,181 @@ const Integrations = () => {
                     TAB: WIDGET CHAT
                     ============================================================ */}
                 {activeTab === 'widget' && (
-                    <div className="tab-content">
-                        <div className="widget-config-grid">
-                                <div className="widget-settings">
-                                    <h3><Settings size={18} /> Configuration</h3>
-                                    
-                                    <div className="setting-group">
-                                        <label>Couleur du widget</label>
-                                        <div className="color-picker">
-                                <input
-                                                type="color" 
-                                                value={widgetColor} 
-                                                onChange={(e) => setWidgetColor(e.target.value)}
-                                            />
-                                <input
-                                    type="text"
-                                                value={widgetColor} 
-                                                onChange={(e) => setWidgetColor(e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="setting-group">
-                                        <label>Position</label>
-                                        <div className="position-selector">
-                                <button 
-                                                className={widgetPosition === 'left' ? 'active' : ''}
-                                                onClick={() => setWidgetPosition('left')}
-                                >
-                                                ← Gauche
-                                </button>
-                                            <button 
-                                                className={widgetPosition === 'right' ? 'active' : ''}
-                                                onClick={() => setWidgetPosition('right')}
-                                            >
-                                                Droite →
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <button className="btn-primary" onClick={saveWidgetConfig} disabled={saving === 'widget'}>
-                                        <Save size={16} /> {saving === 'widget' ? 'Sauvegarde...' : 'Sauvegarder'}
+                    <div className="tab-content widget-tab">
+                        {/* Widget Sub-tabs */}
+                        <div className="widget-subtabs">
+                                    <button 
+                                className={`subtab ${widgetTab === 'setup' ? 'active' : ''}`}
+                                onClick={() => setWidgetTab('setup')}
+                                    >
+                                <Code size={14} /> Installation
                                     </button>
+                                    <button 
+                                className={`subtab ${widgetTab === 'customize' ? 'active' : ''}`}
+                                onClick={() => setWidgetTab('customize')}
+                            >
+                                <Palette size={14} /> Personnalisation
+                                    </button>
+                            <button 
+                                className={`subtab ${widgetTab === 'analytics' ? 'active' : ''}`}
+                                onClick={() => setWidgetTab('analytics')}
+                            >
+                                <Zap size={14} /> Analytics
+                            </button>
+                        </div>
+
+                        {/* Setup Tab */}
+                        {widgetTab === 'setup' && (
+                            <div className="widget-setup">
+                                <div className="setup-step">
+                                    <div className="step-number">1</div>
+                                    <div className="step-content">
+                                        <h4>Copiez le code</h4>
+                                        <p>Ajoutez ce script juste avant &lt;/body&gt;</p>
                                 </div>
-                                
-                                <div className="widget-code">
-                                    <h3><Code size={18} /> Code à intégrer</h3>
-                                    <p>Copiez ce code et collez-le juste avant la balise <code>&lt;/body&gt;</code> de votre site</p>
-                                    
-                                    <div className="code-block">
-                                        <pre>{getWidgetCode()}</pre>
-                                <button 
-                                            className="btn-copy"
-                                            onClick={() => copyToClipboard(getWidgetCode(), 'widget')}
-                                >
-                                            {copied === 'widget' ? <Check size={16} /> : <Copy size={16} />}
-                                            {copied === 'widget' ? 'Copié !' : 'Copier'}
-                                </button>
                             </div>
                             
-                                    <div className="widget-preview">
-                                        <h4>Aperçu</h4>
-                                        <div className="preview-container">
-                                            <div 
-                                                className="widget-bubble-preview"
-                                                style={{ 
-                                                    backgroundColor: widgetColor,
-                                                    [widgetPosition]: '20px'
-                                                }}
+                                <div className="code-block">
+                                    <pre>{generateWidgetCode()}</pre>
+                                    <button className="btn-copy" onClick={copyWidgetCode}>
+                                        {widgetCopied ? <><Check size={14} /> Copié</> : <><Copy size={14} /> Copier</>}
+                                    </button>
+                                </div>
+
+                                <div className="setup-step">
+                                    <div className="step-number">2</div>
+                                    <div className="step-content">
+                                        <h4>Vérifiez l'installation</h4>
+                                        <p>Visitez votre site et vérifiez que le widget apparaît</p>
+                                    </div>
+                                </div>
+
+                                <div className="verification-list">
+                                    <div className="check-item"><CheckCircle size={14} /> Le bouton apparaît en bas {widgetConfig.position === 'left' ? 'à gauche' : 'à droite'}</div>
+                                    <div className="check-item"><CheckCircle size={14} /> Le chat s'ouvre au clic</div>
+                                    <div className="check-item"><CheckCircle size={14} /> Vous pouvez envoyer un message</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Customize Tab */}
+                        {widgetTab === 'customize' && (
+                            <div className="widget-customize">
+                                <div className="config-section">
+                                    <label>Couleur</label>
+                                    <div className="color-presets">
+                                        {colorPresets.map(preset => (
+                                <button 
+                                                key={preset.color}
+                                                className={`color-btn ${widgetConfig.color === preset.color ? 'active' : ''}`}
+                                                style={{ backgroundColor: preset.color }}
+                                                onClick={() => setWidgetConfig({...widgetConfig, color: preset.color})}
+                                                title={preset.name}
                                             >
-                                                <MessageCircle size={24} />
-                                            </div>
-                                        </div>
+                                                {widgetConfig.color === preset.color && <Check size={12} />}
+                                </button>
+                                        ))}
+                                        <input
+                                            type="color"
+                                            value={widgetConfig.color}
+                                            onChange={(e) => setWidgetConfig({...widgetConfig, color: e.target.value})}
+                                            className="color-input"
+                                        />
+                                    </div>
+                            </div>
+                            
+                                <div className="config-section">
+                                    <label>Position</label>
+                                    <div className="position-selector">
+                                        <button 
+                                            className={widgetConfig.position === 'left' ? 'active' : ''}
+                                            onClick={() => setWidgetConfig({...widgetConfig, position: 'left'})}
+                                        >
+                                            ← Gauche
+                                        </button>
+                                        <button 
+                                            className={widgetConfig.position === 'right' ? 'active' : ''}
+                                            onClick={() => setWidgetConfig({...widgetConfig, position: 'right'})}
+                                        >
+                                            Droite →
+                                        </button>
                         </div>
+                            </div>
+                            
+                                <div className="config-section">
+                                    <label>Nom de l'assistant</label>
+                                <input
+                                    type="text"
+                                        value={widgetConfig.name}
+                                        onChange={(e) => setWidgetConfig({...widgetConfig, name: e.target.value})}
+                                        placeholder="Assistant"
+                                    />
+                                </div>
+
+                                <div className="config-section">
+                                    <label>Message d'accueil</label>
+                                    <textarea
+                                        value={widgetConfig.greeting}
+                                        onChange={(e) => setWidgetConfig({...widgetConfig, greeting: e.target.value})}
+                                        placeholder="Bonjour ! 👋 Comment puis-je vous aider ?"
+                                        rows={2}
+                                    />
+                                </div>
+
+                                <button className="btn-primary" onClick={saveWidgetConfig} disabled={saving === 'widget'}>
+                                    <Save size={14} /> {saving === 'widget' ? 'Sauvegarde...' : 'Sauvegarder'}
+                                </button>
+
+                                {/* Preview */}
+                                <div className="widget-preview-section">
+                                    <label>Aperçu</label>
+                                    <div className="preview-container">
+                                        <div 
+                                            className="widget-bubble-preview"
+                                            style={{ 
+                                                backgroundColor: widgetConfig.color,
+                                                [widgetConfig.position]: '12px'
+                                            }}
+                                        >
+                                            <MessageCircle size={18} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Analytics Tab */}
+                        {widgetTab === 'analytics' && (
+                            <div className="widget-analytics">
+                                {widgetAnalytics ? (
+                                    <div className="analytics-grid">
+                                        <div className="stat-box">
+                                            <div className="stat-value">{widgetAnalytics.totalSessions || 0}</div>
+                                            <div className="stat-label">Conversations</div>
+                                </div>
+                                        <div className="stat-box">
+                                            <div className="stat-value">{widgetAnalytics.qualifiedSessions || 0}</div>
+                                            <div className="stat-label">Leads qualifiés</div>
+                                        </div>
+                                        <div className="stat-box highlight">
+                                            <div className="stat-value">{widgetAnalytics.qualificationRate || 0}%</div>
+                                            <div className="stat-label">Taux de qualification</div>
+                                        </div>
+                                        <div className="stat-box">
+                                            <div className="stat-value">{widgetAnalytics.avgMessagesPerSession || 0}</div>
+                                            <div className="stat-label">Msg / conversation</div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="empty-analytics">
+                                        <MessageCircle size={32} />
+                                        <p>Pas encore de données</p>
+                                        <span>Les statistiques apparaîtront après les premières conversations</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
-                </div>
-            </div>
                 )}
 
                 {/* ============================================================
@@ -560,7 +733,7 @@ const Integrations = () => {
                                     <span>Disponibilités manuelles</span>
                                 </button>
                             </div>
-
+                            
                             {/* Google Calendar */}
                             {calendarType === 'google' && (
                                 <div className="calendar-config">
@@ -569,7 +742,7 @@ const Integrations = () => {
                                         <div>
                                             <h3>Connecter Google Calendar</h3>
                                             <p>Synchronisez automatiquement vos disponibilités avec votre agenda Google</p>
-                                        </div>
+                        </div>
                                         <button className="btn-google" onClick={handleGoogleConnect}>
                                             <svg viewBox="0 0 24 24" width="18" height="18">
                                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -579,8 +752,8 @@ const Integrations = () => {
                                             </svg>
                                             Continuer avec Google
                                         </button>
-                                    </div>
-                                </div>
+                    </div>
+                </div>
                             )}
                             
                             {/* Calendly / Cal.com URL */}
@@ -596,11 +769,11 @@ const Integrations = () => {
                                         />
                                         <button className="btn-primary" onClick={saveCalendarUrl} disabled={saving === 'calendar'}>
                                             <Save size={16} /> {saving === 'calendar' ? 'Sauvegarde...' : 'Sauvegarder'}
-                                        </button>
+                        </button>
                                     </div>
                                 </div>
                             )}
-
+                            
                             {/* Manual Availability */}
                             {calendarType === 'manual' && (
                                 <div className="calendar-config">
@@ -654,8 +827,8 @@ const Integrations = () => {
                                         <button className="btn-primary" onClick={saveAvailability} disabled={saving === 'availability'}>
                                             <Save size={16} /> {saving === 'availability' ? 'Sauvegarde...' : 'Sauvegarder les disponibilités'}
                                         </button>
-                                    </div>
                         </div>
+                    </div>
                             )}
                 </div>
             )}
@@ -719,8 +892,8 @@ const Integrations = () => {
 
                                     <button className="btn-primary" onClick={saveCrmWebhook} disabled={saving === 'crm'}>
                                         <Save size={16} /> {saving === 'crm' ? 'Sauvegarde...' : 'Sauvegarder'}
-                                    </button>
-                                </div>
+                        </button>
+                    </div>
                             </div>
                     </div>
                 )}

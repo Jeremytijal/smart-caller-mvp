@@ -22,7 +22,6 @@ import {
   Clock,
   AlertTriangle,
   ArrowLeft,
-  MessageCircle,
   BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -147,7 +146,6 @@ const Sidebar = () => {
     { icon: Megaphone, label: 'Campagnes', path: '/campaigns' },
     { icon: Ban, label: 'Liste noire', path: '/blacklist' },
     { icon: Link2, label: 'Intégrations', path: '/integrations' },
-    { icon: MessageCircle, label: 'Widget Chat', path: '/widget' },
     { icon: Settings, label: 'Configuration', path: '/settings' },
     { icon: BookOpen, label: 'Aide & FAQ', path: '/faq' },
   ];

@@ -1359,6 +1359,264 @@
 }
 
 /* ============================================
+   Widget Tab - Enhanced
+   ============================================ */
+.widget-tab {
+    max-width: 800px;
+}
+
+.widget-subtabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.subtab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.subtab:hover {
+    color: #374151;
+    background: #f9fafb;
+}
+
+.subtab.active {
+    color: #FF470F;
+    background: #fff7f5;
+}
+
+/* Widget Setup */
+.widget-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.setup-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    background: #FF470F;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content h4 {
+    margin: 0 0 2px 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.step-content p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.verification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+    color: #16a34a;
+}
+
+/* Widget Customize */
+.widget-customize {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.config-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.config-section > label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.config-section input[type="text"],
+.config-section textarea {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    resize: none;
+}
+
+.config-section input:focus,
+.config-section textarea:focus {
+    outline: none;
+    border-color: #FF470F;
+}
+
+.color-presets {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.color-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.15s;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+}
+
+.color-btn.active {
+    border-color: #111827;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #111827;
+}
+
+.color-input {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.widget-preview-section {
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.widget-preview-section > label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+}
+
+/* Widget Analytics */
+.widget-analytics {
+    padding: 16px 0;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.stat-box {
+    padding: 16px;
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-box.highlight {
+    background: #fff7f5;
+    border-color: #fed7aa;
+}
+
+.stat-box .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.stat-box.highlight .stat-value {
+    color: #FF470F;
+}
+
+.stat-box .stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.empty-analytics {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: #9ca3af;
+    text-align: center;
+}
+
+.empty-analytics svg {
+    margin-bottom: 12px;
+}
+
+.empty-analytics p {
+    margin: 0;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.empty-analytics span {
+    font-size: 0.8125rem;
+    margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
    Responsive
    ============================================ */
 @media (max-width: 768px) {
