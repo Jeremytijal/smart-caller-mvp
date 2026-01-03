@@ -3700,19 +3700,19 @@ textarea:focus {
     justify-content: space-between;
     align-items: flex-start;
     padding-bottom: 24px;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid #E5E7EB;
 }
 
 .config-title {
     font-size: 1.75rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #1A1A1A;
     margin-bottom: 8px;
 }
 
 .config-subtitle {
     font-size: 0.95rem;
-    color: var(--text-secondary);
+    color: #6B7280;
 }
 
 .btn-outline-sm {
@@ -3720,10 +3720,10 @@ textarea:focus {
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    background: transparent;
-    border: 1px solid var(--border-strong);
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
     border-radius: 8px;
-    color: var(--text-secondary);
+    color: #6B7280;
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
@@ -3731,23 +3731,23 @@ textarea:focus {
 }
 
 .btn-outline-sm:hover {
-    background: var(--bg-hover);
-    border-color: var(--text-primary);
-    color: var(--text-primary);
+    background: #F9FAFB;
+    border-color: #1A1A1A;
+    color: #1A1A1A;
 }
 
 /* Configuration Cards */
 .config-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
     border-radius: 16px;
     overflow: hidden;
     transition: all 0.2s;
 }
 
 .config-card:hover {
-    border-color: var(--border-strong);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border-color: #D1D5DB;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .config-card-header {
@@ -3755,7 +3755,7 @@ textarea:focus {
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    background: transparent;
+    background: #FFFFFF;
 }
 
 .config-card-icon {
@@ -3786,19 +3786,20 @@ textarea:focus {
 .config-card-header h3 {
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #1A1A1A;
     margin-bottom: 2px;
 }
 
 .config-card-header p {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: #6B7280;
     margin: 0;
 }
 
 .config-card-body {
     padding: 20px;
-    border-top: 1px solid var(--border-subtle);
+    border-top: 1px solid #E5E7EB;
+    background: #FFFFFF;
 }
 
 /* Config Fields */
@@ -3818,7 +3819,7 @@ textarea:focus {
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #1A1A1A;
     margin-bottom: 8px;
 }
 
@@ -3826,24 +3827,24 @@ textarea:focus {
 .config-field textarea {
     width: 100%;
     padding: 12px 16px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-subtle);
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
     border-radius: 10px;
     font-size: 0.95rem;
-    color: var(--text-primary);
+    color: #1A1A1A;
     transition: all 0.2s;
 }
 
 .config-field input:hover,
 .config-field textarea:hover {
-    border-color: var(--border-strong);
+    border-color: #D1D5DB;
 }
 
 .config-field input:focus,
 .config-field textarea:focus {
     outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-dim);
+    border-color: #FF470F;
+    box-shadow: 0 0 0 3px rgba(255, 71, 15, 0.1);
 }
 
 .config-field textarea {
@@ -3874,9 +3875,9 @@ textarea:focus {
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-    background: var(--bg-input);
+    background: #F9FAFB;
     border-radius: 10px;
-    border: 1px solid var(--border-subtle);
+    border: 1px solid #E5E7EB;
 }
 
 .objective-check {
@@ -3893,7 +3894,7 @@ textarea:focus {
 
 .objective-item span {
     font-size: 0.9rem;
-    color: var(--text-primary);
+    color: #1A1A1A;
 }
 
 /* Flow Timeline */
@@ -3919,7 +3920,7 @@ textarea:focus {
     top: 48px;
     bottom: 0;
     width: 2px;
-    background: var(--border-subtle);
+    background: #E5E7EB;
 }
 
 .flow-timeline-number {
@@ -3927,7 +3928,7 @@ textarea:focus {
     height: 28px;
     border-radius: 50%;
     background: #1F2937;
-    color: var(--bg-card);
+    color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3946,13 +3947,13 @@ textarea:focus {
 .flow-timeline-content h4 {
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #1A1A1A;
     margin-bottom: 4px;
 }
 
 .flow-timeline-content p {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: #6B7280;
     margin: 0;
 }
 
@@ -4371,16 +4372,16 @@ textarea:focus {
     align-items: flex-start;
     gap: 16px;
     padding: 20px;
-    background: var(--bg-hover);
-    border: 2px solid transparent;
+    background: #F9FAFB;
+    border: 2px solid #E5E7EB;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .behavior-option:hover {
-    background: var(--bg-card);
-    border-color: var(--border-strong);
+    background: #FFFFFF;
+    border-color: #D1D5DB;
 }
 
 .behavior-option.selected {
@@ -4391,7 +4392,7 @@ textarea:focus {
 .behavior-option-icon {
     width: 48px;
     height: 48px;
-    background: var(--bg-card);
+    background: #FFFFFF;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -4412,13 +4413,13 @@ textarea:focus {
 .behavior-option-content h4 {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #1A1A1A;
     margin: 0 0 4px 0;
 }
 
 .behavior-option-content p {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: #6B7280;
     margin: 0;
     line-height: 1.5;
 }
@@ -4440,7 +4441,7 @@ textarea:focus {
 
 /* Response Delay Section */
 .response-delay-section {
-    background: var(--bg-hover);
+    background: #F3F4F6;
     border-radius: 12px;
     padding: 20px;
     margin-top: 8px;
@@ -4530,7 +4531,7 @@ textarea:focus {
 .time-input {
     width: 100%;
     padding: 12px 16px;
-    background: var(--bg-card);
+    background: #FFFFFF;
     border: 1px solid var(--border-subtle);
     border-radius: 10px;
     font-size: 1rem;
