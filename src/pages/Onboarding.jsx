@@ -50,7 +50,7 @@ const Onboarding = () => {
         goal: 'qualify', // 'qualify' or 'book'
         selectedAgentId: null, // New field for the selected agent option
         agentPersona: null, // { role, goal, firstMessage, behaviors, constraints, tone }
-        channels: { sms: true, whatsapp: false, email: false, webchat: false }, // Default SMS/WhatsApp true
+        channels: { sms: true, whatsapp: false, instagram: false, messenger: false, email: false, webchat: false },
         crm: null, // 'hubspot', 'pipedrive', 'salesforce', 'none'
         crmApiKey: '',
         // Behavior & Scheduling
@@ -2304,10 +2304,10 @@ const Onboarding = () => {
                                     {[
                                         { id: 'whatsapp', label: 'WhatsApp', desc: 'Engagez vos leads via WhatsApp Business.', icon: MessageCircle, available: true },
                                         { id: 'sms', label: 'SMS', desc: 'Envoyez et recevez des SMS.', icon: Smartphone, available: true },
-                                        { id: 'instagram', label: 'Instagram', desc: 'Communiquez avec vos clients via les messages Instagram.', icon: Instagram, available: false },
-                                        { id: 'messenger', label: 'Meta', desc: 'Intégrez Messenger pour un support instantané.', icon: Facebook, available: false },
+                                        { id: 'instagram', label: 'Instagram', desc: 'Communiquez avec vos clients via les messages Instagram.', icon: Instagram, available: true },
+                                        { id: 'messenger', label: 'Messenger', desc: 'Intégrez Messenger pour un support instantané.', icon: Facebook, available: true },
                                         { id: 'email', label: 'Email', desc: 'Automatisez les réponses et relances par email.', icon: Mail, available: false },
-                                        { id: 'webchat', label: 'Chat Web', desc: 'Ajoutez un widget de chat en direct sur votre site.', icon: MessageSquare, available: false },
+                                        { id: 'webchat', label: 'Chat Web', desc: 'Ajoutez un widget de chat en direct sur votre site.', icon: MessageSquare, available: true },
                                     ].map(channel => (
                                         <div key={channel.id} className={`channel-card ${!channel.available ? 'disabled' : ''}`}>
                                             <div className="flex justify-between items-start mb-4">
