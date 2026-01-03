@@ -154,60 +154,19 @@ const Conversations = () => {
         if (!user) return;
 
         try {
-            // Get default agent first
-            const { data: agentData } = await supabase
-                .from('agents')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('is_default', true)
-                .maybeSingle();
+            // Fetch messages for this user (using user.id directly as before)
+            const { data, error } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('agent_id', user.id)
+                .order('created_at', { ascending: true });
 
-            const agentId = agentData?.id;
-
-            // Try fetching with agent_id first, then fallback to user_id
-            let data = [];
-            let error = null;
-
-            if (agentId) {
-                const result = await supabase
-                    .from('messages')
-                    .select('*')
-                    .eq('agent_id', agentId)
-                    .order('created_at', { ascending: true });
-                data = result.data || [];
-                error = result.error;
+            if (error) {
+                console.error('Error fetching messages:', error);
+                throw error;
             }
 
-            // If no messages found with agent_id, try with user_id (legacy)
-            if (data.length === 0) {
-                const result = await supabase
-                    .from('messages')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .order('created_at', { ascending: true });
-                data = result.data || [];
-                error = result.error;
-            }
-
-            // If still no messages, try without filter to debug
-            if (data.length === 0) {
-                console.log('No messages found with agent_id or user_id, checking all messages...');
-                const result = await supabase
-                    .from('messages')
-                    .select('*')
-                    .order('created_at', { ascending: true })
-                    .limit(100);
-                
-                // Filter client-side for this user
-                data = (result.data || []).filter(msg => 
-                    msg.agent_id === agentId || 
-                    msg.agent_id === user.id || 
-                    msg.user_id === user.id
-                );
-                console.log('Found messages after manual filter:', data.length);
-            }
-
-            if (error) throw error;
+            console.log('Fetched messages:', data?.length || 0);
 
             const grouped = {};
             (data || []).forEach(msg => {
@@ -225,7 +184,7 @@ const Conversations = () => {
                         messageCount: 0,
                         botMessages: 0,
                         lastActive: null,
-                        channel: msg.channel || 'sms' // Default to SMS
+                        channel: msg.channel || 'sms'
                     };
                 }
                 grouped[normalizedPhone].messages.push(msg);
