@@ -162,13 +162,50 @@ const Conversations = () => {
                 .eq('is_default', true)
                 .maybeSingle();
 
-            const agentId = agentData?.id || user.id;
+            const agentId = agentData?.id;
 
-            const { data, error } = await supabase
-                .from('messages')
-                .select('*')
-                .eq('agent_id', agentId)
-                .order('created_at', { ascending: true });
+            // Try fetching with agent_id first, then fallback to user_id
+            let data = [];
+            let error = null;
+
+            if (agentId) {
+                const result = await supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('agent_id', agentId)
+                    .order('created_at', { ascending: true });
+                data = result.data || [];
+                error = result.error;
+            }
+
+            // If no messages found with agent_id, try with user_id (legacy)
+            if (data.length === 0) {
+                const result = await supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: true });
+                data = result.data || [];
+                error = result.error;
+            }
+
+            // If still no messages, try without filter to debug
+            if (data.length === 0) {
+                console.log('No messages found with agent_id or user_id, checking all messages...');
+                const result = await supabase
+                    .from('messages')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+                    .limit(100);
+                
+                // Filter client-side for this user
+                data = (result.data || []).filter(msg => 
+                    msg.agent_id === agentId || 
+                    msg.agent_id === user.id || 
+                    msg.user_id === user.id
+                );
+                console.log('Found messages after manual filter:', data.length);
+            }
 
             if (error) throw error;
 
@@ -187,7 +224,8 @@ const Conversations = () => {
                         status: 'pending',
                         messageCount: 0,
                         botMessages: 0,
-                        lastActive: null
+                        lastActive: null,
+                        channel: msg.channel || 'sms' // Default to SMS
                     };
                 }
                 grouped[normalizedPhone].messages.push(msg);
@@ -195,6 +233,7 @@ const Conversations = () => {
                 grouped[normalizedPhone].time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 grouped[normalizedPhone].messageCount++;
                 grouped[normalizedPhone].lastActive = msg.created_at;
+                grouped[normalizedPhone].channel = msg.channel || grouped[normalizedPhone].channel;
                 if (msg.role === 'assistant') {
                     grouped[normalizedPhone].botMessages++;
                 }
@@ -415,11 +454,18 @@ const Conversations = () => {
                                         </div>
                                         <p className="conv-preview">{chat.lastMessage}</p>
                                         <div className="conv-badges">
+                                            <span className={`badge-channel ${chat.channel || 'sms'}`} title={`Canal: ${chat.channel || 'SMS'}`}>
+                                                {chat.channel === 'whatsapp' ? '💬' : 
+                                                 chat.channel === 'instagram' ? '📸' :
+                                                 chat.channel === 'messenger' ? '💙' :
+                                                 chat.channel === 'widget' ? '🌐' : '📱'}
+                                                {chat.channel === 'whatsapp' ? 'WhatsApp' : 
+                                                 chat.channel === 'instagram' ? 'Instagram' :
+                                                 chat.channel === 'messenger' ? 'Messenger' :
+                                                 chat.channel === 'widget' ? 'Widget' : 'SMS'}
+                                            </span>
                                             <span className="badge-bot" title="Messages IA">
                                                 <Bot size={12} /> {chat.botMessages}
-                                            </span>
-                                            <span className="badge-total" title="Total messages">
-                                                <MessageCircle size={12} /> {chat.messageCount}
                                             </span>
                                         </div>
                                     </div>
@@ -443,10 +489,19 @@ const Conversations = () => {
                                     </div>
                                     <div className="header-info">
                                         <h2>{getContactName(selectedPhone)}</h2>
-                                        <span className="last-active">
-                                            <span className="active-dot"></span>
-                                            Dernier actif: {getLastActive(selectedPhone)}
-                                        </span>
+                                        <div className="header-meta">
+                                            <span className={`channel-indicator ${selectedConv?.channel || 'sms'}`}>
+                                                {selectedConv?.channel === 'whatsapp' ? '💬 WhatsApp' : 
+                                                 selectedConv?.channel === 'instagram' ? '📸 Instagram' :
+                                                 selectedConv?.channel === 'messenger' ? '💙 Messenger' :
+                                                 selectedConv?.channel === 'widget' ? '🌐 Widget' : '📱 SMS'}
+                                            </span>
+                                            <span className="meta-separator">•</span>
+                                            <span className="last-active">
+                                                <span className="active-dot"></span>
+                                                {getLastActive(selectedPhone)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="header-actions">

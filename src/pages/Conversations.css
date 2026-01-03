@@ -233,6 +233,41 @@
     gap: 8px;
 }
 
+.badge-channel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-channel.sms {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1d4ed8;
+}
+
+.badge-channel.whatsapp {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    color: #16a34a;
+}
+
+.badge-channel.instagram {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    color: #db2777;
+}
+
+.badge-channel.messenger {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #2563eb;
+}
+
+.badge-channel.widget {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+    color: #7c3aed;
+}
+
 .badge-bot, .badge-total {
     display: flex;
     align-items: center;
@@ -336,7 +371,53 @@
     font-size: 1.15rem;
     font-weight: 700;
     color: #1a1a1a;
-    margin: 0 0 4px 0;
+    margin: 0 0 6px 0;
+}
+
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.channel-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.channel-indicator.sms {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1d4ed8;
+}
+
+.channel-indicator.whatsapp {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    color: #16a34a;
+}
+
+.channel-indicator.instagram {
+    background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+    color: #db2777;
+}
+
+.channel-indicator.messenger {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #2563eb;
+}
+
+.channel-indicator.widget {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+    color: #7c3aed;
+}
+
+.meta-separator {
+    color: #d1d5db;
+    font-size: 0.8rem;
 }
 
 .last-active {
