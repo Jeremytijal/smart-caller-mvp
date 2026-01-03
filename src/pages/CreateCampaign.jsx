@@ -221,34 +221,30 @@ const CreateCampaign = () => {
         try {
             let data = null;
             
-            // If impersonating, use admin API to bypass RLS
-            if (isImpersonating && realUser) {
-                const response = await fetch(endpoints.adminProfiles, {
-                    headers: { 'X-Admin-Email': realUser.email }
-                });
-                if (response.ok) {
-                    const result = await response.json();
-                    data = result.profiles?.find(p => p.id === user.id);
-                }
-            } else {
-                // Normal mode: use Supabase directly
-                const { data: supabaseData, error } = await supabase
-                    .from('profiles')
-                    .select('agent_config, first_message_template')
-                    .eq('id', user.id)
-                    .maybeSingle();
+            // Get default agent from agents table
+            const { data: agentData, error } = await supabase
+                .from('agents')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('is_default', true)
+                .maybeSingle();
 
-                if (error) throw error;
-                data = supabaseData;
-            }
-
-            if (!data) return;
+            if (error) throw error;
             
-            if (data?.agent_config) {
-                setAgentConfig(data.agent_config);
-                const defaultMessage = data.first_message_template || 
-                    data.agent_config?.agentPersona?.firstMessage || 
-                    `Bonjour {{name}}, je suis ${data.agent_config?.name || 'votre assistant'} de ${data.agent_config?.company || 'notre équipe'}. Comment puis-je vous aider ?`;
+            if (agentData) {
+                // Build agentConfig from agents table
+                const config = agentData.config || {};
+                data = {
+                    id: agentData.id,
+                    name: agentData.name,
+                    role: agentData.role,
+                    company: config.company,
+                    ...config
+                };
+                setAgentConfig(data);
+                
+                const defaultMessage = config.firstMessage || 
+                    `Bonjour ! Je suis ${agentData.name || 'votre assistant'} de ${config.company || 'notre équipe'}. Comment puis-je vous aider ?`;
                 
                 setCampaign(prev => ({
                     ...prev,
@@ -604,16 +600,15 @@ const CreateCampaign = () => {
         // Different validation based on campaign type
         if (campaign.type === 'inbound') {
         switch (currentStep) {
-                case 1: return campaign.name && campaign.type;
+                case 1: return campaign.type; // Name can be filled later
                 case 2: return campaign.channel;
                 case 3: return true; // Config is optional
                 case 4: return true; // Routing rules have defaults
             default: return true;
             }
-        } else {
-            // Outbound
+        } else if (campaign.type === 'outbound') {
             switch (currentStep) {
-                case 1: return campaign.name && campaign.type;
+                case 1: return campaign.type; // Name can be filled later
                 case 2: return campaign.objectives.length > 0;
                 case 3: return selectedContacts.length > 0;
                 case 4: return campaign.channel;
@@ -621,6 +616,9 @@ const CreateCampaign = () => {
                 case 6: return campaign.schedule.startDate && campaign.schedule.days.length > 0;
                 default: return true;
             }
+        } else {
+            // No type selected yet
+            return campaign.type;
         }
     };
 
