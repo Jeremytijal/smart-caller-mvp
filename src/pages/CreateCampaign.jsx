@@ -124,6 +124,8 @@ const CreateCampaign = () => {
     // Channel options - INBOUND
     const inboundChannels = [
         { id: 'widget', label: 'Widget Chat', icon: MessageSquare, available: true },
+        { id: 'sms', label: 'SMS Entrant', icon: Phone, available: true },
+        { id: 'whatsapp', label: 'WhatsApp Entrant', icon: MessageCircle, available: true },
         { id: 'instagram', label: 'Instagram DM', icon: MessageCircle, available: true },
         { id: 'messenger', label: 'Messenger', icon: MessageCircle, available: true }
     ];
@@ -1114,9 +1116,237 @@ const CreateCampaign = () => {
                     </div>
                 )}
 
-                {/* Step 4: First Message */}
-                {/* Step 5: Message (OUTBOUND) OR Step 3: Config (INBOUND) */}
-                {((currentStep === 5 && campaign.type === 'outbound') || (currentStep === 3 && campaign.type === 'inbound')) && (
+                {/* Step 3: Channel Configuration (INBOUND ONLY) */}
+                {currentStep === 3 && campaign.type === 'inbound' && (
+                    <div className="step-content">
+                        <div className="step-header">
+                            <h2>Configuration du canal</h2>
+                            <p>Configurez votre canal {campaign.channel} pour recevoir les leads</p>
+                        </div>
+
+                        {/* Widget Configuration */}
+                        {campaign.channel === 'widget' && agentConfig && (
+                            <div className="channel-config">
+                                <div className="config-card success">
+                                    <div className="config-icon">
+                                        <Check size={24} />
+                                    </div>
+                                    <h3>Widget prêt à être intégré !</h3>
+                                    <p>Copiez ce code et collez-le juste avant la balise &lt;/body&gt; de votre site</p>
+                                </div>
+
+                                <div className="code-block">
+                                    <div className="code-header">
+                                        <span>Code d'intégration</span>
+                                        <button 
+                                            className="btn-copy"
+                                            onClick={() => {
+                                                const code = `<!-- Smart Caller Chat Widget -->
+<script 
+    src="https://agent.smart-caller.ai/widget/widget-loader.js"
+    data-agent-id="${agentConfig.id}"
+    data-color="#FF470F"
+    data-position="right">
+</script>`;
+                                                navigator.clipboard.writeText(code);
+                                                alert('Code copié !');
+                                            }}
+                                        >
+                                            <Copy size={16} />
+                                            Copier
+                                        </button>
+                                    </div>
+                                    <pre className="code-content">
+{`<!-- Smart Caller Chat Widget -->
+<script 
+    src="https://agent.smart-caller.ai/widget/widget-loader.js"
+    data-agent-id="${agentConfig.id}"
+    data-color="#FF470F"
+    data-position="right">
+</script>`}
+                                    </pre>
+                                </div>
+
+                                <div className="config-info">
+                                    <Info size={16} />
+                                    <span>Le widget apparaîtra en bas à droite de votre site une fois le code installé.</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Instagram DM Configuration */}
+                        {campaign.channel === 'instagram' && (
+                            <div className="channel-config">
+                                <div className="config-card warning">
+                                    <div className="config-icon warning">
+                                        <AlertCircle size={24} />
+                                    </div>
+                                    <h3>Connexion Instagram requise</h3>
+                                    <p>Connectez votre compte Instagram Business pour recevoir les DM</p>
+                                </div>
+
+                                <div className="integration-steps">
+                                    <div className="step-item">
+                                        <span className="step-number">1</span>
+                                        <div className="step-content">
+                                            <h4>Compte Instagram Business</h4>
+                                            <p>Votre compte Instagram doit être un compte professionnel</p>
+                                        </div>
+                                    </div>
+                                    <div className="step-item">
+                                        <span className="step-number">2</span>
+                                        <div className="step-content">
+                                            <h4>Page Facebook liée</h4>
+                                            <p>Votre compte Instagram doit être lié à une Page Facebook</p>
+                                        </div>
+                                    </div>
+                                    <div className="step-item">
+                                        <span className="step-number">3</span>
+                                        <div className="step-content">
+                                            <h4>Autoriser Smart Caller</h4>
+                                            <p>Autorisez l'application à accéder à vos messages</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    className="btn-connect instagram"
+                                    onClick={() => window.open('/integrations', '_blank')}
+                                >
+                                    <MessageCircle size={18} />
+                                    Connecter Instagram
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Messenger Configuration */}
+                        {campaign.channel === 'messenger' && (
+                            <div className="channel-config">
+                                <div className="config-card warning">
+                                    <div className="config-icon warning">
+                                        <AlertCircle size={24} />
+                                    </div>
+                                    <h3>Connexion Messenger requise</h3>
+                                    <p>Connectez votre Page Facebook pour recevoir les messages Messenger</p>
+                                </div>
+
+                                <div className="integration-steps">
+                                    <div className="step-item">
+                                        <span className="step-number">1</span>
+                                        <div className="step-content">
+                                            <h4>Page Facebook</h4>
+                                            <p>Vous devez être administrateur d'une Page Facebook</p>
+                                        </div>
+                                    </div>
+                                    <div className="step-item">
+                                        <span className="step-number">2</span>
+                                        <div className="step-content">
+                                            <h4>Autoriser Smart Caller</h4>
+                                            <p>Autorisez l'application à gérer les messages de votre Page</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    className="btn-connect messenger"
+                                    onClick={() => window.open('/integrations', '_blank')}
+                                >
+                                    <MessageCircle size={18} />
+                                    Connecter Messenger
+                                </button>
+                            </div>
+                        )}
+
+                        {/* SMS Inbound Webhook */}
+                        {campaign.channel === 'sms' && agentConfig && (
+                            <div className="channel-config">
+                                <div className="config-card success">
+                                    <div className="config-icon">
+                                        <Check size={24} />
+                                    </div>
+                                    <h3>Webhook SMS configuré</h3>
+                                    <p>Utilisez ce webhook pour envoyer vos leads entrants par SMS</p>
+                                </div>
+
+                                <div className="code-block">
+                                    <div className="code-header">
+                                        <span>URL du Webhook</span>
+                                        <button 
+                                            className="btn-copy"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(`https://webhook.smart-caller.ai/webhooks/${user.id}/leads`);
+                                                alert('URL copiée !');
+                                            }}
+                                        >
+                                            <Copy size={16} />
+                                            Copier
+                                        </button>
+                                    </div>
+                                    <pre className="code-content">
+{`https://webhook.smart-caller.ai/webhooks/${user.id}/leads`}
+                                    </pre>
+                                </div>
+
+                                <div className="webhook-example">
+                                    <h4>Exemple de payload JSON</h4>
+                                    <pre className="code-content small">
+{`{
+  "name": "Jean Dupont",
+  "phone": "+33612345678",
+  "email": "jean@example.com",
+  "source": "landing-page"
+}`}
+                                    </pre>
+                                </div>
+
+                                <div className="config-info">
+                                    <Info size={16} />
+                                    <span>Intégrez ce webhook dans votre formulaire ou CRM pour envoyer automatiquement les leads.</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* WhatsApp Inbound Webhook */}
+                        {campaign.channel === 'whatsapp' && agentConfig && (
+                            <div className="channel-config">
+                                <div className="config-card success">
+                                    <div className="config-icon">
+                                        <Check size={24} />
+                                    </div>
+                                    <h3>Webhook WhatsApp configuré</h3>
+                                    <p>Utilisez ce webhook pour envoyer vos leads entrants par WhatsApp</p>
+                                </div>
+
+                                <div className="code-block">
+                                    <div className="code-header">
+                                        <span>URL du Webhook</span>
+                                        <button 
+                                            className="btn-copy"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(`https://webhook.smart-caller.ai/webhooks/${user.id}/leads`);
+                                                alert('URL copiée !');
+                                            }}
+                                        >
+                                            <Copy size={16} />
+                                            Copier
+                                        </button>
+                                    </div>
+                                    <pre className="code-content">
+{`https://webhook.smart-caller.ai/webhooks/${user.id}/leads`}
+                                    </pre>
+                                </div>
+
+                                <div className="config-info">
+                                    <Info size={16} />
+                                    <span>Les leads reçus seront contactés automatiquement via WhatsApp Business.</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Step 5: Message (OUTBOUND ONLY) */}
+                {currentStep === 5 && campaign.type === 'outbound' && (
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Premier message</h2>
