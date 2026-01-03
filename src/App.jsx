@@ -24,6 +24,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import WebhookDocs from './pages/WebhookDocs';
 import WidgetIntegration from './pages/WidgetIntegration';
+import FAQ from './pages/FAQ';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = () => {
@@ -66,6 +67,7 @@ function App() {
               <Route path="settings" element={<AgentSettings />} />
               <Route path="integrations" element={<Integrations />} />
               <Route path="widget" element={<WidgetIntegration />} />
+              <Route path="faq" element={<FAQ />} />
             </Route>
           </Route>
         </Routes>

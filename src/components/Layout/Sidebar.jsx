@@ -22,7 +22,8 @@ import {
   Clock,
   AlertTriangle,
   ArrowLeft,
-  MessageCircle
+  MessageCircle,
+  BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../supabaseClient';
@@ -148,6 +149,7 @@ const Sidebar = () => {
     { icon: Link2, label: 'Intégrations', path: '/integrations' },
     { icon: MessageCircle, label: 'Widget Chat', path: '/widget' },
     { icon: Settings, label: 'Configuration', path: '/settings' },
+    { icon: BookOpen, label: 'Aide & FAQ', path: '/faq' },
   ];
 
   const formatDate = (dateString) => {
