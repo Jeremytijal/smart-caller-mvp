@@ -1,5 +1,5 @@
 /* ==========================================================================
-   INTEGRATIONS PAGE - Clean & Minimal Design
+   INTEGRATIONS PAGE - Professional Design
    ========================================================================== */
 
 /* Base & Loading */
@@ -25,71 +25,70 @@
 /* Page Container */
 .integrations-page-v2 {
     min-height: 100vh;
-    background: #F8F9FA;
+    background: #f9fafb;
     padding: 32px 40px;
 }
 
 /* ============================================
-   Header - Clean
+   Header
    ============================================ */
 .integrations-header {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .integrations-header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 600;
     color: #111827;
     margin: 0 0 4px 0;
 }
 
 .integrations-header p {
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     color: #6b7280;
     margin: 0;
 }
 
 /* ============================================
-   Tabs Navigation - Minimal
+   Tabs Navigation - Segment Control Style
    ============================================ */
 .integrations-tabs {
     display: inline-flex;
-    gap: 4px;
-    padding: 4px;
-    background: white;
-    border-radius: 10px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 3px;
     margin-bottom: 24px;
-    border: 1px solid #e5e7eb;
 }
 
 .tab-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
+    gap: 6px;
+    padding: 8px 16px;
     border: none;
     background: transparent;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: #6b7280;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
+    white-space: nowrap;
 }
 
 .tab-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
 }
 
 .tab-btn:hover {
     color: #374151;
-    background: #f9fafb;
 }
 
 .tab-btn.active {
-    background: #FF470F;
-    color: white;
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* ============================================
@@ -97,39 +96,32 @@
    ============================================ */
 .integrations-content {
     background: white;
-    border-radius: 16px;
-    padding: 32px;
+    border-radius: 12px;
     border: 1px solid #e5e7eb;
 }
 
 .tab-content {
-    animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    padding: 24px;
 }
 
 /* ============================================
    Tab Content Layout
    ============================================ */
-.tab-content > * {
-    margin-bottom: 24px;
-}
-
-.tab-content > *:last-child {
-    margin-bottom: 0;
+.tab-content > * + * {
+    margin-top: 20px;
 }
 
 /* ============================================
-   WhatsApp Status Card - Clean
+   WhatsApp Status Card
    ============================================ */
 .whatsapp-status-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
     background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px 24px;
+    border-radius: 8px;
 }
 
 .status-connected,
@@ -137,19 +129,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
     gap: 16px;
 }
 
 .status-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 .status-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     background: #f3f4f6;
     display: flex;
     align-items: center;
@@ -158,8 +151,8 @@
 }
 
 .status-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
 }
 
 .status-icon.connected {
@@ -168,47 +161,46 @@
 }
 
 .status-info h3 {
-    margin: 0 0 2px 0;
-    font-size: 0.95rem;
-    font-weight: 600;
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
     color: #111827;
 }
 
 .status-info p {
-    margin: 0;
+    margin: 2px 0 0 0;
     color: #6b7280;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .btn-connect-wa {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: 6px;
+    padding: 8px 14px;
     background: #25D366;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.15s;
 }
 
 .btn-connect-wa:hover {
-    background: #22c55e;
+    background: #1fba59;
 }
 
 .btn-disconnect {
-    padding: 8px 16px;
-    background: white;
+    padding: 6px 12px;
+    background: transparent;
     color: #dc2626;
     border: 1px solid #fecaca;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-disconnect:hover {
@@ -220,77 +212,76 @@
    ============================================ */
 .cards-grid {
     display: grid;
-    gap: 20px;
+    gap: 16px;
 }
 
 .cards-grid.two {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.cards-grid.three {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-@media (max-width: 900px) {
-    .cards-grid.two,
-    .cards-grid.three {
+@media (max-width: 768px) {
+    .cards-grid.two {
         grid-template-columns: 1fr;
     }
 }
 
-/* Channel Cards - Clean */
+/* ============================================
+   Channel Cards
+   ============================================ */
 .channel-card {
-    background: white;
+    padding: 20px;
+    background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 24px;
-    transition: all 0.2s ease;
+    border-radius: 8px;
+    transition: border-color 0.15s;
 }
 
 .channel-card:hover {
     border-color: #d1d5db;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .channel-card.connected {
-    border-color: #86efac;
     background: #f0fdf4;
+    border-color: #bbf7d0;
 }
 
 .card-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-bottom: 12px;
     display: block;
 }
 
 .channel-card h3 {
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: #111827;
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
 }
 
 .channel-card > p {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     color: #6b7280;
     margin: 0 0 16px 0;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
-/* Social Connect Buttons */
 .btn-connect {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    padding: 10px 20px;
+    padding: 8px 14px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: opacity 0.15s;
+}
+
+.btn-connect:hover {
+    opacity: 0.9;
 }
 
 .btn-connect.facebook {
@@ -298,71 +289,57 @@
     color: white;
 }
 
-.btn-connect.facebook:hover {
-    background: #1565d8;
-}
-
 .btn-connect.instagram {
-    background: linear-gradient(135deg, #E4405F 0%, #C13584 100%);
+    background: linear-gradient(135deg, #E4405F, #C13584);
     color: white;
-}
-
-.btn-connect.instagram:hover {
-    opacity: 0.9;
 }
 
 .connected-info {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .connected-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
+    gap: 4px;
+    padding: 4px 8px;
     background: #dcfce7;
-    border-radius: 6px;
+    border-radius: 4px;
     color: #16a34a;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    width: fit-content;
 }
 
 .connected-badge svg {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
 }
 
-/* Card Note */
 .card-note {
     display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 14px;
-    padding: 10px 12px;
-    background: #fffbeb;
-    border-radius: 8px;
-    font-size: 0.8rem;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 0.75rem;
     color: #92400e;
-    line-height: 1.4;
 }
 
 .card-note svg {
-    flex-shrink: 0;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     color: #f59e0b;
-    margin-top: 1px;
 }
 
 /* ============================================
-   Widget Chat Configuration
+   Widget Configuration
    ============================================ */
 .widget-config-grid {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 32px;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
 }
 
 @media (max-width: 900px) {
@@ -371,91 +348,92 @@
     }
 }
 
-.widget-settings {
+.widget-settings,
+.widget-code {
+    padding: 20px;
     background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 8px;
 }
 
-.widget-settings h3 {
+.widget-settings h3,
+.widget-code h3 {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
+    gap: 6px;
+    font-size: 0.875rem;
     font-weight: 600;
     color: #111827;
-    margin: 0 0 20px 0;
+    margin: 0 0 16px 0;
 }
 
-.widget-settings h3 svg {
-    width: 18px;
-    height: 18px;
+.widget-settings h3 svg,
+.widget-code h3 svg {
+    width: 14px;
+    height: 14px;
     color: #6b7280;
 }
 
 .setting-group {
-    margin-bottom: 20px;
-}
-
-.setting-group:last-of-type {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .setting-group label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
+    color: #6b7280;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
-.color-picker-row {
+.color-picker {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
 }
 
-.color-picker-row input[type="color"] {
-    width: 44px;
-    height: 40px;
+.color-picker input[type="color"] {
+    width: 32px;
+    height: 32px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    padding: 4px;
-    background: white;
+    padding: 2px;
 }
 
-.color-picker-row input[type="text"] {
+.color-picker input[type="text"] {
     flex: 1;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-family: monospace;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-family: 'SF Mono', Monaco, monospace;
     color: #374151;
 }
 
-.color-picker-row input[type="text"]:focus {
+.color-picker input[type="text"]:focus {
     outline: none;
     border-color: #FF470F;
 }
 
 .position-selector {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .position-selector button {
     flex: 1;
-    padding: 10px 16px;
+    padding: 8px 12px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 6px;
     background: white;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     color: #6b7280;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
 }
 
 .position-selector button:hover {
@@ -468,78 +446,53 @@
     color: #FF470F;
 }
 
-/* Widget Code Section */
-.widget-code {
-    background: #fafafa;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 24px;
-}
-
-.widget-code h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #111827;
-    margin: 0 0 8px 0;
-}
-
-.widget-code h3 svg {
-    width: 18px;
-    height: 18px;
-    color: #6b7280;
-}
-
+/* Widget Code */
 .widget-code > p {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     color: #6b7280;
-    margin: 0 0 16px 0;
+    margin: 0 0 12px 0;
 }
 
 .widget-code > p code {
-    background: #f3f4f6;
+    background: #fee2e2;
     color: #dc2626;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 0.75rem;
 }
 
 .code-block {
     position: relative;
     background: #1f2937;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 20px;
+    border-radius: 6px;
+    margin-bottom: 16px;
 }
 
 .code-block pre {
     margin: 0;
-    padding: 20px;
+    padding: 16px;
     overflow-x: auto;
-    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    font-size: 0.8rem;
-    line-height: 1.6;
-    color: #e5e7eb;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: #d1d5db;
 }
 
 .btn-copy {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 8px;
+    right: 8px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    gap: 4px;
+    padding: 4px 10px;
     background: #FF470F;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     font-weight: 500;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-copy:hover {
@@ -548,18 +501,19 @@
 
 /* Widget Preview */
 .widget-preview h4 {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #374151;
-    margin: 0 0 12px 0;
+    color: #6b7280;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
 .preview-container {
     background: #f3f4f6;
-    border-radius: 10px;
-    height: 160px;
+    border-radius: 6px;
+    height: 140px;
     position: relative;
-    overflow: hidden;
     border: 1px solid #e5e7eb;
 }
 
@@ -570,47 +524,46 @@
     left: 50%;
     transform: translate(-50%, -50%);
     color: #9ca3af;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .widget-bubble-preview {
     position: absolute;
-    bottom: 16px;
-    width: 48px;
-    height: 48px;
+    bottom: 12px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .widget-bubble-preview svg {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
 }
 
 /* ============================================
-   Calendar / Agenda Section
+   Calendar / Agenda
    ============================================ */
 .calendar-options {
     display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .calendar-option {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 8px;
-    padding: 16px 24px;
+    padding: 10px 16px;
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
 }
 
 .calendar-option:hover {
@@ -623,13 +576,13 @@
 }
 
 .calendar-option img {
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
 }
 
 .calendar-option svg {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     color: #6b7280;
 }
 
@@ -638,7 +591,7 @@
 }
 
 .calendar-option span {
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: #374151;
 }
@@ -648,82 +601,80 @@
 }
 
 .calendar-config {
-    max-width: 500px;
+    max-width: 480px;
 }
 
 .google-connect-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
+    gap: 12px;
+    padding: 16px;
     background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .google-connect-card img {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
 }
 
-.google-connect-card div {
+.google-connect-card > div {
     flex: 1;
 }
 
 .google-connect-card h3 {
-    margin: 0 0 2px 0;
-    font-size: 0.95rem;
+    margin: 0;
+    font-size: 0.875rem;
     font-weight: 600;
     color: #111827;
 }
 
 .google-connect-card p {
-    margin: 0;
-    font-size: 0.85rem;
+    margin: 2px 0 0 0;
+    font-size: 0.75rem;
     color: #6b7280;
 }
 
 .btn-google {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
+    gap: 6px;
+    padding: 8px 12px;
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: #374151;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-google:hover {
-    border-color: #d1d5db;
     background: #f9fafb;
 }
 
 .url-config-card {
-    padding: 20px;
+    padding: 16px;
     background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .url-config-card label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
+    color: #6b7280;
+    margin-bottom: 6px;
 }
 
 .url-config-card input {
     width: 100%;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
     margin-bottom: 12px;
 }
 
@@ -732,52 +683,83 @@
     border-color: #FF470F;
 }
 
-/* Availability Schedule */
-.availability-schedule {
-    padding: 20px;
+/* Availability */
+.availability-card {
+    padding: 16px;
     background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    border-radius: 8px;
+}
+
+.availability-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 4px 0;
+}
+
+.availability-card > p {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin: 0 0 16px 0;
+}
+
+.availability-grid {
+    margin-bottom: 16px;
 }
 
 .day-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 0;
+    gap: 12px;
+    padding: 8px 0;
     border-bottom: 1px solid #f3f4f6;
 }
 
 .day-row:last-child {
     border-bottom: none;
-    padding-bottom: 0;
+}
+
+.day-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.day-toggle input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #FF470F;
 }
 
 .day-name {
-    width: 90px;
+    font-size: 0.8125rem;
     font-weight: 500;
-    font-size: 0.85rem;
     color: #374151;
-    text-transform: capitalize;
+    min-width: 70px;
 }
 
 .time-inputs {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex: 1;
+    gap: 6px;
+    margin-left: auto;
 }
 
 .time-inputs span {
     color: #9ca3af;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .time-inputs input[type="time"] {
-    padding: 8px 10px;
+    padding: 4px 8px;
     border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
     color: #374151;
 }
 
@@ -786,123 +768,153 @@
     border-color: #FF470F;
 }
 
-.time-inputs input:disabled {
-    background: #f9fafb;
-    color: #9ca3af;
-}
-
 /* ============================================
-   Webhooks Section
+   Webhooks
    ============================================ */
-.webhook-url-card {
+.webhook-card {
     padding: 20px;
     background: #fafafa;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    border-radius: 8px;
 }
 
-.webhook-url-display {
+.card-icon-small {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
     display: flex;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 12px;
 }
 
-.webhook-url-display input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 0.85rem;
-    color: #374151;
+.card-icon-small.blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.card-icon-small.orange {
+    background: #ffedd5;
+    color: #ea580c;
+}
+
+.card-icon-small svg {
+    width: 14px;
+    height: 14px;
+}
+
+.card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.webhook-card h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.badge-active {
+    padding: 2px 6px;
+    background: #dcfce7;
+    color: #16a34a;
+    border-radius: 4px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.webhook-card > p {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0 0 12px 0;
+}
+
+.webhook-card label {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.url-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
     background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 12px;
 }
 
-.webhook-url-display button {
-    padding: 10px 16px;
-    background: #FF470F;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.url-box code {
+    flex: 1;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.webhook-url-display button:hover {
-    background: #e63d0a;
-}
-
-.json-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 0;
-    background: none;
+.url-box button {
+    padding: 4px;
+    background: transparent;
     border: none;
     color: #6b7280;
-    font-weight: 500;
-    font-size: 0.85rem;
     cursor: pointer;
-    transition: color 0.2s;
 }
 
-.json-toggle:hover {
-    color: #FF470F;
+.url-box button:hover {
+    color: #111827;
 }
 
-.json-example {
-    margin-top: 12px;
-}
-
-.json-example h4 {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #374151;
-    margin: 0 0 10px 0;
-}
-
-.json-example pre {
-    background: #1f2937;
-    border-radius: 8px;
-    padding: 16px;
-    overflow-x: auto;
-    font-family: monospace;
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: #a3e635;
-}
-
-.outbound-webhook-form {
-    padding: 20px;
-    background: #fafafa;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-}
-
-.outbound-webhook-form label {
+.btn-secondary {
     display: block;
-    font-size: 0.85rem;
+    width: 100%;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 6px;
     font-weight: 500;
+    font-size: 0.8125rem;
     color: #374151;
-    margin-bottom: 8px;
+    cursor: pointer;
+    text-align: center;
 }
 
-.outbound-webhook-form input {
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.json-preview {
+    margin-top: 12px;
+    padding: 12px;
+    background: #1f2937;
+    border-radius: 6px;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    color: #a3e635;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.webhook-card input[type="url"] {
     width: 100%;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
     margin-bottom: 12px;
 }
 
-.outbound-webhook-form input:focus {
+.webhook-card input[type="url"]:focus {
     outline: none;
     border-color: #FF470F;
 }
@@ -913,17 +925,15 @@
 .btn-save, .btn-primary {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: 6px;
+    padding: 8px 14px;
     background: #FF470F;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-save:hover, .btn-primary:hover {
@@ -936,13 +946,13 @@
 }
 
 /* ============================================
-   Toggle Switch - Compact
+   Toggle Switch
    ============================================ */
 .switch {
     position: relative;
     display: inline-block;
-    width: 44px;
-    height: 24px;
+    width: 36px;
+    height: 20px;
 }
 
 .switch input {
@@ -956,21 +966,20 @@
     cursor: pointer;
     inset: 0;
     background: #e5e7eb;
-    border-radius: 24px;
-    transition: 0.2s;
+    border-radius: 20px;
+    transition: 0.15s;
 }
 
 .switch .slider:before {
     content: "";
     position: absolute;
-    height: 18px;
-    width: 18px;
+    height: 14px;
+    width: 14px;
     left: 3px;
     bottom: 3px;
     background: white;
     border-radius: 50%;
-    transition: 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: 0.15s;
 }
 
 .switch input:checked + .slider {
@@ -978,34 +987,16 @@
 }
 
 .switch input:checked + .slider:before {
-    transform: translateX(20px);
-}
-
-.switch input:disabled + .slider {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.toggle-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-}
-
-.toggle-row span {
-    font-weight: 500;
-    font-size: 0.875rem;
-    color: #374151;
+    transform: translateX(16px);
 }
 
 /* ============================================
-   Modal - Clean
+   Modal
    ============================================ */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1015,36 +1006,29 @@
 
 .whatsapp-modal-v2 {
     background: white;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 480px;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 420px;
     width: 100%;
     position: relative;
-    animation: modalIn 0.2s ease;
     max-height: 90vh;
     overflow-y: auto;
 }
 
-@keyframes modalIn {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
-}
-
 .modal-close {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
     border: none;
     background: #f3f4f6;
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: #6b7280;
-    transition: all 0.2s;
 }
 
 .modal-close:hover {
@@ -1052,9 +1036,9 @@
 }
 
 .whatsapp-modal-v2 h2 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
     text-align: center;
     color: #111827;
 }
@@ -1062,36 +1046,36 @@
 .whatsapp-modal-v2 > p {
     text-align: center;
     color: #6b7280;
-    margin: 0 0 24px 0;
-    font-size: 0.9rem;
+    margin: 0 0 20px 0;
+    font-size: 0.8125rem;
 }
 
 .btn-back {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 6px 0;
+    padding: 4px 0;
     background: none;
     border: none;
     color: #6b7280;
     font-weight: 500;
     cursor: pointer;
-    margin-bottom: 16px;
-    font-size: 0.875rem;
+    margin-bottom: 12px;
+    font-size: 0.8125rem;
 }
 
 .btn-back:hover {
     color: #374151;
 }
 
-/* WhatsApp Options Cards */
+/* WhatsApp Options */
 .whatsapp-option {
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 12px;
-    transition: all 0.2s;
-    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s;
+    cursor: pointer;
 }
 
 .whatsapp-option:hover {
@@ -1106,18 +1090,17 @@
 .option-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .option-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
 }
 
 .option-icon.business {
@@ -1130,37 +1113,34 @@
 }
 
 .option-info h3 {
-    margin: 0 0 2px 0;
-    font-size: 1rem;
+    margin: 0;
+    font-size: 0.875rem;
     font-weight: 600;
     color: #111827;
 }
 
 .option-info span {
     color: #6b7280;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .option-features {
     list-style: none;
     padding: 0;
-    margin: 0 0 16px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    margin: 0 0 12px 0;
 }
 
 .option-features li {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
+    gap: 6px;
+    font-size: 0.75rem;
+    padding: 2px 0;
 }
 
 .option-features li svg {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
 }
 
 .option-features li.good {
@@ -1175,38 +1155,36 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    padding: 12px 20px;
+    padding: 10px 16px;
     background: #25D366;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-option-primary:hover {
-    background: #22c55e;
+    background: #1fba59;
 }
 
 .btn-option-secondary {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    padding: 12px 20px;
+    padding: 10px 16px;
     background: white;
     color: #374151;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-option-secondary:hover {
@@ -1214,15 +1192,15 @@
     background: #f0fdf4;
 }
 
-/* QR Code Container */
+/* QR Code */
 .qr-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 240px;
+    min-height: 200px;
     background: #f9fafb;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    border-radius: 8px;
+    margin-bottom: 16px;
     border: 1px dashed #e5e7eb;
 }
 
@@ -1230,83 +1208,80 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
 }
 
 .qr-image {
-    max-width: 200px;
-    border-radius: 12px;
+    max-width: 180px;
+    border-radius: 8px;
 }
 
 .qr-error {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     color: #dc2626;
     text-align: center;
-    padding: 20px;
+    font-size: 0.8125rem;
 }
 
 .qr-error button {
-    padding: 10px 20px;
+    padding: 8px 16px;
     background: #dc2626;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
+    font-size: 0.8125rem;
     cursor: pointer;
 }
 
 .modal-instructions {
     background: #f9fafb;
-    border-radius: 10px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 12px;
 }
 
 .modal-instructions h4 {
-    margin: 0 0 12px 0;
-    font-size: 0.9rem;
+    margin: 0 0 8px 0;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: #111827;
 }
 
 .modal-instructions ol {
     margin: 0;
-    padding-left: 20px;
+    padding-left: 18px;
 }
 
 .modal-instructions li {
-    padding: 4px 0;
-    font-size: 0.85rem;
+    padding: 2px 0;
+    font-size: 0.75rem;
     color: #4b5563;
 }
 
-/* Business Form in Modal */
-.business-form {
-    padding-top: 12px;
-}
-
+/* Business Form */
 .business-form .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .business-form label {
     display: block;
     font-weight: 500;
     color: #374151;
-    margin-bottom: 6px;
-    font-size: 0.85rem;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
 }
 
 .business-form input {
     width: 100%;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
 }
 
 .business-form input:focus {
@@ -1317,35 +1292,31 @@
 .verified-badge-modal {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
+    gap: 6px;
+    padding: 8px 12px;
     background: #dcfce7;
-    border-radius: 8px;
+    border-radius: 6px;
     color: #16a34a;
     font-weight: 500;
-    font-size: 0.85rem;
-    margin-bottom: 16px;
+    font-size: 0.75rem;
+    margin-bottom: 12px;
 }
 
 .form-actions {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .btn-verify-modal {
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 18px;
+    padding: 8px 14px;
     background: #f3f4f6;
     color: #374151;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     cursor: pointer;
 }
 
@@ -1353,25 +1324,16 @@
     background: #e5e7eb;
 }
 
-.btn-verify-modal:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
 .btn-connect-modal {
     flex: 1;
-    padding: 10px 18px;
+    padding: 8px 14px;
     background: #25D366;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     cursor: pointer;
-}
-
-.btn-connect-modal:hover:not(:disabled) {
-    background: #22c55e;
 }
 
 .btn-connect-modal:disabled {
@@ -1380,16 +1342,16 @@
 }
 
 .help-link {
-    text-align: center;
-}
-
+        text-align: center;
+    }
+    
 .help-link a {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     color: #6b7280;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .help-link a:hover {
@@ -1401,28 +1363,16 @@
    ============================================ */
 @media (max-width: 768px) {
     .integrations-page-v2 {
-        padding: 20px;
+        padding: 16px;
     }
 
     .integrations-tabs {
-        flex-wrap: wrap;
         width: 100%;
+        overflow-x: auto;
     }
 
-    .tab-btn {
-        flex: 1;
-        min-width: 100px;
-        justify-content: center;
-        padding: 10px 12px;
-    }
-
-    .integrations-content {
-        padding: 20px;
-    }
-
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
+    .tab-content {
+        padding: 16px;
     }
 
     .widget-config-grid {
@@ -1430,10 +1380,6 @@
     }
 
     .calendar-options {
-        flex-direction: column;
-    }
-
-    .whatsapp-modal-v2 {
-        padding: 24px;
+        flex-wrap: wrap;
     }
 }
