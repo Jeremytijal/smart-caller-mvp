@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .contacts-page {
-    padding: 32px;
-    background: var(--bg-app, #F5F3EF);
+    padding: var(--page-padding-x);
+    background: var(--bg-app);
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -79,11 +79,11 @@
 }
 
 .contacts-table-wrapper {
-    background: #fff;
-    border: 1px solid var(--border-subtle, #e5e5e5);
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
     overflow-x: auto;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-xs);
 }
 
 .contacts-table {

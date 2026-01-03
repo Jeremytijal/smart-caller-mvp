@@ -25,8 +25,8 @@
 /* Page Container */
 .integrations-page-v2 {
     min-height: 100vh;
-    background: #f9fafb;
-    padding: 32px 40px;
+    background: var(--bg-app);
+    padding: var(--page-padding-y) var(--page-padding-x);
 }
 
 /* ============================================
@@ -95,9 +95,9 @@
    Main Content Area
    ============================================ */
 .integrations-content {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
 }
 
 .tab-content {
@@ -415,19 +415,19 @@
    Channel Cards
    ============================================ */
 .channel-card {
-    padding: 20px;
-    background: #fafafa;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    transition: border-color 0.15s;
+    padding: var(--space-5);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-fast);
 }
 
 .channel-card:hover {
-    border-color: #d1d5db;
+    border-color: var(--border-strong);
 }
 
 .channel-card.connected {
-    background: #f0fdf4;
+    background: var(--color-success-light);
     border-color: #bbf7d0;
 }
 
@@ -1528,7 +1528,7 @@
 }
 
 .help-link {
-        text-align: center;
+    text-align: center;
     }
     
 .help-link a {

@@ -5,7 +5,7 @@
 .campaigns-page {
     padding: 0;
     min-height: 100vh;
-    background: #F5F3EF;
+    background: var(--bg-app);
 }
 
 /* Header */
@@ -80,13 +80,13 @@
 }
 
 .stat-card {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 14px;
-    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .stat-icon {
@@ -281,17 +281,16 @@
 
 /* Campaign Card */
 .campaign-card {
-    background: #FFFFFF !important;
-    border: 1px solid #e5e5e5;
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.2s;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    transition: all var(--transition-base);
 }
 
 .campaign-card:hover {
-    background: #FFFFFF !important;
-    border-color: #d1d5db;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow-sm);
 }
 
 .campaign-header {

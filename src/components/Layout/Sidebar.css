@@ -84,10 +84,10 @@
     flex-direction: column;
     padding: 24px 16px;
     z-index: 50;
-    background: #ffffff !important;
-    border-radius: 20px;
-    border: 1px solid #e5e5e5 !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Header */
@@ -116,8 +116,8 @@
 .app-title {
     font-size: 1.15rem;
     margin: 0;
-    color: #1a1a1a !important;
-    font-weight: 700;
+    color: var(--text-primary);
+    font-weight: var(--font-bold);
 }
 
 .text-orange {
@@ -137,53 +137,53 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    color: #6b7280 !important;
+    color: var(--text-secondary);
     text-decoration: none;
-    border-radius: 12px;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
     border: 1px solid transparent;
-    background: transparent !important;
-    font-size: 0.95rem;
-    font-weight: 500;
+    background: transparent;
+    font-size: var(--text-md);
+    font-weight: var(--font-medium);
     width: 100%;
     text-align: left;
     cursor: pointer;
 }
 
 .nav-item:hover {
-    color: #1a1a1a !important;
-    background: #f9fafb !important;
+    color: var(--text-primary);
+    background: var(--bg-hover);
 }
 
 .nav-item.active {
-    background: rgba(255, 71, 15, 0.08) !important;
-    color: #FF470F !important;
-    border-color: rgba(255, 71, 15, 0.15) !important;
+    background: var(--color-primary-dim);
+    color: var(--color-primary);
+    border-color: rgba(255, 71, 15, 0.15);
 }
 
 .nav-item.active svg {
-    color: #FF470F !important;
+    color: var(--color-primary);
 }
 
 /* Logout Button */
 .logout-btn {
     margin-top: auto;
-    color: #9ca3af !important;
+    color: var(--text-muted);
 }
 
 .logout-btn:hover {
-    color: #EF4444 !important;
-    background: rgba(239, 68, 68, 0.08) !important;
+    color: var(--color-danger);
+    background: var(--color-danger-light);
 }
 
 /* Account Button */
 .account-btn {
-    color: #6b7280 !important;
+    color: var(--text-secondary);
 }
 
 .account-btn:hover {
-    color: #FF470F !important;
-    background: rgba(255, 71, 15, 0.08) !important;
+    color: var(--color-primary);
+    background: var(--color-primary-dim);
 }
 
 /* Account Modal */

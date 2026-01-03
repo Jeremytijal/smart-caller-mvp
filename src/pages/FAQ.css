@@ -4,16 +4,16 @@
 
 .faq-page {
     padding: 0;
-    background: linear-gradient(180deg, #fff8f6 0%, #ffffff 200px);
+    background: linear-gradient(180deg, var(--color-primary-lighter) 0%, var(--bg-card) 200px);
     min-height: 100vh;
 }
 
 /* Header */
 .faq-header {
-    background: linear-gradient(135deg, #FF470F 0%, #FF6B35 50%, #FF8F5C 100%);
-    padding: 48px 40px;
-    border-radius: 0 0 32px 32px;
-    margin-bottom: 32px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 50%, #FF8F5C 100%);
+    padding: var(--space-12) var(--page-padding-x);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    margin-bottom: var(--space-8);
 }
 
 .faq-header-content {
@@ -105,18 +105,18 @@
 }
 
 .quick-card {
-    background: white;
-    border: 2px solid #f3f4f6;
-    border-radius: 16px;
-    padding: 24px;
+    background: var(--bg-card);
+    border: 2px solid var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-slow);
 }
 
 .quick-card:hover {
-    border-color: #FF470F;
+    border-color: var(--color-primary);
     transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(255, 71, 15, 0.15);
+    box-shadow: 0 12px 32px var(--color-primary-glow);
 }
 
 .quick-icon {
