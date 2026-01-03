@@ -358,19 +358,8 @@ const Integrations = () => {
                     ============================================================ */}
                 {activeTab === 'channels' && (
                     <div className="tab-content">
-            {/* WhatsApp Section */}
-                        <section className="integration-section">
-                            <div className="section-header">
-                                <div className="section-icon whatsapp">
-                            <MessageCircle size={24} />
-                        </div>
-                                <div>
-                                    <h2>WhatsApp</h2>
-                                    <p>Connectez votre WhatsApp pour contacter vos prospects</p>
-                                </div>
-                            </div>
-                            
-                            <div className="whatsapp-status-card">
+                        {/* WhatsApp */}
+                        <div className="whatsapp-status-card">
                                 {whatsappStatus.connected || whatsappBusinessEnabled ? (
                                     <div className="status-connected">
                                         <div className="status-info">
@@ -409,21 +398,9 @@ const Integrations = () => {
                                     </div>
                             )}
                         </div>
-                        </section>
 
-                        {/* Facebook & Instagram Section */}
-                        <section className="integration-section">
-                            <div className="section-header">
-                                <div className="section-icon meta">
-                                    <Facebook size={24} />
-                        </div>
-                                <div>
-                                    <h2>Facebook & Instagram</h2>
-                                    <p>Connectez vos pages pour répondre aux DM automatiquement</p>
-                                </div>
-                            </div>
-                            
-                            <div className="cards-grid two">
+                        {/* Facebook & Instagram */}
+                        <div className="cards-grid two">
                                 {/* Facebook Messenger */}
                                 <div className={`channel-card ${facebookConnected ? 'connected' : ''}`}>
                                     <div className="card-icon">💙</div>
@@ -437,7 +414,7 @@ const Integrations = () => {
                                                 <span>Connecté: {facebookPageName}</span>
                                 </div>
                                             <button className="btn-disconnect">Déconnecter</button>
-                                        </div>
+                            </div>
                                     ) : (
                                         <button className="btn-connect facebook" onClick={handleFacebookConnect}>
                                             <Facebook size={18} /> Connecter avec Facebook
@@ -470,8 +447,7 @@ const Integrations = () => {
                                     </p>
                                 </div>
                             </div>
-                        </section>
-                    </div>
+                                    </div>
                 )}
 
                 {/* ============================================================
@@ -479,18 +455,7 @@ const Integrations = () => {
                     ============================================================ */}
                 {activeTab === 'widget' && (
                     <div className="tab-content">
-                        <section className="integration-section">
-                            <div className="section-header">
-                                <div className="section-icon widget">
-                                    <Globe size={24} />
-                                    </div>
-                                <div>
-                                    <h2>Widget Chat</h2>
-                                    <p>Intégrez votre agent IA sur n'importe quel site web</p>
-                                </div>
-                            </div>
-
-                            <div className="widget-config-grid">
+                        <div className="widget-config-grid">
                                 <div className="widget-settings">
                                     <h3><Settings size={18} /> Configuration</h3>
                                     
@@ -559,13 +524,12 @@ const Integrations = () => {
                                                 }}
                                             >
                                                 <MessageCircle size={24} />
+                                            </div>
+                                        </div>
                         </div>
                     </div>
                 </div>
             </div>
-                            </div>
-                        </section>
-                    </div>
                 )}
 
                 {/* ============================================================
@@ -573,18 +537,7 @@ const Integrations = () => {
                     ============================================================ */}
                 {activeTab === 'calendar' && (
                     <div className="tab-content">
-                        <section className="integration-section">
-                            <div className="section-header">
-                                <div className="section-icon calendar">
-                                    <Calendar size={24} />
-                                </div>
-                                <div>
-                                    <h2>Agenda & Disponibilités</h2>
-                                    <p>Permettez à l'IA de proposer des créneaux et planifier des RDV</p>
-                                </div>
-                            </div>
-
-                            <div className="calendar-options">
+                        <div className="calendar-options">
                                 <button 
                                     className={`calendar-option ${calendarType === 'google' ? 'active' : ''}`}
                                     onClick={() => setCalendarType('google')}
@@ -701,10 +654,9 @@ const Integrations = () => {
                                         <button className="btn-primary" onClick={saveAvailability} disabled={saving === 'availability'}>
                                             <Save size={16} /> {saving === 'availability' ? 'Sauvegarde...' : 'Sauvegarder les disponibilités'}
                                         </button>
+                                    </div>
                         </div>
-                    </div>
                             )}
-                        </section>
                 </div>
             )}
 
@@ -713,22 +665,11 @@ const Integrations = () => {
                     ============================================================ */}
                 {activeTab === 'webhooks' && (
                     <div className="tab-content">
-                        <section className="integration-section">
-                            <div className="section-header">
-                                <div className="section-icon webhooks">
-                        <Link2 size={24} />
-                                </div>
-                                <div>
-                                    <h2>Webhooks & Automatisations</h2>
-                                    <p>Connectez vos outils externes via webhooks</p>
-                                </div>
-                            </div>
-                            
-                            <div className="cards-grid two">
+                        <div className="cards-grid two">
                                 {/* Webhook Entrant */}
                                 <div className="webhook-card">
                                     <div className="card-icon-small blue">
-                                        <Link2 size={20} />
+                <Link2 size={20} />
                     </div>
                     <h3>Webhook Entrant</h3>
                                     <p>Recevez des leads depuis Zapier, votre site web, ou tout autre outil</p>
@@ -778,10 +719,9 @@ const Integrations = () => {
 
                                     <button className="btn-primary" onClick={saveCrmWebhook} disabled={saving === 'crm'}>
                                         <Save size={16} /> {saving === 'crm' ? 'Sauvegarde...' : 'Sauvegarder'}
-                        </button>
-                    </div>
-                        </div>
-                        </section>
+                                    </button>
+                                </div>
+                            </div>
                     </div>
                 )}
                 </div>
