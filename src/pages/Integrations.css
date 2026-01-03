@@ -1135,3 +1135,377 @@
     font-size: 0.9rem;
     color: #374151;
 }
+
+/* ============================================
+   WhatsApp Status Card
+   ============================================ */
+.whatsapp-status-card {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 16px;
+}
+
+.status-connected,
+.status-disconnected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.status-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.status-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+}
+
+.status-icon.connected {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: white;
+}
+
+.status-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.status-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.btn-connect-wa {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-connect-wa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+}
+
+.btn-disconnect {
+    padding: 10px 20px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-disconnect:hover {
+    background: #fecaca;
+}
+
+/* ============================================
+   WhatsApp Modal V2 (DM Champ Style)
+   ============================================ */
+.whatsapp-modal-v2 {
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 560px;
+    width: 95%;
+    position: relative;
+    animation: modalIn 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.whatsapp-modal-v2 h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    text-align: center;
+    color: #111827;
+}
+
+.whatsapp-modal-v2 > p {
+    text-align: center;
+    color: #6b7280;
+    margin: 0 0 28px 0;
+    font-size: 1rem;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.btn-back:hover {
+    color: #374151;
+}
+
+/* WhatsApp Options */
+.whatsapp-option {
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+}
+
+.whatsapp-option:hover {
+    border-color: #d1d5db;
+}
+
+.whatsapp-option.business {
+    background: linear-gradient(135deg, rgba(37, 211, 102, 0.03) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.option-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.option-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.option-icon.business {
+    background: #25D366;
+}
+
+.option-icon.web {
+    background: #f0fdf4;
+    border: 2px solid #bbf7d0;
+}
+
+.option-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.option-info span {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.option-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.option-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+.option-features li.good {
+    color: #059669;
+}
+
+.option-features li.warning {
+    color: #d97706;
+}
+
+.btn-option-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-option-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+}
+
+.btn-option-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 24px;
+    background: white;
+    color: #374151;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-option-secondary:hover {
+    border-color: #25D366;
+    background: #f0fdf4;
+}
+
+/* Business API Form */
+.business-form {
+    padding-top: 16px;
+}
+
+.business-form .form-group {
+    margin-bottom: 16px;
+}
+
+.business-form label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.business-form input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.business-form input:focus {
+    outline: none;
+    border-color: #25D366;
+}
+
+.verified-badge-modal {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+    border-radius: 10px;
+    color: #059669;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.btn-verify-modal {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-verify-modal:hover {
+    background: #e5e7eb;
+}
+
+.btn-verify-modal:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-connect-modal {
+    flex: 1;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-connect-modal:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+}
+
+.btn-connect-modal:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.help-link {
+        text-align: center;
+    }
+    
+.help-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.help-link a:hover {
+    color: #25D366;
+}

@@ -39,8 +39,9 @@ const Integrations = () => {
     const [whatsappQR, setWhatsappQR] = useState(null);
     const [whatsappConnecting, setWhatsappConnecting] = useState(false);
     const [whatsappError, setWhatsappError] = useState(null);
+    const [whatsappMode, setWhatsappMode] = useState(null); // 'web' or 'business'
     
-    // WhatsApp Business API states (Twilio)
+    // WhatsApp Business API states
     const [whatsappBusinessNumber, setWhatsappBusinessNumber] = useState('');
     const [whatsappBusinessEnabled, setWhatsappBusinessEnabled] = useState(false);
     
@@ -368,111 +369,46 @@ const Integrations = () => {
                                     <p>Connectez votre WhatsApp pour contacter vos prospects</p>
                                 </div>
                             </div>
-
-                            <div className="cards-grid three">
-                                {/* WhatsApp Web */}
-                                <div className={`channel-card ${whatsappStatus.connected ? 'connected' : ''}`}>
-                                    <div className="card-badge starter">Starter</div>
-                                    <div className="card-icon">📱</div>
-                                    <h3>WhatsApp Web</h3>
-                                    <p>Connexion rapide via QR code</p>
-                                    
-                                    <ul className="features-list">
-                                        <li className="good"><CheckCircle size={14} /> Connexion en quelques secondes</li>
-                                        <li className="good"><CheckCircle size={14} /> Utilisez votre WhatsApp existant</li>
-                                        <li className="good"><CheckCircle size={14} /> Gratuit</li>
-                                        <li className="warning"><AlertTriangle size={14} /> Max 25 contacts/jour</li>
-                                    </ul>
                             
-                            {whatsappStatus.connected ? (
-                                        <div className="connected-info">
-                                            <div className="connected-badge">
-                                                <CheckCircle size={16} />
-                                                <span>Connecté: {whatsappStatus.pushname}</span>
+                            <div className="whatsapp-status-card">
+                                {whatsappStatus.connected || whatsappBusinessEnabled ? (
+                                    <div className="status-connected">
+                                        <div className="status-info">
+                                            <div className="status-icon connected">
+                                                <CheckCircle size={24} />
                                         </div>
-                                            <button className="btn-disconnect" onClick={disconnectWhatsApp}>
+                                            <div>
+                                                <h3>WhatsApp Connecté</h3>
+                                                <p>
+                                                    {whatsappStatus.connected 
+                                                        ? `${whatsappStatus.pushname || 'WhatsApp Web'} • +${whatsappStatus.phoneNumber}`
+                                                        : `Business API • ${whatsappBusinessNumber}`
+                                                    }
+                                                </p>
+                                        </div>
+                                    </div>
+                                        <button className="btn-disconnect" onClick={whatsappStatus.connected ? disconnectWhatsApp : () => setWhatsappBusinessEnabled(false)}>
                                         Déconnecter
                                     </button>
                                 </div>
                             ) : (
-                                        <button className="btn-connect whatsapp" onClick={() => { setShowWhatsAppModal(true); startWhatsAppConnection(); }}>
-                                            ⏻ Connecter via QR Code
+                                    <div className="status-disconnected">
+                                        <div className="status-info">
+                                            <div className="status-icon">
+                                                <MessageCircle size={24} />
+                                            </div>
+                                            <div>
+                                                <h3>Connecter WhatsApp</h3>
+                                                <p>Choisissez comment connecter votre numéro WhatsApp</p>
+                                            </div>
+                                        </div>
+                                        <button className="btn-connect-wa" onClick={() => setShowWhatsAppModal(true)}>
+                                            <MessageCircle size={18} />
+                                            Connecter WhatsApp
                                     </button>
+                                    </div>
                             )}
                         </div>
-
-                                {/* WhatsApp Business */}
-                                <div className={`channel-card ${whatsappBusinessEnabled ? 'connected' : ''}`}>
-                                    <div className="card-badge pro">Pro</div>
-                                    <div className="card-icon">🏢</div>
-                                    <h3>WhatsApp Business API</h3>
-                                    <p>Volume illimité via Twilio</p>
-                                    
-                                    <ul className="features-list">
-                                        <li className="good"><CheckCircle size={14} /> Messages illimités</li>
-                                        <li className="good"><CheckCircle size={14} /> Vérification Meta officielle</li>
-                                        <li className="good"><CheckCircle size={14} /> 100% fiable, pas de ban</li>
-                                        <li className="warning"><AlertTriangle size={14} /> Nécessite compte Twilio</li>
-                            </ul>
-                            
-                                    <div className="config-form">
-                                <input
-                                    type="tel"
-                                    placeholder="+33612345678"
-                                    value={whatsappBusinessNumber}
-                                    onChange={(e) => setWhatsappBusinessNumber(e.target.value)}
-                                        />
-                                        <div className="toggle-row">
-                                            <span>Activer</span>
-                                            <label className="switch">
-                                                <input type="checkbox" checked={whatsappBusinessEnabled} onChange={(e) => setWhatsappBusinessEnabled(e.target.checked)} />
-                                                <span className="slider"></span>
-                                    </label>
-                                        </div>
-                                        <button className="btn-save" onClick={saveWhatsAppBusiness} disabled={saving === 'whatsapp-business'}>
-                                            <Save size={16} /> {saving === 'whatsapp-business' ? 'Sauvegarde...' : 'Sauvegarder'}
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                {/* Meta Cloud API */}
-                                <div className={`channel-card ${metaEnabled && metaVerified ? 'connected' : ''}`}>
-                                    <div className="card-badge enterprise">Enterprise</div>
-                                    <div className="card-icon">🌐</div>
-                                    <h3>Meta Cloud API</h3>
-                                    <p>Connexion directe à Meta</p>
-                                    
-                                    <ul className="features-list">
-                                        <li className="good"><CheckCircle size={14} /> Messages illimités</li>
-                                        <li className="good"><CheckCircle size={14} /> ~0.04€/message</li>
-                                        <li className="good"><CheckCircle size={14} /> API officielle Meta</li>
-                                        <li className="warning"><AlertTriangle size={14} /> Vérification Business requise</li>
-                                    </ul>
-
-                                    <div className="config-form">
-                                        <input type="text" placeholder="Phone Number ID" value={metaPhoneNumberId} onChange={(e) => setMetaPhoneNumberId(e.target.value)} />
-                                        <input type="password" placeholder="Access Token" value={metaAccessToken} onChange={(e) => setMetaAccessToken(e.target.value)} />
-                                        <button className="btn-verify" onClick={verifyMetaCredentials} disabled={metaVerifying}>
-                                            {metaVerifying ? 'Vérification...' : 'Vérifier'}
-                                        </button>
-                                        {metaVerified && (
-                                            <div className="verified-badge">
-                                                <CheckCircle size={14} /> {metaVerified.verifiedName}
-                                            </div>
-                                        )}
-                                        <div className="toggle-row">
-                                            <span>Activer</span>
-                                            <label className="switch">
-                                                <input type="checkbox" checked={metaEnabled} onChange={(e) => setMetaEnabled(e.target.checked)} disabled={!metaVerified} />
-                                                <span className="slider"></span>
-                                            </label>
-                                        </div>
-                                        <button className="btn-save" onClick={saveMetaConfig} disabled={saving === 'meta' || !metaVerified}>
-                                            <Save size={16} /> Sauvegarder
-                                </button>
-                                    </div>
-                                </div>
-                            </div>
                         </section>
 
                         {/* Facebook & Instagram Section */}
@@ -499,16 +435,16 @@ const Integrations = () => {
                                             <div className="connected-badge">
                                                 <CheckCircle size={16} />
                                                 <span>Connecté: {facebookPageName}</span>
-                                            </div>
+                                </div>
                                             <button className="btn-disconnect">Déconnecter</button>
                                         </div>
                                     ) : (
                                         <button className="btn-connect facebook" onClick={handleFacebookConnect}>
                                             <Facebook size={18} /> Connecter avec Facebook
-                                        </button>
+                                </button>
                                     )}
-                                </div>
-
+                            </div>
+                            
                                 {/* Instagram DM */}
                                 <div className={`channel-card ${instagramConnected ? 'connected' : ''}`}>
                                     <div className="card-icon">📸</div>
@@ -520,9 +456,9 @@ const Integrations = () => {
                                             <div className="connected-badge">
                                         <CheckCircle size={16} />
                                                 <span>Connecté: @{instagramUsername}</span>
-                                            </div>
+                        </div>
                                             <button className="btn-disconnect">Déconnecter</button>
-                                        </div>
+                        </div>
                                     ) : (
                                         <button className="btn-connect instagram" onClick={handleFacebookConnect}>
                                             <Instagram size={18} /> Connecter Instagram
@@ -577,12 +513,12 @@ const Integrations = () => {
                                     <div className="setting-group">
                                         <label>Position</label>
                                         <div className="position-selector">
-                                            <button 
+                                <button 
                                                 className={widgetPosition === 'left' ? 'active' : ''}
                                                 onClick={() => setWidgetPosition('left')}
-                                            >
+                                >
                                                 ← Gauche
-                                            </button>
+                                </button>
                                             <button 
                                                 className={widgetPosition === 'right' ? 'active' : ''}
                                                 onClick={() => setWidgetPosition('right')}
@@ -596,22 +532,22 @@ const Integrations = () => {
                                         <Save size={16} /> {saving === 'widget' ? 'Sauvegarde...' : 'Sauvegarder'}
                                     </button>
                                 </div>
-
+                                
                                 <div className="widget-code">
                                     <h3><Code size={18} /> Code à intégrer</h3>
                                     <p>Copiez ce code et collez-le juste avant la balise <code>&lt;/body&gt;</code> de votre site</p>
                                     
                                     <div className="code-block">
                                         <pre>{getWidgetCode()}</pre>
-                                        <button 
+                                <button 
                                             className="btn-copy"
                                             onClick={() => copyToClipboard(getWidgetCode(), 'widget')}
-                                        >
+                                >
                                             {copied === 'widget' ? <Check size={16} /> : <Copy size={16} />}
                                             {copied === 'widget' ? 'Copié !' : 'Copier'}
-                                        </button>
-                                    </div>
-
+                                </button>
+                            </div>
+                            
                                     <div className="widget-preview">
                                         <h4>Aperçu</h4>
                                         <div className="preview-container">
@@ -623,10 +559,10 @@ const Integrations = () => {
                                                 }}
                                             >
                                                 <MessageCircle size={24} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
                             </div>
                         </section>
                     </div>
@@ -655,7 +591,7 @@ const Integrations = () => {
                                 >
                                     <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Google Calendar" />
                                     <span>Google Calendar</span>
-                                </button>
+                        </button>
                                 <button 
                                     className={`calendar-option ${calendarType === 'url' ? 'active' : ''}`}
                                     onClick={() => setCalendarType('url')}
@@ -693,7 +629,7 @@ const Integrations = () => {
                                     </div>
                                 </div>
                             )}
-
+                            
                             {/* Calendly / Cal.com URL */}
                             {calendarType === 'url' && (
                                 <div className="calendar-config">
@@ -756,21 +692,21 @@ const Integrations = () => {
                                                                     setAvailability(newAvail);
                                                                 }}
                                                             />
-                                                        </div>
-                                                    )}
-                                                </div>
+                                </div>
+                            )}
+                        </div>
                                             ))}
-                                        </div>
+                        </div>
 
                                         <button className="btn-primary" onClick={saveAvailability} disabled={saving === 'availability'}>
                                             <Save size={16} /> {saving === 'availability' ? 'Sauvegarde...' : 'Sauvegarder les disponibilités'}
                                         </button>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
                             )}
                         </section>
-                    </div>
-                )}
+                </div>
+            )}
 
                 {/* ============================================================
                     TAB: WEBHOOKS
@@ -780,7 +716,7 @@ const Integrations = () => {
                         <section className="integration-section">
                             <div className="section-header">
                                 <div className="section-icon webhooks">
-                                    <Link2 size={24} />
+                        <Link2 size={24} />
                                 </div>
                                 <div>
                                     <h2>Webhooks & Automatisations</h2>
@@ -793,102 +729,232 @@ const Integrations = () => {
                                 <div className="webhook-card">
                                     <div className="card-icon-small blue">
                                         <Link2 size={20} />
-                                    </div>
-                                    <h3>Webhook Entrant</h3>
+                    </div>
+                    <h3>Webhook Entrant</h3>
                                     <p>Recevez des leads depuis Zapier, votre site web, ou tout autre outil</p>
 
-                                    <label>URL DE VOTRE WEBHOOK</label>
+                        <label>URL DE VOTRE WEBHOOK</label>
                                     <div className="url-box">
                                         <code>{`${WEBHOOK_BASE_URL}/${user?.id?.slice(0, 8)}••••/leads`}</code>
                                         <button onClick={() => copyToClipboard(inboundWebhookUrl, 'webhook')}>
                                             {copied === 'webhook' ? <Check size={16} /> : <Copy size={16} />}
-                                        </button>
-                                    </div>
+                            </button>
+                        </div>
 
                                     <button className="btn-secondary" onClick={() => setShowJson(!showJson)}>
-                                        {showJson ? 'Masquer le format JSON' : 'Voir le format JSON attendu'}
-                                    </button>
+                            {showJson ? 'Masquer le format JSON' : 'Voir le format JSON attendu'}
+                        </button>
 
-                                    {showJson && (
-                                        <pre className="json-preview">
+                        {showJson && (
+                            <pre className="json-preview">
 {`{
   "name": "Jean Dupont",
   "phone": "+33612345678",
   "email": "jean@example.com",
   "company_name": "Tech Corp"
 }`}
-                                        </pre>
-                                    )}
-                                </div>
+                            </pre>
+                        )}
+                </div>
 
                                 {/* CRM Webhook */}
                                 <div className="webhook-card">
                                     <div className="card-icon-small orange">
                                         <Webhook size={20} />
-                                    </div>
+                    </div>
                                     <div className="card-header-row">
-                                        <h3>CRM Webhook</h3>
+                        <h3>CRM Webhook</h3>
                                         {crmWebhookUrl && <span className="badge-active">Actif</span>}
-                                    </div>
+                    </div>
                                     <p>Envoyez automatiquement les leads qualifiés vers votre CRM</p>
 
-                                    <label>URL DU WEBHOOK (SORTANT)</label>
-                                    <input
-                                        type="url"
-                                        placeholder="https://hooks.zapier.com/..."
-                                        value={crmWebhookUrl}
-                                        onChange={(e) => setCrmWebhookUrl(e.target.value)}
+                        <label>URL DU WEBHOOK (SORTANT)</label>
+                        <input
+                            type="url"
+                            placeholder="https://hooks.zapier.com/..."
+                            value={crmWebhookUrl}
+                            onChange={(e) => setCrmWebhookUrl(e.target.value)}
                                     />
 
                                     <button className="btn-primary" onClick={saveCrmWebhook} disabled={saving === 'crm'}>
                                         <Save size={16} /> {saving === 'crm' ? 'Sauvegarde...' : 'Sauvegarder'}
-                                    </button>
-                                </div>
+                        </button>
+                    </div>
                         </div>
                         </section>
                     </div>
                 )}
-            </div>
+                </div>
 
-            {/* WhatsApp QR Modal */}
+            {/* WhatsApp Connection Modal */}
             {showWhatsAppModal && (
-                <div className="modal-overlay" onClick={() => setShowWhatsAppModal(false)}>
-                    <div className="whatsapp-modal" onClick={e => e.stopPropagation()}>
-                        <button className="modal-close" onClick={() => setShowWhatsAppModal(false)}>
+                <div className="modal-overlay" onClick={() => { setShowWhatsAppModal(false); setWhatsappMode(null); }}>
+                    <div className="whatsapp-modal-v2" onClick={e => e.stopPropagation()}>
+                        <button className="modal-close" onClick={() => { setShowWhatsAppModal(false); setWhatsappMode(null); }}>
                             <X size={20} />
                         </button>
                         
-                        <h2>Connecter WhatsApp</h2>
-                        <p>Scannez le QR code avec votre téléphone</p>
+                        {!whatsappMode ? (
+                            <>
+                                <h2>Connect Your WhatsApp Number</h2>
+                                <p>Choose how you want to connect your WhatsApp number</p>
 
-                        <div className="qr-container">
-                            {whatsappConnecting && !whatsappQR && (
-                                <div className="qr-loading">
-                                    <Loader2 size={40} className="spin" />
-                                    <p>Génération du QR code...</p>
+                                {/* Option 1: Business API */}
+                                <div className="whatsapp-option business">
+                                    <div className="option-header">
+                                        <div className="option-icon business">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <rect width="24" height="24" rx="6" fill="#25D366"/>
+                                                <path d="M17.6 6.4C16.4 5.2 14.6 4.4 12.6 4.4C8.4 4.4 5 7.8 5 12C5 13.4 5.4 14.8 6.2 16L5 19.6L8.8 18.4C10 19.2 11.2 19.6 12.6 19.6C16.8 19.6 20.2 16.2 20.2 12C20 10 19.2 8 17.6 6.4Z" fill="white"/>
+                                                <path d="M12.6 18.4C11.4 18.4 10.2 18 9.2 17.4L9 17.2L6.6 18L7.4 15.6L7.2 15.4C6.4 14.4 6 13.2 6 12C6 8.4 9 5.4 12.6 5.4C14.4 5.4 16 6 17.2 7.2C18.4 8.4 19 10 19 12C19 15.6 16.2 18.4 12.6 18.4Z" fill="#25D366"/>
+                                                <path d="M15.6 13.6C15.4 13.4 14.6 13 14.4 13C14.2 12.8 14 12.8 13.8 13.2C13.6 13.4 13.2 13.8 13 14C12.8 14.2 12.6 14.2 12.4 14.2C12.2 14 11.4 13.6 10.6 12.8C10 12.2 9.4 11.4 9.4 11.2C9.2 11 9.4 10.8 9.4 10.6C9.6 10.4 9.6 10.2 9.8 10C9.8 9.8 9.8 9.6 9.6 9.4C9.6 9.2 9.2 8.4 9 8C8.8 7.6 8.6 7.6 8.4 7.6H8C7.8 7.6 7.4 7.8 7.2 8C7 8.2 6.4 8.8 6.4 10C6.4 11.2 7.2 12.4 7.4 12.6C7.4 12.8 9.2 15.6 12 16.6C12.6 16.8 13 17 13.4 17C13.8 17.2 14.4 17 14.8 17C15.2 17 15.8 16.6 16 16.2C16.2 15.8 16.2 15.4 16 15.2C15.8 14 15.8 13.6 15.6 13.6Z" fill="white"/>
+                                            </svg>
+                    </div>
+                                        <div className="option-info">
+                                            <h3>WhatsApp Business API</h3>
+                                            <span>Unlimited scale for businesses</span>
+                                        </div>
+                                    </div>
+                                    <ul className="option-features">
+                                        <li className="good"><CheckCircle size={16} /> Send unlimited messages</li>
+                                        <li className="good"><CheckCircle size={16} /> Official Meta verification</li>
+                                        <li className="good"><CheckCircle size={16} /> 100% uptime reliability</li>
+                                        <li className="warning"><AlertTriangle size={16} /> Requires business verification</li>
+                                    </ul>
+                                    <button className="btn-option-primary" onClick={() => setWhatsappMode('business')}>
+                                        <span>→</span> Continue with Business API
+                                    </button>
                                 </div>
-                            )}
-                            
-                            {whatsappQR && <img src={whatsappQR} alt="QR Code" className="qr-image" />}
 
-                            {whatsappError && (
-                                <div className="qr-error">
-                                    <AlertTriangle size={40} />
-                                    <p>{whatsappError}</p>
-                                    <button onClick={startWhatsAppConnection}>Réessayer</button>
+                                {/* Option 2: WhatsApp Web */}
+                                <div className="whatsapp-option web">
+                                    <div className="option-header">
+                                        <div className="option-icon web">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                <rect width="24" height="24" rx="6" fill="#F0FDF4"/>
+                                                <path d="M12 4C7.58 4 4 7.58 4 12C4 13.85 4.63 15.55 5.69 16.91L4.53 19.91C4.43 20.16 4.49 20.44 4.68 20.63C4.87 20.82 5.15 20.88 5.4 20.78L8.4 19.62C9.76 20.68 11.46 21.31 13.31 21.31C17.73 21.31 21.31 17.73 21.31 13.31C21.31 8.89 17.73 5.31 13.31 5.31" stroke="#25D366" strokeWidth="1.5" strokeLinecap="round"/>
+                                                <rect x="8" y="10" width="8" height="5" rx="1" stroke="#25D366" strokeWidth="1.5"/>
+                                                <circle cx="10" cy="12.5" r="0.5" fill="#25D366"/>
+                                                <circle cx="12" cy="12.5" r="0.5" fill="#25D366"/>
+                                                <circle cx="14" cy="12.5" r="0.5" fill="#25D366"/>
+                                            </svg>
+                                        </div>
+                                        <div className="option-info">
+                                            <h3>WhatsApp Web</h3>
+                                            <span>Get started quickly</span>
+                                        </div>
+                                    </div>
+                                    <ul className="option-features">
+                                        <li className="good"><CheckCircle size={16} /> Connect in seconds via QR code</li>
+                                        <li className="good"><CheckCircle size={16} /> Use your existing WhatsApp</li>
+                                        <li className="good"><CheckCircle size={16} /> Up to 25 new contacts/day safely</li>
+                                        <li className="warning"><AlertTriangle size={16} /> Daily limits apply for safety</li>
+                                        <li className="warning"><AlertTriangle size={16} /> Best for &lt;500 contacts/month</li>
+                                    </ul>
+                                    <button className="btn-option-secondary" onClick={() => { setWhatsappMode('web'); startWhatsAppConnection(); }}>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                            <rect x="2" y="3" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="2"/>
+                                            <rect x="14" y="3" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="2"/>
+                                            <rect x="2" y="13" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="2"/>
+                                            <rect x="14" y="13" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="2"/>
+                                        </svg>
+                                        Connect via QR Code
+                                    </button>
                                 </div>
-                            )}
-                        </div>
+                            </>
+                        ) : whatsappMode === 'web' ? (
+                            <>
+                                <button className="btn-back" onClick={() => setWhatsappMode(null)}>
+                                    ← Back
+                                </button>
+                                <h2>Scan QR Code</h2>
+                                <p>Scan the QR code with your phone to connect</p>
 
-                        <div className="modal-instructions">
-                            <h4>Comment scanner ?</h4>
-                            <ol>
-                                <li>Ouvrez WhatsApp sur votre téléphone</li>
-                                <li>Allez dans <strong>Paramètres → Appareils liés</strong></li>
-                                <li>Appuyez sur <strong>Lier un appareil</strong></li>
-                                <li>Scannez le QR code ci-dessus</li>
-                            </ol>
-                        </div>
+                                <div className="qr-container">
+                                    {whatsappConnecting && !whatsappQR && (
+                                        <div className="qr-loading">
+                                            <Loader2 size={40} className="spin" />
+                                            <p>Generating QR code...</p>
+                                        </div>
+                                    )}
+                                    
+                                    {whatsappQR && <img src={whatsappQR} alt="QR Code" className="qr-image" />}
+
+                                    {whatsappError && (
+                                        <div className="qr-error">
+                                            <AlertTriangle size={40} />
+                                            <p>{whatsappError}</p>
+                                            <button onClick={startWhatsAppConnection}>Retry</button>
+                    </div>
+                                    )}
+                                </div>
+
+                                <div className="modal-instructions">
+                                    <h4>How to scan?</h4>
+                                    <ol>
+                                        <li>Open WhatsApp on your phone</li>
+                                        <li>Go to <strong>Settings → Linked Devices</strong></li>
+                                        <li>Tap <strong>Link a Device</strong></li>
+                                        <li>Scan the QR code above</li>
+                                    </ol>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <button className="btn-back" onClick={() => setWhatsappMode(null)}>
+                                    ← Back
+                                </button>
+                                <h2>WhatsApp Business API</h2>
+                                <p>Configure your Business API credentials</p>
+
+                                <div className="business-form">
+                                    <div className="form-group">
+                                        <label>Phone Number ID</label>
+                        <input
+                                            type="text"
+                                            placeholder="Enter your Phone Number ID"
+                                            value={metaPhoneNumberId}
+                                            onChange={(e) => setMetaPhoneNumberId(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Access Token</label>
+                                        <input
+                                            type="password"
+                                            placeholder="Enter your Access Token"
+                                            value={metaAccessToken}
+                                            onChange={(e) => setMetaAccessToken(e.target.value)}
+                                        />
+                                    </div>
+                                    
+                                    {metaVerified && (
+                                        <div className="verified-badge-modal">
+                                            <CheckCircle size={16} />
+                                            <span>Verified: {metaVerified.verifiedName}</span>
+                                        </div>
+                                    )}
+
+                                    <div className="form-actions">
+                                        <button className="btn-verify-modal" onClick={verifyMetaCredentials} disabled={metaVerifying}>
+                                            {metaVerifying ? <><Loader2 size={16} className="spin" /> Verifying...</> : 'Verify Credentials'}
+                                        </button>
+                        <button
+                                            className="btn-connect-modal" 
+                                            onClick={() => { saveMetaConfig(); setShowWhatsAppModal(false); setWhatsappMode(null); }} 
+                                            disabled={!metaVerified}
+                                        >
+                                            Connect
+                        </button>
+                    </div>
+
+                                    <div className="help-link">
+                                        <a href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started" target="_blank" rel="noopener noreferrer">
+                                            <ExternalLink size={14} /> How to get your API credentials?
+                                        </a>
+                </div>
+            </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
