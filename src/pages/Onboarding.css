@@ -161,13 +161,7 @@
     --glass: rgba(255, 255, 255, 0.02);
 }
 
-body {
-    background-color: #F5F3EF;
-    color: #1A1A1A;
-    font-family: 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+/* Body styles scoped to onboarding only via container */
 
 .onboarding-container {
     min-height: 100vh;
