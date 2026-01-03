@@ -6,7 +6,7 @@ import {
     Sparkles, AlertCircle, Info, Zap, Phone,
     Mail, MessageCircle, Eye, ArrowLeft, Building2, User,
     Users, Upload, FileText, X, Database, Filter, CheckSquare,
-    Square, Search, Copy, FlaskConical
+    Square, Search, Copy, FlaskConical, Bell
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -229,9 +229,9 @@ const CreateCampaign = () => {
                 .select('*')
                 .eq('user_id', user.id)
                 .eq('is_default', true)
-                .maybeSingle();
+                    .maybeSingle();
 
-            if (error) throw error;
+                if (error) throw error;
             
             if (agentData) {
                 // Build agentConfig from agents table
@@ -1682,12 +1682,20 @@ const CreateCampaign = () => {
                     <div className="step-content">
                         <div className="step-header">
                             <h2>Règles de routage</h2>
-                            <p>Configurez le transfert vers un humain pour les leads qualifiés</p>
+                            <p>Configurez le transfert intelligent vers un humain pour les leads qualifiés</p>
                         </div>
 
-                        <div className="form-section">
-                            <div className="routing-toggle">
-                                <label className="toggle-label">
+                        {/* Human Transfer Card */}
+                        <div className={`routing-card ${campaign.routingRules.routeToHuman ? 'active' : ''}`}>
+                            <div className="routing-card-header">
+                                <div className="routing-icon">
+                                    <UserCheck size={24} />
+                                </div>
+                                <div className="routing-info">
+                                    <h3>Transfert vers un humain</h3>
+                                    <p>Activez le routage intelligent pour les leads qualifiés</p>
+                                </div>
+                                <label className="switch">
                                     <input
                                         type="checkbox"
                                         checked={campaign.routingRules.routeToHuman}
@@ -1696,71 +1704,148 @@ const CreateCampaign = () => {
                                             routingRules: { ...campaign.routingRules, routeToHuman: e.target.checked }
                                         })}
                                     />
-                                    <span className="toggle-text">Transférer vers un humain si le lead est qualifié</span>
+                                    <span className="slider"></span>
                                 </label>
                             </div>
+
+                            {campaign.routingRules.routeToHuman && (
+                                <div className="routing-card-body">
+                                    {/* Qualification Threshold */}
+                                    <div className="threshold-section">
+                                        <div className="threshold-header">
+                                            <div className="threshold-icon">
+                                                <Target size={20} />
+                                            </div>
+                                            <div>
+                                                <h4>Seuil de qualification</h4>
+                                                <p>Score minimum pour déclencher le transfert</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="threshold-control">
+                                            <div className="threshold-bar">
+                                                <div 
+                                                    className="threshold-fill" 
+                                                    style={{ width: `${campaign.routingRules.qualificationThreshold}%` }}
+                                                />
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="100"
+                                                    value={campaign.routingRules.qualificationThreshold}
+                                                    onChange={(e) => setCampaign({
+                                                        ...campaign,
+                                                        routingRules: { ...campaign.routingRules, qualificationThreshold: parseInt(e.target.value) }
+                                                    })}
+                                                />
+                                            </div>
+                                            <div className="threshold-display">
+                                                <span className="threshold-number">{campaign.routingRules.qualificationThreshold}</span>
+                                                <span className="threshold-percent">%</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="threshold-labels">
+                                            <span className={campaign.routingRules.qualificationThreshold < 40 ? 'active' : ''}>
+                                                <span className="dot low"></span> Froid
+                                            </span>
+                                            <span className={campaign.routingRules.qualificationThreshold >= 40 && campaign.routingRules.qualificationThreshold < 70 ? 'active' : ''}>
+                                                <span className="dot medium"></span> Tiède
+                                            </span>
+                                            <span className={campaign.routingRules.qualificationThreshold >= 70 ? 'active' : ''}>
+                                                <span className="dot hot"></span> Chaud
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Notification Section */}
+                                    <div className="notification-section">
+                                        <div className={`notification-card ${campaign.routingRules.humanNotification.enabled ? 'active' : ''}`}>
+                                            <div className="notification-header">
+                                                <div className="notification-icon">
+                                                    <Bell size={20} />
+                                                </div>
+                                                <div>
+                                                    <h4>Notification par email</h4>
+                                                    <p>Recevez une alerte quand un lead est qualifié</p>
+                                                </div>
+                                                <label className="switch small">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={campaign.routingRules.humanNotification.enabled}
+                                                        onChange={(e) => setCampaign({
+                                                            ...campaign,
+                                                            routingRules: {
+                                                                ...campaign.routingRules,
+                                                                humanNotification: { ...campaign.routingRules.humanNotification, enabled: e.target.checked }
+                                                            }
+                                                        })}
+                                                    />
+                                                    <span className="slider"></span>
+                                                </label>
+                                            </div>
+
+                                            {campaign.routingRules.humanNotification.enabled && (
+                                                <div className="notification-body">
+                                                    <div className="email-input-wrapper">
+                                                        <Mail size={18} />
+                                                        <input
+                                                            type="email"
+                                                            placeholder="votre@email.com"
+                                                            value={campaign.routingRules.humanNotification.recipient}
+                                                            onChange={(e) => setCampaign({
+                                                                ...campaign,
+                                                                routingRules: {
+                                                                    ...campaign.routingRules,
+                                                                    humanNotification: { ...campaign.routingRules.humanNotification, recipient: e.target.value }
+                                                                }
+                                                            })}
+                                                        />
+                                                    </div>
+                                                    <p className="email-hint">
+                                                        <Zap size={14} /> Vous recevrez un email instantané avec les détails du lead
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {campaign.routingRules.routeToHuman && (
-                            <>
-                                <div className="form-section">
-                                    <label className="form-label">Seuil de qualification (score minimum)</label>
-                                    <div className="threshold-slider">
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="100"
-                                            value={campaign.routingRules.qualificationThreshold}
-                                            onChange={(e) => setCampaign({
-                                                ...campaign,
-                                                routingRules: { ...campaign.routingRules, qualificationThreshold: parseInt(e.target.value) }
-                                            })}
-                                        />
-                                        <span className="threshold-value">{campaign.routingRules.qualificationThreshold}%</span>
+                        {/* Preview Card */}
+                        <div className="routing-preview">
+                            <h4><Eye size={18} /> Aperçu du flux</h4>
+                            <div className="flow-steps">
+                                <div className="flow-step">
+                                    <div className="flow-icon incoming">
+                                        <MessageCircle size={20} />
                                     </div>
-                                    <p className="form-hint">Le lead sera transféré si son score de qualification atteint ce seuil</p>
+                                    <span>Lead entrant</span>
                                 </div>
-
-                                <div className="form-section">
-                                    <label className="form-label">Notification</label>
-                                    <div className="notification-toggle">
-                                        <label className="toggle-label">
-                                            <input
-                                                type="checkbox"
-                                                checked={campaign.routingRules.humanNotification.enabled}
-                                                onChange={(e) => setCampaign({
-                                                    ...campaign,
-                                                    routingRules: {
-                                                        ...campaign.routingRules,
-                                                        humanNotification: { ...campaign.routingRules.humanNotification, enabled: e.target.checked }
-                                                    }
-                                                })}
-                                            />
-                                            <span className="toggle-text">Envoyer une notification par email</span>
-                                        </label>
+                                <div className="flow-arrow">→</div>
+                                <div className="flow-step">
+                                    <div className="flow-icon ai">
+                                        <Zap size={20} />
                                     </div>
+                                    <span>Agent IA</span>
                                 </div>
-
-                                {campaign.routingRules.humanNotification.enabled && (
-                                    <div className="form-section">
-                                        <label className="form-label">Email de notification</label>
-                                        <input
-                                            type="email"
-                                            className="form-input"
-                                            placeholder="votre@email.com"
-                                            value={campaign.routingRules.humanNotification.recipient}
-                                            onChange={(e) => setCampaign({
-                                                ...campaign,
-                                                routingRules: {
-                                                    ...campaign.routingRules,
-                                                    humanNotification: { ...campaign.routingRules.humanNotification, recipient: e.target.value }
-                                                }
-                                            })}
-                                        />
+                                <div className="flow-arrow">→</div>
+                                <div className="flow-step">
+                                    <div className="flow-icon qualify">
+                                        <Target size={20} />
                                     </div>
-                                )}
-                            </>
-                        )}
+                                    <span>Score ≥ {campaign.routingRules.qualificationThreshold}%</span>
+                                </div>
+                                <div className="flow-arrow">→</div>
+                                <div className="flow-step">
+                                    <div className={`flow-icon human ${campaign.routingRules.routeToHuman ? 'active' : 'disabled'}`}>
+                                        <UserCheck size={20} />
+                                    </div>
+                                    <span>{campaign.routingRules.routeToHuman ? 'Humain' : 'IA continue'}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
